@@ -1,149 +1,141 @@
-############################################################################################
-## MAKE_HST_SPEC_PREVIEWS
-##
-## Given an HST spectrum file name, this script will read in the data and generate preview plots of the spectra.  The plots are generated in different dimensions (large, medium, small, thumbnail) and, depending on the instrument/configuration, are plotted in different formats to maximize readability and usability.
-##
-############################################################################################
+__version__ = '1.0'
 
+"""
+.. module:: make_hst_spec_previews
+   :synopsis: Given an HST spectrum file name, this script will read in the data and generate preview plots of the spectra.  The plots are generated in different dimensions (large, medium, small, thumbnail) and, depending on the instrument/configuration, are plotted in different formats to maximize readability and usability.
+.. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
+"""
 
-
-############################################################################################
-## Place import commands and logging options.
-############################################################################################
-import sys
-import os
-import logging
+import argparse
+from os import path
 import pyfits
-import specutils_cos # Local package.
-import specutils_stis # Local package.
-from optparse import OptionParser
-
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
-############################################################################################
+import sys
+"""These are local modules that are imported."""
+import specutils_cos
+import specutils_stis
 
 
-
-############################################################################################
-## This class defines a generic Exception to use for errors raised in MAKE_HST_SPEC_PREVIEWS and specific to this module.  It simply returns the given value when raising the exception, e.g., raise HSTSpecPrevError("Print this string") -> __main__.MyError: 'Print this string.'
-############################################################################################
 class HSTSpecPrevError(Exception):
+    """ This class defines a generic Exception to use for errors raised in MAKE_HST_SPEC_PREVIEWS and specific to this module.  It simply returns the given value when raising the exception, e.g., raise HSTSpecPrevError("Print this string") -> __main__.MyError: 'Print this string.'"""
     def __init__(self, value):
+        """
+        Initiate the Exception.
+        :param value: The string to print on error.
+        :type value: str
+        """
         self.value = value
     def __str__(self):
-        return repr(self.value)
-############################################################################################
+        """
+        Overrides the str function for this class.
+        """
+        return "*** MAKE_HST_SPEC_PREVIEWS ERROR: "+repr(self.value)
 
 
-
-############################################################################################
-## This function sets up command-line options and arguments through the OptionParser class.
-############################################################################################
-def setup_input_options(parser):
-    parser.add_option("-f", action="store", type="string", dest="input_file", default="", help="[Required] Full path to input file (HST spectrum) for which to generate preview plots.  Include the file name in the path.")
-    parser.add_option("-o", action="store", type="string", dest="output_path", default="", help="[Required] Full path to output file (HST spectrum) for which to generate preview plots.  Do not inclue file name in path.")
-    parser.add_option("-v", action="store_true", dest="verbose", default=False, help='[Optional] Turn on verbose messages/logging.  Default = "False".')
-    parser.add_option("-t", action="store", dest="output_type", default="png", help='[Optional] Specify where plots should be output.  Options are "png" or "screen".  Default = "png".')
-############################################################################################
-
-
-
-############################################################################################
-## This function checks input arguments satisfy some minimum requirements.
-############################################################################################
-def check_input_options(parser,opts):
-    ## Make sure the input file is specified on input (non-empty string).  Catch as an OptionsParser error in this case.
-    if not opts.input_file.strip():
-        parser.error("File name must be specified.")
-
-    ## Make sure input file exists on disk, and is readable.  Catch as an IOError in this case.
-    try:
-        with open(opts.input_file) as ifile:
-            pass
-    except IOError as input_error:
-        print "File could not be read, or does not exist: ", opts.input_file
-
-    ## Make sure the output path is specified on input (non-empty string).  Catch as an OptionsParser error in this case.
-    if not opts.output_path.strip():
-        parser.error("Output path must be specified.")
-
-    ## Make sure the output type is understood.
-    if opts.output_type != "png" and opts.output_type != "screen":
-        parser.error('Invalid choice of output type (-o option).  Valid options are "png" or "screen".')
-
-    ## Make sure the output_type string is trimmed and lowercase.
-    opts.output_type = opts.output_type.strip().lower()
-############################################################################################
+def setup_args():
+    """
+    Set up command-line arguments and options.
+    :returns: ArgumentParser -- Stores arguments and options.
+    """
+    parser = argparse.ArgumentParser(description="Create spectroscopic preview plots given an HST spectrum FITS file.")
+    parser.add_argument("-f", action="store", type=str, dest="input_file", default=None, help="[Required] Full path to input file (HST spectrum) for which to generate preview plots.  Include the file name in the path.",metavar='input file')
+    parser.add_argument("-o", action="store", type=str, dest="output_path", default="", help="[Optional] Full path to output plot files.  Do not inclue file name in path.  Default is the same directory as the input file.",metavar='output path')
+    parser.add_argument("-t", action="store", type=str, dest="output_type", default="png", help='[Optional] Specify where plots should be output.  Default = "png".', choices=['png','PNG','screen','SCREEN'], metavar='{png,screen}')
+    parser.add_argument("-v", action="store_true", dest="verbose", default=False, help='[Optional] Turn on verbose messages/logging.  Default = "False".')
+    return parser
 
 
+def check_input_options(args):
+    """
+    Check that input arguments satisfy some minimum requirements.
+    :param args: Stores arguments and options.
+    :type args: argparse.Namespace object.
+    :raises: HSTSpecPrevError
+    """
 
-############################################################################################
-## This function determines the instrument name from a FITS file primary header.
-############################################################################################
-def get_instrument_name(input_file):
-    hdulist = pyfits.open(input_file)
-    ## Make sure the INSTRUME keyword exists in the primary header, otherwise, catch as a PYFITS KeyError in this case.
-    try:
-        this_instrument = hdulist[0].header['INSTRUME']
-    except KeyError as header_error:
-        ## Make sure we close the FITS file before exiting with an Exception
-        hdulist.close()
-        print "INSTRUME keyword not found in file's primary header: ", input_file
-    ## Close the FITS file.
-    hdulist.close()
-    return this_instrument.strip().upper()
-############################################################################################
-
-
-
-############################################################################################
-## This is the main routine.
-############################################################################################
-def main():
-    ## Define input options here.
-    parser = OptionParser(usage="%prog -f <input file> -o <output path> [-v] [-t <plot type {png,screen}>]", version="%prog 1.0")
-    setup_input_options(parser)
-
-    ## Parse input options from the command line.
-    opts, args = parser.parse_args()
-
-    ## Check input arguments are valid and sensible.
-    check_input_options(parser,opts)
-
-    ## Print file name, if verbose is turned on.
-    if opts.verbose:
-        print "Input file: " + opts.input_file
-
-    ## Derive output file name from input file name.
-    if opts.output_type == "png":
-        output_file = os.path.join(opts.output_path,"") + os.path.basename(opts.input_file).split(".fits")[0] + ".png"
-
-    ## Print name of output file, if verbose is turned on and not printing to screen.
-    if opts.verbose and opts.output_type != "screen":
-        print "Output file: " + output_file
+    """Make sure the input file is specified on input (non-empty string), and remove any leading/trailing whitespace.  Catch as an ArgumentsParser error in this case.  If it does exist, check that the input file exists at the time of the command-line parameter checking."""
+    if not args.input_file:
+        try:
+            raise HSTSpecPrevError("File name must be specified.")
+        except HSTSpecPrevError as error_string:
+            print error_string
+            exit(1)
     else:
+        args.input_file = args.input_file.strip()
+        if not path.isfile(args.input_file):
+            try:
+                raise HSTSpecPrevError("Input file not found: "+args.input_file)
+            except HSTSpecPrevError as error_string:
+                print error_string
+                exit(1)
+    """Make sure the output_type string is trimmed and lowercase."""
+    args.output_type = args.output_type.strip().lower()
+
+
+def get_instrument_name(input_file):
+    """
+    Determines the instrument name from a FITS file primary header.
+    :param input_file: Name of input FITS file.
+    :type input_file: str
+    :returns: str -- The name of the instrument based on the FITS header keyword, in uppercase with leading/trailing whitespace removed.
+    :raises: KeyError
+    """
+    with pyfits.open(input_file) as hdulist:
+        """Make sure the INSTRUME keyword exists in the primary header, otherwise, catch as a PYFITS KeyError in this case."""
+        try:
+            this_instrument = hdulist[0].header['INSTRUME']
+        except KeyError as header_error:
+            print "*** MAKE_HST_SPEC_PREVIEWS ERROR: INSTRUME keyword not found in file's primary header: ", input_file
+            exit(1)
+    return this_instrument.strip().upper()
+
+
+def make_hst_spec_previews(args):
+    """
+    Main function in the module.
+    :param args:
+    :type args: argparse.Namespace object.
+    :raises: HSTSpecPrevError
+    """
+    """Print file name, if verbose is turned on."""
+    if args.verbose:
+        print "Input file: " + args.input_file
+
+    """Derive output file name from input file name."""
+    if args.output_type == "png":
+        output_file = path.join(args.output_path,"") + path.basename(args.input_file).split(".fits")[0] + ".png"
+
+    """Print name of output file, if verbose is turned on and not printing to screen."""
+    if args.verbose and args.output_type != "screen":
+        print "Output file: " + output_file
+    elif args.verbose:
         print "Output file: Plotting to screen."
 
-    ## Read in the FITS file to determine which instrument it comes from.  Print the name of the instrument found in the header if verbose is turned on.
-    this_instrument = get_instrument_name(opts.input_file)
-    if opts.verbose:
+    """Read in the FITS file to determine which instrument it comes from.  Print the name of the instrument found in the header if verbose is turned on."""
+    this_instrument = get_instrument_name(args.input_file)
+    if args.verbose:
         print "Instrument: " + this_instrument
 
-    ## Read in the FITS file to extract wavelengths, fluxes, and flux uncertainties, using the local package appropriate for the instrument used in the input file.
+    """Read in the FITS file to extract wavelengths, fluxes, and flux uncertainties, using the local package appropriate for the instrument used in the input file."""
     if this_instrument == 'COS':
-        ## Get wavelengths, fluxes, flux uncertainties.
-        spec_tuple = specutils_cos.readspec(opts.input_file, opts.verbose)
-        ## Plot spectra preview plots.
-        specutils_cos.plotspec(spec_tuple, opts.output_type, output_file)
+        """Get wavelengths, fluxes, flux uncertainties."""
+        spec_tuple = specutils_cos.readspec(args.input_file, args.verbose)
+        """Plot spectra preview plots."""
+        specutils_cos.plotspec(spec_tuple, args.output_type, output_file)
     elif this_instrument == 'STIS':
         pass
-        ## specutils_stis.readspec(opts.input_file)
+        ## specutils_stis.readspec(args.input_file)
         ## specutils_stis.plotspec()
     else:
-        raise HSTSpecPrevError('"INSTRUME" keyword not understood: ' + this_instrument)
+        try:
+            raise HSTSpecPrevError('"INSTRUME" keyword not understood: ' + this_instrument)
+        except HSTSpecPrevError as error_string:
+            print error_string
+            exit(1)
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO)
-    logger.setLevel(logging.INFO)
-    main()
-############################################################################################
+    """Create ArgumentParser object that holds arguments and options."""
+    args = setup_args().parse_args()
+    """Check arguments and options."""
+    check_input_options(args)
+    """Call main function."""
+    make_hst_spec_previews(args)
