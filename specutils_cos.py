@@ -6,12 +6,67 @@ __version__ = '1.0'
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
 """
 
-from numpy import array_equal
+import numpy
 import os
 import pyfits
 import matplotlib.pyplot as pyplot
 """These are local modules that are imported."""
 from make_hst_spec_previews import HSTSpecPrevError
+
+class COSSpectrum:
+    """
+    Defines a COS spectrum, including wavelegnth, flux, and flux errors.  A COS spectrum consists of N segments (N = {2,3}) stored as a dict object.  Each of these dicts contain a COSSegment object that contains the wavelengths, fluxes, flux errors, etc.
+    :raises: ValueError
+    """
+    def __init__(self, band=None, cos_segments=None):
+        """
+        Create a COSSpectrum object given a band choice (must be "FUV" or "NUV").
+        :param band: Which band is this spectrum for ("FUV" or "NUV")?
+        :type band: str
+        :param cos_segments: [Optional] COSSegment objects to populate the COSSpectrum with.
+        :type cos_segments: dict
+        """
+        if band.strip().upper() == "FUV":
+            self.band = band
+            if cos_segments is not None:
+                if len(cos_segments) == 2:
+                    self.segments = {'FUVA':cos_segments['FUVA'], 'FUVB':cos_segments['FUVB']}
+                else:
+                    raise ValueError("Band is specified as "+band.strip().upper()+", expected 2 COSSegment objects as a list but received "+str(len(cos_segments))+".")
+            else:
+                self.segments = {'FUVA':COSSegment(), 'FUVB':COSSegment()}
+        elif band.strip().upper() == "NUV":
+            self.band = band
+            pass
+        else:
+            raise ValueError("Must specify band=\"FUV\" or band=\"NUV\".")
+
+
+class COSSegment:
+    """
+    Defines a spectrum from a COS segment.  The data (wavelength, flux, flux errors) are stored as numpy ndarrays.  A scalar int property provides the number of elements in this segment.
+    """
+    def __init__(self, nelem=None, wavelengths=None, fluxes=None, fluxerrs=None):
+        """
+        Create a COSSegment object, default to empty values.  Allows user to preallocate space if they desire by setting "nelem" but not providing lists/arrays on input right away.
+        :param nelem: Number of elements for this segment's
+        """
+        if nelem is not None:
+            self.nelem = nelem
+        else:
+            self.nelem = 0
+        if wavelengths is not None:
+            self.wavelengths = numpy.asarray(wavelengths)
+        else:
+            self.wavelengths = numpy.zeros(self.nelem)
+        if fluxes is not None:
+            self.fluxes = numpy.asarray(fluxes)
+        else:
+            self.fluxes = numpy.zeros(self.nelem)
+        if fluxerrs is not None:
+            self.fluxerrs = numpy.asarray(fluxerrs)
+        else:
+            self.fluxerrs = numpy.zeros(self.nelem)
 
 
 def check_segments(segments_list, input_file):
@@ -30,7 +85,7 @@ def check_segments(segments_list, input_file):
     """Segment array must contain either two or three elements."""
     if list_len == 2:
         """Must be ["FUVA", "FUVB"]."""
-        if array_equal(segments_list, ["FUVA", "FUVB"]):
+        if numpy.array_equal(segments_list, ["FUVA", "FUVB"]):
             this_band = "FUV"
         else:
             try:
@@ -40,7 +95,7 @@ def check_segments(segments_list, input_file):
                 exit(1)
     elif list_len == 3:
         """Must be ["NUVA", "NUVB", "NUVC"]."""
-        if array_equal(segments_list, ["NUVA", "NUVB", "NUVC"]):
+        if numpy.array_equal(segments_list, ["NUVA", "NUVB", "NUVC"]):
             this_band = "NUV"
         else:
             try:
@@ -64,11 +119,7 @@ def readspec(input_file, verbosity=False):
     :type input_file: str
     :param verbosity: Should verbose output be displayed?  Default is False.
     :type verbosity: bool
-    :returns: tuple -- The spectroscopic data {band, wavelength table, flux table, flux uncertainty table}, where:
-    band = Scalar string, either "FUV" or "NUV".
-    wavelength table = Table of wavelengths for each segment/slice, where a given segment/slice is a row in the table.  FUV has 2 segments, NUV has 3 slices.
-    flux table = Table of fluxes for each segment/slice, where a given segment/slice is a row in the table.  FUV has 2 segments, NUV has 3 slices.
-    flux uncertainty table = Table of flux uncertainties for each segment/slice, where a given segment/slice is a row in the table.  FUV has 2 segments, NUV has 3 slices.
+    :returns: COSSpectrum -- The spectroscopic data (wavelength, flux, flux error, etc):
     :raises: KeyError
     """
     with pyfits.open(input_file) as hdulist:
@@ -76,14 +127,14 @@ def readspec(input_file, verbosity=False):
         cos_tabledata = hdulist[1].data
         """Extract the SEGMENTS.  This is either a 2-element array of ["FUVA", "FUVB"], or a 3-element array of ["NUVA", "NUVB", "NUVC"]."""
         try:
-            segment_list = cos_tabledata.field("SEGMENT")
+            segment_arr = cos_tabledata.field("SEGMENT")
         except KeyError:
             print "*** MAKE_HST_SPEC_PREVIEWS ERROR: SEGMENT column not found in first extension's binary table."
             exit(1)
-        band = check_segments(segment_list, input_file)
+        band = check_segments(segment_arr, input_file)
         """Extract the number of elements (n_wavelengths, n_fluxes, etc.) for each segment.  This will also be either a 2-element array (FUV) or 3-element array (NUV)."""
         try:
-            nelems_list = cos_tabledata.field("NELEM")
+            nelems_arr = cos_tabledata.field("NELEM")
         except KeyError:
             print "*** MAKE_HST_SPEC_PREVIEWS ERROR: NELEM column not found in first extension's binary table."
             exit(1)
@@ -103,44 +154,94 @@ def readspec(input_file, verbosity=False):
         except KeyError:
             print "*** MAKE_HST_SPEC_PREVIEWS ERROR: ERROR column not found in first extension's binary table."
             exit(1)
-        return (band, wavelength_table, flux_table, fluxerr_table)
+        """Create COSSegment objects to populate the COSSpectrum object with"""
+        fuva_index = numpy.where(segment_arr == "FUVA")[0][0]
+        fuva_cossegment = COSSegment(nelem=nelems_arr[fuva_index], wavelengths=wavelength_table[fuva_index,:], fluxes=flux_table[fuva_index,:], fluxerrs=fluxerr_table[fuva_index,:])
+        fuvb_index = numpy.where(segment_arr == "FUVB")[0][0]
+        fuvb_cossegment = COSSegment(nelem=nelems_arr[fuvb_index], wavelengths=wavelength_table[fuvb_index,:], fluxes=flux_table[fuvb_index,:], fluxerrs=fluxerr_table[fuvb_index,:])
+        """Create COSSpectrum object."""
+        return_spec = COSSpectrum(band=band, cos_segments={'FUVA':fuva_cossegment,'FUVB':fuvb_cossegment})
+#        return {band, segment_arr, nelems_arr, wavelength_table, flux_table, fluxerr_table}
+        return return_spec
 
-
-def plotspec(this_spec_tuple, output_type, output_file):
+def set_plot_xrange(wavelengths,fluxes):
     """
-    This function accepts a COS spectrum tuple from the READSPEC function and produces preview plots.
-    :param this_spec_tuple: COS spectrum as returned by READSPEC.
-    :type this_spec_tuple: tuple
+    Given a COS tuple from READSPEC, returns a list of [xmin,xmax] to define an optimal x-axis plot range.
+    :param wavelengths: The wavelengths to be plotted.
+    :type wavelengths: numpy.ndarray
+    :param fluxes: The fluxes to be plotted.
+    :type fluxes: numpy.ndarray
+    :returns: list -- Two-element list containing the optimal [xmin,xmax] values to define the x-axis plot range.
+    """
+    """Test if there are any NaN's in the wavelength array.  If so, issue a warning for now..."""
+    """ NOTE: Use of the SUM here was reported on stackoverflow to be faster than MIN...it won't matter for the sizes we're dealing with here, but I thought it was a neat trick."""
+    if numpy.isnan(numpy.sum(wavelengths)):
+        print "***WARNING in SPECUTILS_COS: Wavelength array contains NaN values.  Behavior has not been fully tested in this case."
+    """Sort the wavelength and flux arrays.  Don't do it in-place since we aren't (yet) going to sort the fluxes, errors, etc. as well."""
+    sorted_indexes = numpy.argsort(wavelengths)
+    sorted_wavelengths = wavelengths[sorted_indexes]
+    sorted_fluxes = fluxes[sorted_indexes]
+    """Find the first element in the array that is NOT 0.0, and the last element in the array that is NOT 0.0."""
+    start_index = 0
+    end_index = -1
+    while sorted_fluxes[start_index] == 0.:
+        start_index += 1
+    while sorted_fluxes[end_index] == 0.:
+        end_index -= 1
+    """Return the optimal start and end wavelength values for defining the x-axis plot range."""
+    return [wavelengths[start_index],wavelengths[end_index]]
+    
+
+def plotspec(cos_spectrum, output_type, output_file):
+    """
+    Accepts a COS spectrum tuple from the READSPEC function and produces preview plots.
+    :param cos_spectrum: COS spectrum as returned by READSPEC.
+    :type cos_spectrum: COSSpectrum
     :param output_type: What kind of output to make.
     :type output_type: str
     :param output_file: Name of output file (including full path).
     :type output_file: str
     :raises: OSError,HSTSpecPrevError
+    .. note::
+       This function assumes a screen resolution of 96 DPI in order to generate plots of the desired sizes.  This is because matplotlib works in units of inches and DPI rather than pixels.
     """
+    dpi_val = 96.
     """Make sure the output path exists, if not, create it."""
-    if not os.path.isdir(os.path.dirname(output_file)):
-        try:
-            os.mkdir(os.path.dirname(output_file))
-        except OSError as this_error:
-            if this_error.errno == 13: 
-                print "*** MAKE_HST_SPEC_PREVIEWS ERROR: Output directory could not be created, "+repr(this_error.strerror)
-                exit(1)
-            else:
-                raise
+    if output_type != 'screen':
+        if not os.path.isdir(os.path.dirname(output_file)):
+            try:
+                os.mkdir(os.path.dirname(output_file))
+            except OSError as this_error:
+                if this_error.errno == 13: 
+                    print "*** MAKE_HST_SPEC_PREVIEWS ERROR: Output directory could not be created, "+repr(this_error.strerror)
+                    exit(1)
+                else:
+                    raise
     """Extract the band from the tuple."""
-    this_band = this_spec_tuple[0]
+    this_band = cos_spectrum.band
     """Start plot figure."""
-    pyplot.figure(1)
+    pyplot.figure(figsize=(800./dpi_val,600./dpi_val),dpi=dpi_val)
     if this_band == "FUV":
         """Then there are two segments, so make a 2-panel plot.
-        First plot area (top) is for *FUVB*."""
+        First plot area (top) is for *FUVB*, since that's the bluest segment."""
         segment_1_plotarea = pyplot.subplot(2, 1, 1)
-        pyplot.plot(this_spec_tuple[1][0], this_spec_tuple[2][0], 'k')
-        """Second plot area (bottom) is for *FUVA*."""
+        """Determine optimal x-axis."""
+        x_axis_range = set_plot_xrange(cos_spectrum.segments["FUVB"].wavelengths, cos_spectrum.segments["FUVB"].fluxes)
+        """Plot the spectrum."""
+        pyplot.plot(cos_spectrum.segments["FUVB"].wavelengths, cos_spectrum.segments["FUVB"].fluxes, 'k')
+        """Update the x-axis range."""
+        pyplot.xlim(x_axis_range)
+        """Second plot area (bottom) is for *FUVA, since that's the reddest*."""
         segment_2_plotarea = pyplot.subplot(2, 1, 2)
-        pyplot.plot(this_spec_tuple[1][1], this_spec_tuple[2][1], 'k')
-        if output_type == "png":
-            pyplot.savefig(output_file, format=output_type)
+        """Determine optimal x-axis."""
+        x_axis_range = set_plot_xrange(cos_spectrum.segments["FUVA"].wavelengths, cos_spectrum.segments["FUVA"].fluxes)
+        """Plot the spectrum."""
+        pyplot.plot(cos_spectrum.segments["FUVA"].wavelengths, cos_spectrum.segments["FUVA"].fluxes, 'k')
+        """Update the x-axis range."""
+        pyplot.xlim(x_axis_range)
+        """Display or plot to the desired format."""
+        if output_type != "screen":
+            pyplot.savefig(output_file, format=output_type, dpi=dpi_val,bbox_inches='tight')
         elif output_type == "screen":
             pyplot.show()
     elif this_band == "NUV":

@@ -39,7 +39,7 @@ def setup_args():
     parser = argparse.ArgumentParser(description="Create spectroscopic preview plots given an HST spectrum FITS file.")
     parser.add_argument("-f", action="store", type=str, dest="input_file", default=None, help="[Required] Full path to input file (HST spectrum) for which to generate preview plots.  Include the file name in the path.",metavar='input file')
     parser.add_argument("-o", action="store", type=str, dest="output_path", default="", help="[Optional] Full path to output plot files.  Do not inclue file name in path.  Default is the same directory as the input file.",metavar='output path')
-    parser.add_argument("-t", action="store", type=str, dest="output_type", default="png", help='[Optional] Specify where plots should be output.  Default = "png".', choices=['png','PNG','screen','SCREEN'], metavar='{png,screen}')
+    parser.add_argument("-t", action="store", type=str, dest="output_type", default="png", help='[Optional] Specify where plots should be output.  Default = "png".', choices=['png','PNG','eps', 'EPS', 'screen','SCREEN'], metavar='{png,ps,screen}')
     parser.add_argument("-v", action="store_true", dest="verbose", default=False, help='[Optional] Turn on verbose messages/logging.  Default = "False".')
     return parser
 
@@ -101,8 +101,10 @@ def make_hst_spec_previews(args):
         print "Input file: " + args.input_file
 
     """Derive output file name from input file name."""
-    if args.output_type == "png":
-        output_file = path.join(args.output_path,"") + path.basename(args.input_file).split(".fits")[0] + ".png"
+    if args.output_type != "screen":
+        output_file = path.join(args.output_path,"") + path.basename(args.input_file).split(".fits")[0] + "." + args.output_type
+    else:
+        output_file = None
 
     """Print name of output file, if verbose is turned on and not printing to screen."""
     if args.verbose and args.output_type != "screen":
@@ -118,9 +120,9 @@ def make_hst_spec_previews(args):
     """Read in the FITS file to extract wavelengths, fluxes, and flux uncertainties, using the local package appropriate for the instrument used in the input file."""
     if this_instrument == 'COS':
         """Get wavelengths, fluxes, flux uncertainties."""
-        spec_tuple = specutils_cos.readspec(args.input_file, args.verbose)
+        cos_spectrum = specutils_cos.readspec(args.input_file, args.verbose)
         """Plot spectra preview plots."""
-        specutils_cos.plotspec(spec_tuple, args.output_type, output_file)
+        specutils_cos.plotspec(cos_spectrum, args.output_type, output_file)
     elif this_instrument == 'STIS':
         pass
         ## specutils_stis.readspec(args.input_file)
