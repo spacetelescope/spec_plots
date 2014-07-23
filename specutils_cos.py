@@ -37,7 +37,13 @@ class COSSpectrum:
                 self.segments = {'FUVA':COSSegment(), 'FUVB':COSSegment()}
         elif band.strip().upper() == "NUV":
             self.band = band
-            pass
+            if cos_segments is not None:
+                if len(cos_segments) == 3:
+                    self.segments = {'NUVA':cos_segments['NUVA'], 'NUVB':cos_segments['NUVB'], 'NUVC':cos_segments['NUVC']}
+                else:
+                    raise ValueError("Band is specified as "+band.strip().upper()+", expected 3 COSSegment objects as a list but received "+str(len(cos_segments))+".")
+            else:
+                self.segments = {'NUVA':COSSegment(), 'NUVB':COSSegment(), 'NUVC':COSSegment()}
         else:
             raise ValueError("Must specify band=\"FUV\" or band=\"NUV\".")
 
@@ -155,13 +161,23 @@ def readspec(input_file, verbosity=False):
             print "*** MAKE_HST_SPEC_PREVIEWS ERROR: ERROR column not found in first extension's binary table."
             exit(1)
         """Create COSSegment objects to populate the COSSpectrum object with"""
-        fuva_index = numpy.where(segment_arr == "FUVA")[0][0]
-        fuva_cossegment = COSSegment(nelem=nelems_arr[fuva_index], wavelengths=wavelength_table[fuva_index,:], fluxes=flux_table[fuva_index,:], fluxerrs=fluxerr_table[fuva_index,:])
-        fuvb_index = numpy.where(segment_arr == "FUVB")[0][0]
-        fuvb_cossegment = COSSegment(nelem=nelems_arr[fuvb_index], wavelengths=wavelength_table[fuvb_index,:], fluxes=flux_table[fuvb_index,:], fluxerrs=fluxerr_table[fuvb_index,:])
+        if band == 'FUV':
+            fuva_index = numpy.where(segment_arr == "FUVA")[0][0]
+            fuva_cossegment = COSSegment(nelem=nelems_arr[fuva_index], wavelengths=wavelength_table[fuva_index,:], fluxes=flux_table[fuva_index,:], fluxerrs=fluxerr_table[fuva_index,:])
+            fuvb_index = numpy.where(segment_arr == "FUVB")[0][0]
+            fuvb_cossegment = COSSegment(nelem=nelems_arr[fuvb_index], wavelengths=wavelength_table[fuvb_index,:], fluxes=flux_table[fuvb_index,:], fluxerrs=fluxerr_table[fuvb_index,:])
+        elif band == 'NUV':
+            nuva_index = numpy.where(segment_arr == "NUVA")[0][0]
+            nuva_cossegment = COSSegment(nelem=nelems_arr[nuva_index], wavelengths=wavelength_table[nuva_index,:], fluxes=flux_table[nuva_index,:], fluxerrs=fluxerr_table[nuva_index,:])
+            nuvb_index = numpy.where(segment_arr == "NUVB")[0][0]
+            nuvb_cossegment = COSSegment(nelem=nelems_arr[nuvb_index], wavelengths=wavelength_table[nuvb_index,:], fluxes=flux_table[nuvb_index,:], fluxerrs=fluxerr_table[nuvb_index,:])
+            nuvc_index = numpy.where(segment_arr == "NUVC")[0][0]
+            nuvc_cossegment = COSSegment(nelem=nelems_arr[nuvc_index], wavelengths=wavelength_table[nuvc_index,:], fluxes=flux_table[nuvc_index,:], fluxerrs=fluxerr_table[nuvc_index,:])
         """Create COSSpectrum object."""
-        return_spec = COSSpectrum(band=band, cos_segments={'FUVA':fuva_cossegment,'FUVB':fuvb_cossegment})
-#        return {band, segment_arr, nelems_arr, wavelength_table, flux_table, fluxerr_table}
+        if band == 'FUV':
+            return_spec = COSSpectrum(band=band, cos_segments={'FUVA':fuva_cossegment,'FUVB':fuvb_cossegment})
+        elif band == 'NUV':
+            return_spec = COSSpectrum(band=band, cos_segments={'NUVA':nuva_cossegment,'NUVB':nuvb_cossegment,'NUVC':nuvc_cossegment})
         return return_spec
 
 def set_plot_xrange(wavelengths,fluxes):
@@ -181,16 +197,23 @@ def set_plot_xrange(wavelengths,fluxes):
     sorted_indexes = numpy.argsort(wavelengths)
     sorted_wavelengths = wavelengths[sorted_indexes]
     sorted_fluxes = fluxes[sorted_indexes]
-    """Find the first element in the array that is NOT 0.0, and the last element in the array that is NOT 0.0."""
+    """Find the first element in the array that is NOT 0.0, and the last element in the array that is NOT 0.0.  If the input array is all zeroes, then it will find the last and first element, respectively."""
     start_index = 0
     end_index = -1
+    n_fluxes = len(sorted_fluxes)
     while sorted_fluxes[start_index] == 0.:
         start_index += 1
+        if start_index >= n_fluxes:
+            break
     while sorted_fluxes[end_index] == 0.:
         end_index -= 1
-    """Return the optimal start and end wavelength values for defining the x-axis plot range."""
-    return [wavelengths[start_index],wavelengths[end_index]]
-    
+        if end_index < -1*n_fluxes:
+            break
+    """Return the optimal start and end wavelength values for defining the x-axis plot range.  Note that if the fluxes are all zeroes, then start index will be past end index, so we return NaN values to indicate a special plot should be made in that case.  The odd conditional below checks to make sure the end index (working from the back of the list via negative indexes) stops before reaching the start index (which works from the front using zero-based, positive indexes), otherwise return NaN values because the array is all zeroes."""
+    if n_fluxes + end_index > start_index:
+        return [sorted_wavelengths[start_index],sorted_wavelengths[end_index]]
+    else:
+        return [numpy.nan,numpy.nan]
 
 def plotspec(cos_spectrum, output_type, output_file):
     """
@@ -221,22 +244,24 @@ def plotspec(cos_spectrum, output_type, output_file):
     this_band = cos_spectrum.band
     """Start plot figure."""
     pyplot.figure(figsize=(800./dpi_val,600./dpi_val),dpi=dpi_val)
-    if this_band == "FUV":
-        """Then there are two segments, so make a 2-panel plot.
-        First plot area (top) is for *FUVB*, since that's the bluest segment."""
-        segment_1_plotarea = pyplot.subplot(2, 1, 1)
+    segment_names = cos_spectrum.segments.keys()
+    """Reverse the list of segment names FOR FUV DATA, becaue the bluest segment is latter in the alphabet. but only for the FUV spectra.  If NUV, then just make sure the segments are sorted alphabetically."""
+    if this_band == 'FUV':
+        segment_names.sort(reverse=True)
+    else:
+        segment_names.sort(reverse=False)
+    n_segments = len(segment_names)
+    for i,s in zip(range(n_segments),segment_names):
+        this_plotarea = pyplot.subplot(n_segments,1,i+1)
         """Determine optimal x-axis."""
-        x_axis_range = set_plot_xrange(cos_spectrum.segments["FUVB"].wavelengths, cos_spectrum.segments["FUVB"].fluxes)
-        """Plot the spectrum."""
-        pyplot.plot(cos_spectrum.segments["FUVB"].wavelengths, cos_spectrum.segments["FUVB"].fluxes, 'k')
-        """Update the x-axis range."""
-        pyplot.xlim(x_axis_range)
-        """Second plot area (bottom) is for *FUVA, since that's the reddest*."""
-        segment_2_plotarea = pyplot.subplot(2, 1, 2)
-        """Determine optimal x-axis."""
-        x_axis_range = set_plot_xrange(cos_spectrum.segments["FUVA"].wavelengths, cos_spectrum.segments["FUVA"].fluxes)
-        """Plot the spectrum."""
-        pyplot.plot(cos_spectrum.segments["FUVA"].wavelengths, cos_spectrum.segments["FUVA"].fluxes, 'k')
+        x_axis_range = set_plot_xrange(cos_spectrum.segments[s].wavelengths, cos_spectrum.segments[s].fluxes)
+        """Plot the spectrum, but only if valid wavelength ranges for x-axis are returned, otherwise plot a special "Fluxes Are All Zero" plot."""
+        print x_axis_range
+        if all(numpy.isfinite(x_axis_range)):
+            pyplot.plot(cos_spectrum.segments[s].wavelengths, cos_spectrum.segments[s].fluxes, 'k')
+        else:
+            this_plotarea.set_axis_bgcolor("lightgrey")
+            this_plotarea.text(0.5,0.5,"Fluxes are all 0.",horizontalalignment="center",verticalalignment="center",transform=this_plotarea.transAxes,size="x-large")
         """Update the x-axis range."""
         pyplot.xlim(x_axis_range)
         """Display or plot to the desired format."""
@@ -244,11 +269,3 @@ def plotspec(cos_spectrum, output_type, output_file):
             pyplot.savefig(output_file, format=output_type, dpi=dpi_val,bbox_inches='tight')
         elif output_type == "screen":
             pyplot.show()
-    elif this_band == "NUV":
-        pass
-    else:
-        try:
-            raise HSTSpecPrevError("The band is not understood, expect either \"FUV\" or \"NUV\", found " + this_band + " in file " + input_file)
-        except HSTSpecPrevError as error_string:
-            print error_string
-            exit(1)
