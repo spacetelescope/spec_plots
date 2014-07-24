@@ -6,12 +6,29 @@ __version__ = '1.0'
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
 """
 
+import math
 import numpy
 import os
 import pyfits
 import matplotlib.pyplot as pyplot
 """These are local modules that are imported."""
 from make_hst_spec_previews import HSTSpecPrevError
+
+class COSAvoidRegion:
+    """
+    Defines a COS avoid region, which is simply a section of wavelength space that should not be included when determining the optimal y-axis plot range.  The object consists of a starting wavelength, ending wavelength, and string description of what that region is.
+    :raises: ValueError
+    """
+    def __init__(self, minwl=None, maxwl=None, description=""):
+        if minwl is None:
+            raise ValueError("Must specify a minimum wavelength for this COS avoid region.")
+        if maxwl is None:
+            raise ValueError("Must specify a maximum wavelength for this COS avoid region.")
+        if minwl >= maxwl:
+            raise ValueError("Minimum wavelength must be less than maximum wavelength for this COS avoid region.  Given min. wavelength = "+str(minwl)+" and max. wavelength = "+str(maxwl)+".")
+        self.minwl = minwl
+        self.maxwl = maxwl
+        self.description = description
 
 class COSSpectrum:
     """
@@ -117,6 +134,71 @@ def check_segments(segments_list, input_file):
                 exit(1)
     return this_band
 
+def generate_cos_avoid_regions():
+    """
+    Creates a list of COSAvoidRegion objects for use in the plotting routine, specifically designed for COS spectra.
+    """
+    lya1215_ar = COSAvoidRegion(1214.,1217., "Lyman alpha emission line.")
+    return [lya1215_ar]
+
+def plotspec(cos_spectrum, output_type, output_file):
+    """
+    Accepts a COS spectrum tuple from the READSPEC function and produces preview plots.
+    :param cos_spectrum: COS spectrum as returned by READSPEC.
+    :type cos_spectrum: COSSpectrum
+    :param output_type: What kind of output to make.
+    :type output_type: str
+    :param output_file: Name of output file (including full path).
+    :type output_file: str
+    :raises: OSError,HSTSpecPrevError
+    .. note::
+       This function assumes a screen resolution of 96 DPI in order to generate plots of the desired sizes.  This is because matplotlib works in units of inches and DPI rather than pixels.
+    """
+    dpi_val = 96.
+    """Make sure the output path exists, if not, create it."""
+    if output_type != 'screen':
+        if not os.path.isdir(os.path.dirname(output_file)):
+            try:
+                os.mkdir(os.path.dirname(output_file))
+            except OSError as this_error:
+                if this_error.errno == 13: 
+                    print "*** MAKE_HST_SPEC_PREVIEWS ERROR: Output directory could not be created, "+repr(this_error.strerror)
+                    exit(1)
+                else:
+                    raise
+    """Extract the band from the tuple."""
+    this_band = cos_spectrum.band
+    """Start plot figure."""
+    pyplot.figure(figsize=(800./dpi_val,600./dpi_val),dpi=dpi_val)
+    segment_names = cos_spectrum.segments.keys()
+    """Reverse the list of segment names FOR FUV DATA, becaue the bluest segment is latter in the alphabet. but only for the FUV spectra.  If NUV, then just make sure the segments are sorted alphabetically."""
+    if this_band == 'FUV':
+        segment_names.sort(reverse=True)
+    else:
+        segment_names.sort(reverse=False)
+    n_segments = len(segment_names)
+    for i,s in zip(range(n_segments),segment_names):
+        this_plotarea = pyplot.subplot(n_segments,1,i+1)
+        """Determine optimal x-axis."""
+        x_axis_range = set_plot_xrange(cos_spectrum.segments[s].wavelengths, cos_spectrum.segments[s].fluxes)
+        """Plot the spectrum, but only if valid wavelength ranges for x-axis are returned, otherwise plot a special "Fluxes Are All Zero" plot."""
+        if all(numpy.isfinite(x_axis_range)):
+            """Create COS avoid regions."""
+            avoid_regions = generate_cos_avoid_regions()
+            """Determine optimal y-axis."""
+            y_axis_range = set_plot_yrange(cos_spectrum.segments[s].wavelengths, cos_spectrum.segments[s].fluxes, avoid_regions,x_axis_range)
+            pyplot.plot(cos_spectrum.segments[s].wavelengths, cos_spectrum.segments[s].fluxes, 'k')
+            """Update the x-axis and y-axis range, but only adjust the ranges if this isn't an all-zero flux case."""
+            pyplot.xlim(x_axis_range)
+            pyplot.ylim(y_axis_range)
+        else:
+            this_plotarea.set_axis_bgcolor("lightgrey")
+            this_plotarea.text(0.5,0.5,"Fluxes are all 0.",horizontalalignment="center",verticalalignment="center",transform=this_plotarea.transAxes,size="x-large")
+    """Display or plot to the desired format."""
+    if output_type != "screen":
+        pyplot.savefig(output_file, format=output_type, dpi=dpi_val,bbox_inches='tight')
+    elif output_type == "screen":
+        pyplot.show()
 
 def readspec(input_file, verbosity=False):
     """
@@ -182,7 +264,7 @@ def readspec(input_file, verbosity=False):
 
 def set_plot_xrange(wavelengths,fluxes):
     """
-    Given a COS tuple from READSPEC, returns a list of [xmin,xmax] to define an optimal x-axis plot range.
+    Given an array of wavelengths and fluxes, returns a list of [xmin,xmax] to define an optimal x-axis plot range.
     :param wavelengths: The wavelengths to be plotted.
     :type wavelengths: numpy.ndarray
     :param fluxes: The fluxes to be plotted.
@@ -215,57 +297,34 @@ def set_plot_xrange(wavelengths,fluxes):
     else:
         return [numpy.nan,numpy.nan]
 
-def plotspec(cos_spectrum, output_type, output_file):
+def set_plot_yrange(wavelengths,fluxes,avoid_regions,wl_range=None):
     """
-    Accepts a COS spectrum tuple from the READSPEC function and produces preview plots.
-    :param cos_spectrum: COS spectrum as returned by READSPEC.
-    :type cos_spectrum: COSSpectrum
-    :param output_type: What kind of output to make.
-    :type output_type: str
-    :param output_file: Name of output file (including full path).
-    :type output_file: str
-    :raises: OSError,HSTSpecPrevError
+    Given an array of wavelengths, fluxes, and avoid regions, returns a list of [ymin,ymax] to define an optimal y-axis plot range.
+    :param wavelengths: The wavelengths to be plotted.
+    :type wavelengths: numpy.ndarray
+    :param fluxes: The fluxes to be plotted.
+    :type fluxes: numpy.ndarray
+    :param avoid_regions: A list of wavelength ranges to avoid when calculating optimal y-axis plot range.
+    :type avoid_regions: list of COSAvoidRegion objects.
+    :param wl_range: The min. and max. wavelength that defines the x-axis plot range.  The default is None, in which case the min. and max. if the input wavelength array will be used.
+    :type wl_range: list
+    :returns: list -- Two-element list containing the optimal [ymin,ymax] values to define the y-axis plot range.
     .. note::
-       This function assumes a screen resolution of 96 DPI in order to generate plots of the desired sizes.  This is because matplotlib works in units of inches and DPI rather than pixels.
+       This function makes use of an internal look-up table of wavelength regions where known contaminating emission lines or other strong UV artifacts can affect the zoom level of the plot.
     """
-    dpi_val = 96.
-    """Make sure the output path exists, if not, create it."""
-    if output_type != 'screen':
-        if not os.path.isdir(os.path.dirname(output_file)):
-            try:
-                os.mkdir(os.path.dirname(output_file))
-            except OSError as this_error:
-                if this_error.errno == 13: 
-                    print "*** MAKE_HST_SPEC_PREVIEWS ERROR: Output directory could not be created, "+repr(this_error.strerror)
-                    exit(1)
-                else:
-                    raise
-    """Extract the band from the tuple."""
-    this_band = cos_spectrum.band
-    """Start plot figure."""
-    pyplot.figure(figsize=(800./dpi_val,600./dpi_val),dpi=dpi_val)
-    segment_names = cos_spectrum.segments.keys()
-    """Reverse the list of segment names FOR FUV DATA, becaue the bluest segment is latter in the alphabet. but only for the FUV spectra.  If NUV, then just make sure the segments are sorted alphabetically."""
-    if this_band == 'FUV':
-        segment_names.sort(reverse=True)
-    else:
-        segment_names.sort(reverse=False)
-    n_segments = len(segment_names)
-    for i,s in zip(range(n_segments),segment_names):
-        this_plotarea = pyplot.subplot(n_segments,1,i+1)
-        """Determine optimal x-axis."""
-        x_axis_range = set_plot_xrange(cos_spectrum.segments[s].wavelengths, cos_spectrum.segments[s].fluxes)
-        """Plot the spectrum, but only if valid wavelength ranges for x-axis are returned, otherwise plot a special "Fluxes Are All Zero" plot."""
-        print x_axis_range
-        if all(numpy.isfinite(x_axis_range)):
-            pyplot.plot(cos_spectrum.segments[s].wavelengths, cos_spectrum.segments[s].fluxes, 'k')
-        else:
-            this_plotarea.set_axis_bgcolor("lightgrey")
-            this_plotarea.text(0.5,0.5,"Fluxes are all 0.",horizontalalignment="center",verticalalignment="center",transform=this_plotarea.transAxes,size="x-large")
-        """Update the x-axis range."""
-        pyplot.xlim(x_axis_range)
-        """Display or plot to the desired format."""
-        if output_type != "screen":
-            pyplot.savefig(output_file, format=output_type, dpi=dpi_val,bbox_inches='tight')
-        elif output_type == "screen":
-            pyplot.show()
+    if wl_range is None:
+        wl_range = [numpy.nanmin(wavelengths), numpy.nanmax(wavelengths)]
+    """This list will keep track of which fluxes to retain when defining the y-axis plot range, where setting the value to 1 means keep this flux for consideration."""
+    keep_indices = [1] * len(wavelengths)
+    for ar in avoid_regions:
+        reject_indices = [i for i in range(len(wavelengths)) if wavelengths[i] >= ar.minwl and wavelengths[i] <= ar.maxwl or wavelengths[i] < wl_range[0] or wavelengths[i] > wl_range[1]]
+        for j in reject_indices:
+            keep_indices[j] = 0
+    keep_fluxes = numpy.asarray([f for i,f in enumerate(fluxes) if keep_indices[i] == 1])
+    min_flux = min(0.,numpy.nanmin(keep_fluxes))
+    max_flux = numpy.nanmax(keep_fluxes)
+    """Determine a y-buffer based on the difference between the max. and min. flux, grouped by powers of 10, e.g., a value of 1*1E(x) is used if (max-min)/10^x < 10, a value of 10*1E(x) used if 10 < (max-min)/10^x < 100, etc."""
+    max_powerof10 = math.floor(math.log10(max_flux))
+    closest_powerof10 = math.floor(math.log10((max_flux - min_flux)/10**max_powerof10))
+    ybuffer = max(closest_powerof10, 1.)
+    return [max(min_flux-10**closest_powerof10*10**max_powerof10,0.), max_flux+10**closest_powerof10*10**max_powerof10]
