@@ -35,21 +35,28 @@ class COSSpectrum:
     Defines a COS spectrum, including wavelegnth, flux, and flux errors.  A COS spectrum consists of N segments (N = {2,3}) stored as a dict object.  Each of these dicts contain a COSSegment object that contains the wavelengths, fluxes, flux errors, etc.
     :raises: ValueError
     """
-    def __init__(self, band=None, cos_segments=None):
+    def __init__(self, band=None, cos_segments=None, orig_file=None):
         """
         Create a COSSpectrum object given a band choice (must be "FUV" or "NUV").
         :param band: Which band is this spectrum for ("FUV" or "NUV")?
         :type band: str
         :param cos_segments: [Optional] COSSegment objects to populate the COSSpectrum with.
         :type cos_segments: dict
+        :param orig_file: Original FITS file read to create the spectrum (includes full path).
+        :type orig_file: str
         """
+        self.orig_file = orig_file
         if band.strip().upper() == "FUV":
             self.band = band
             if cos_segments is not None:
                 if len(cos_segments) == 2:
                     self.segments = {'FUVA':cos_segments['FUVA'], 'FUVB':cos_segments['FUVB']}
+                elif len(cos_segments) == 1 and 'FUVA' in cos_segments:
+                    self.segments = {'FUVA':cos_segments['FUVA']}
+                elif len(cos_segments) == 1 and 'FUVB' in cos_segments:
+                    self.segments = {'FUVB':cos_segments['FUVB']}
                 else:
-                    raise ValueError("Band is specified as "+band.strip().upper()+", expected 2 COSSegment objects as a list but received "+str(len(cos_segments))+".")
+                    raise ValueError("Band is specified as "+band.strip().upper()+", expected 1 or 2 COSSegment objects as a list but received "+str(len(cos_segments))+".")
             else:
                 self.segments = {'FUVA':COSSegment(), 'FUVB':COSSegment()}
         elif band.strip().upper() == "NUV":
@@ -105,8 +112,18 @@ def check_segments(segments_list, input_file):
        This function does not attempt to access the input file, it only requires the name of the file for error reporting purposes.
     """
     list_len = len(segments_list)
-    """Segment array must contain either two or three elements."""
-    if list_len == 2:
+    """Segment array must contain either one, two, or three elements."""
+    if list_len == 1:
+        """Can happen with FUV data for some reason, so it can be either "FUVA" or "FUVB"."""
+        if numpy.array_equal(segments_list, ["FUVA"]) or numpy.array_equal(segments_list, ["FUVB"]):
+            this_band = "FUV"
+        else:
+            try:
+                raise HSTSpecPrevError("The array of SEGMENT strings contains 1 value, but is not equal to [\"FUVA\"] or [\"FUVB\"] in file " + input_file)
+            except HSTSpecPrevError as error_string:
+                print error_string
+                exit(1)
+    elif list_len == 2:
         """Must be ["FUVA", "FUVB"]."""
         if numpy.array_equal(segments_list, ["FUVA", "FUVB"]):
             this_band = "FUV"
@@ -128,7 +145,7 @@ def check_segments(segments_list, input_file):
                 exit(1)
     else:
         try:
-            raise HSTSpecPrevError("The array of SEGMENT strings should contain 2 or 3 values, found " + str(list_len) + " in file " + input_file)
+            raise HSTSpecPrevError("The array of SEGMENT strings should contain 1, 2, or 3 values, found " + str(list_len) + " in file " + input_file)
         except HSTSpecPrevError as error_string:
                 print error_string
                 exit(1)
@@ -169,7 +186,9 @@ def plotspec(cos_spectrum, output_type, output_file):
     """Extract the band from the tuple."""
     this_band = cos_spectrum.band
     """Start plot figure."""
-    pyplot.figure(figsize=(800./dpi_val,600./dpi_val),dpi=dpi_val)
+    this_figure = pyplot.figure(figsize=(800./dpi_val,600./dpi_val),dpi=dpi_val)
+    this_figure.subplots_adjust(hspace=0.3,top=0.935)
+    this_figure.suptitle(os.path.basename(cos_spectrum.orig_file))
     segment_names = cos_spectrum.segments.keys()
     """Reverse the list of segment names FOR FUV DATA, becaue the bluest segment is latter in the alphabet. but only for the FUV spectra.  If NUV, then just make sure the segments are sorted alphabetically."""
     if this_band == 'FUV':
@@ -244,10 +263,20 @@ def readspec(input_file, verbosity=False):
             exit(1)
         """Create COSSegment objects to populate the COSSpectrum object with"""
         if band == 'FUV':
-            fuva_index = numpy.where(segment_arr == "FUVA")[0][0]
-            fuva_cossegment = COSSegment(nelem=nelems_arr[fuva_index], wavelengths=wavelength_table[fuva_index,:], fluxes=flux_table[fuva_index,:], fluxerrs=fluxerr_table[fuva_index,:])
-            fuvb_index = numpy.where(segment_arr == "FUVB")[0][0]
-            fuvb_cossegment = COSSegment(nelem=nelems_arr[fuvb_index], wavelengths=wavelength_table[fuvb_index,:], fluxes=flux_table[fuvb_index,:], fluxerrs=fluxerr_table[fuvb_index,:])
+            try:
+                fuva_index = numpy.where(segment_arr == "FUVA")[0][0]
+            except IndexError:
+                """Then there is no FUVA segment, normally this happends if there is only one segment present (in which case it's the other one of the two)."""
+                fuva_index = None
+            if fuva_index is not None:
+                fuva_cossegment = COSSegment(nelem=nelems_arr[fuva_index], wavelengths=wavelength_table[fuva_index,:], fluxes=flux_table[fuva_index,:], fluxerrs=fluxerr_table[fuva_index,:])
+            try:
+                fuvb_index = numpy.where(segment_arr == "FUVB")[0][0]
+            except IndexError:
+                """Then there is no FUVB segment, normally this happends if there is only one segment present (in which case it's the other one of the two)."""
+                fuvb_index = None
+            if fuvb_index is not None:
+                fuvb_cossegment = COSSegment(nelem=nelems_arr[fuvb_index], wavelengths=wavelength_table[fuvb_index,:], fluxes=flux_table[fuvb_index,:], fluxerrs=fluxerr_table[fuvb_index,:])
         elif band == 'NUV':
             nuva_index = numpy.where(segment_arr == "NUVA")[0][0]
             nuva_cossegment = COSSegment(nelem=nelems_arr[nuva_index], wavelengths=wavelength_table[nuva_index,:], fluxes=flux_table[nuva_index,:], fluxerrs=fluxerr_table[nuva_index,:])
@@ -257,9 +286,14 @@ def readspec(input_file, verbosity=False):
             nuvc_cossegment = COSSegment(nelem=nelems_arr[nuvc_index], wavelengths=wavelength_table[nuvc_index,:], fluxes=flux_table[nuvc_index,:], fluxerrs=fluxerr_table[nuvc_index,:])
         """Create COSSpectrum object."""
         if band == 'FUV':
-            return_spec = COSSpectrum(band=band, cos_segments={'FUVA':fuva_cossegment,'FUVB':fuvb_cossegment})
+            if fuva_index is not None and fuvb_index is not None:
+                return_spec = COSSpectrum(band=band, cos_segments={'FUVA':fuva_cossegment,'FUVB':fuvb_cossegment}, orig_file=input_file)
+            elif fuva_index is not None:
+                return_spec = COSSpectrum(band=band, cos_segments={'FUVA':fuva_cossegment}, orig_file=input_file)
+            else:
+                return_spec = COSSpectrum(band=band, cos_segments={'FUVB':fuvb_cossegment}, orig_file=input_file)
         elif band == 'NUV':
-            return_spec = COSSpectrum(band=band, cos_segments={'NUVA':nuva_cossegment,'NUVB':nuvb_cossegment,'NUVC':nuvc_cossegment})
+            return_spec = COSSpectrum(band=band, cos_segments={'NUVA':nuva_cossegment,'NUVB':nuvb_cossegment,'NUVC':nuvc_cossegment}, orig_file=input_file)
         return return_spec
 
 def set_plot_xrange(wavelengths,fluxes):
@@ -321,10 +355,8 @@ def set_plot_yrange(wavelengths,fluxes,avoid_regions,wl_range=None):
         for j in reject_indices:
             keep_indices[j] = 0
     keep_fluxes = numpy.asarray([f for i,f in enumerate(fluxes) if keep_indices[i] == 1])
-    min_flux = min(0.,numpy.nanmin(keep_fluxes))
+    min_flux = numpy.nanmin(keep_fluxes)
     max_flux = numpy.nanmax(keep_fluxes)
-    """Determine a y-buffer based on the difference between the max. and min. flux, grouped by powers of 10, e.g., a value of 1*1E(x) is used if (max-min)/10^x < 10, a value of 10*1E(x) used if 10 < (max-min)/10^x < 100, etc."""
-    max_powerof10 = math.floor(math.log10(max_flux))
-    closest_powerof10 = math.floor(math.log10((max_flux - min_flux)/10**max_powerof10))
-    ybuffer = max(closest_powerof10, 1.)
-    return [max(min_flux-10**closest_powerof10*10**max_powerof10,0.), max_flux+10**closest_powerof10*10**max_powerof10]
+    """Determine a y-buffer based on the difference between the max. and min. flux."""
+    ybuffer = 0.1 * (max_flux-min_flux)
+    return [min_flux-ybuffer, max_flux+ybuffer]
