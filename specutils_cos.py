@@ -6,11 +6,11 @@ __version__ = '1.0'
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
 """
 
+from astropy.io import fits
 import math
+import matplotlib.pyplot as pyplot
 import numpy
 import os
-import pyfits
-import matplotlib.pyplot as pyplot
 """These are local modules that are imported."""
 from make_hst_spec_previews import HSTSpecPrevError
 
@@ -79,7 +79,14 @@ class COSSegment:
     def __init__(self, nelem=None, wavelengths=None, fluxes=None, fluxerrs=None):
         """
         Create a COSSegment object, default to empty values.  Allows user to preallocate space if they desire by setting "nelem" but not providing lists/arrays on input right away.
-        :param nelem: Number of elements for this segment's
+        :param nelem: Number of elements for this segment's spectrum.
+        :type nelem: int
+        :param wavelengths: List of wavelengths in this segment's spectrum.
+        :type wavelengths: list
+        :param fluxes: List of fluxes in this segment's spectrum.
+        :type fluxes: list
+        :param fluxerrs: List of flux uncertainties in this segment's spectrum.
+        :type fluxerrs: list
         """
         if nelem is not None:
             self.nelem = nelem
@@ -160,10 +167,10 @@ def generate_cos_avoid_regions():
 
 def plotspec(cos_spectrum, output_type, output_file):
     """
-    Accepts a COS spectrum tuple from the READSPEC function and produces preview plots.
+    Accepts a COSSpectrum object from the READSPEC function and produces preview plots.
     :param cos_spectrum: COS spectrum as returned by READSPEC.
     :type cos_spectrum: COSSpectrum
-    :param output_type: What kind of output to make.
+    :param output_type: What kind of output to make?
     :type output_type: str
     :param output_file: Name of output file (including full path).
     :type output_file: str
@@ -183,7 +190,7 @@ def plotspec(cos_spectrum, output_type, output_file):
                     exit(1)
                 else:
                     raise
-    """Extract the band from the tuple."""
+    """Extract the band type (FUV, NUV)."""
     this_band = cos_spectrum.band
     """Start plot figure."""
     this_figure = pyplot.figure(figsize=(800./dpi_val,600./dpi_val),dpi=dpi_val)
@@ -205,7 +212,7 @@ def plotspec(cos_spectrum, output_type, output_file):
             """Create COS avoid regions."""
             avoid_regions = generate_cos_avoid_regions()
             """Determine optimal y-axis, but only provide it with fluxes from the part of the spectrum that will be plotted based on the x-axis trimming."""
-            y_axis_range = set_plot_yrange(cos_spectrum.segments[s].wavelengths, cos_spectrum.segments[s].fluxes,avoid_regions,x_axis_range)
+            y_axis_range = set_plot_yrange(cos_spectrum.segments[s].wavelengths, cos_spectrum.segments[s].fluxes,avoid_regions=avoid_regions,wl_range=x_axis_range)
             pyplot.plot(cos_spectrum.segments[s].wavelengths, cos_spectrum.segments[s].fluxes, 'k')
             """Overplot the x-axis edges that are trimmed to define the y-axis plot range as a shaded area."""
             pyplot.axvspan(numpy.nanmin(cos_spectrum.segments[s].wavelengths), x_axis_range[0],facecolor="lightgrey",alpha=0.5)
@@ -227,17 +234,15 @@ def plotspec(cos_spectrum, output_type, output_file):
     elif output_type == "screen":
         pyplot.show()
 
-def readspec(input_file, verbosity=False):
+def readspec(input_file):
     """
-    Reads in a COS spectrum FITS file (x1d, x1dsum, or x1dsum{1,2,34} FITS files) and returns the wavelengths, fluxes, and flux uncertainties for the two (FUV segments) or three (NUV stripes).
+    Reads in a COS spectrum FITS file (x1d, x1dsum, or x1dsum{1,2,3,4}) and returns the wavelengths, fluxes, and flux uncertainties for the two (FUV segments) or three (NUV stripes).
     :param input_file: Name of input FITS file.
     :type input_file: str
-    :param verbosity: Should verbose output be displayed?  Default is False.
-    :type verbosity: bool
     :returns: COSSpectrum -- The spectroscopic data (wavelength, flux, flux error, etc):
     :raises: KeyError
     """
-    with pyfits.open(input_file) as hdulist:
+    with fits.open(input_file) as hdulist:
         """Read the data from the first extension.  For COS, the spectra are always stored as tables in the first FITS extension."""
         cos_tabledata = hdulist[1].data
         """Extract the SEGMENTS.  This is either a 2-element array of ["FUVA", "FUVB"], or a 3-element array of ["NUVA", "NUVB", "NUVC"]."""
@@ -371,7 +376,7 @@ def set_plot_xrange(wavelengths,fluxes):
     else:
         return [numpy.nan,numpy.nan]
 
-def set_plot_yrange(wavelengths,fluxes,avoid_regions,wl_range=None):
+def set_plot_yrange(wavelengths,fluxes,avoid_regions=None,wl_range=None):
     """
     Given an array of wavelengths, fluxes, and avoid regions, returns a list of [ymin,ymax] to define an optimal y-axis plot range.
     :param wavelengths: The wavelengths to be plotted.
@@ -390,14 +395,15 @@ def set_plot_yrange(wavelengths,fluxes,avoid_regions,wl_range=None):
         wl_range = [numpy.nanmin(wavelengths), numpy.nanmax(wavelengths)]
     """This list will keep track of which fluxes to retain when defining the y-axis plot range, where setting the value to 1 means keep this flux for consideration."""
     keep_indices = [1] * len(wavelengths)
-    for i,ar in enumerate(avoid_regions):
-        if i == 0:
-            reject_indices = [i for i in range(len(wavelengths)) if wavelengths[i] >= ar.minwl and wavelengths[i] <= ar.maxwl or wavelengths[i] < wl_range[0] or wavelengths[i] > wl_range[1]]
-        else:
-            """Don't need to worry about checking wavelengths within bounds after the first avoid region is examined."""
-            reject_indices = [i for i in range(len(wavelengths)) if wavelengths[i] >= ar.minwl and wavelengths[i] <= ar.maxwl]
-        for j in reject_indices:
-            keep_indices[j] = 0
+    if avoid_regions is not None:
+        for i,ar in enumerate(avoid_regions):
+            if i == 0:
+                reject_indices = [i for i in range(len(wavelengths)) if wavelengths[i] >= ar.minwl and wavelengths[i] <= ar.maxwl or wavelengths[i] < wl_range[0] or wavelengths[i] > wl_range[1]]
+            else:
+                """Don't need to worry about checking wavelengths within bounds after the first avoid region is examined."""
+                reject_indices = [i for i in range(len(wavelengths)) if wavelengths[i] >= ar.minwl and wavelengths[i] <= ar.maxwl]
+            for j in reject_indices:
+                keep_indices[j] = 0
     keep_fluxes = numpy.asarray([f for ii,f in enumerate(fluxes) if keep_indices[ii] == 1 and numpy.isfinite(fluxes[ii])])
     """Don't just take the pure min and max, since weird defects can affect the calculation.  Instead, take the 1th and 99th percentile fluxes within the region to consider."""
     min_flux = numpy.percentile(keep_fluxes,1.)

@@ -120,13 +120,12 @@ def make_hst_spec_previews(args):
     """Read in the FITS file to extract wavelengths, fluxes, and flux uncertainties, using the local package appropriate for the instrument used in the input file."""
     if this_instrument == 'COS':
         """Get wavelengths, fluxes, flux uncertainties."""
-        cos_spectrum = specutils_cos.readspec(args.input_file, args.verbose)
+        cos_spectrum = specutils_cos.readspec(args.input_file)
         """Plot spectra preview plots."""
         specutils_cos.plotspec(cos_spectrum, args.output_type, output_file)
     elif this_instrument == 'STIS':
-        pass
-        ## specutils_stis.readspec(args.input_file)
-        ## specutils_stis.plotspec()
+        stis_spectrum = specutils_stis.readspec(args.input_file)
+        specutils_stis.plotspec(stis_spectrum, args.output_type, output_file)
     else:
         try:
             raise HSTSpecPrevError('"INSTRUME" keyword not understood: ' + this_instrument)
