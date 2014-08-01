@@ -97,6 +97,7 @@ def make_hst_spec_previews(args):
     :raises: HSTSpecPrevError
     """
     """Print file name, if verbose is turned on."""
+    print args.input_file
     if args.verbose:
         print "Input file: " + args.input_file
 
