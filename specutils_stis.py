@@ -8,6 +8,7 @@ __version__ = '1.0'
 
 from astropy.io import fits
 import math
+from matplotlib import rc
 import matplotlib.pyplot as pyplot
 import numpy
 import os
@@ -111,7 +112,7 @@ def generate_stis_avoid_regions():
     lya1215_ar = STISAvoidRegion(1214.,1217., "Lyman alpha emission line.")
     return [lya1215_ar]
 
-def plotspec(stis_spectrum, output_type, output_file):
+def plotspec(stis_spectrum, output_type, output_file, output_size=None):
     """
     Accepts a STIS1DSpectrum object from the READSPEC function and produces preview plots.
     :param stis_spectrum: STIS spectrum as returned by READSPEC.
@@ -120,11 +121,18 @@ def plotspec(stis_spectrum, output_type, output_file):
     :type output_type: str
     :param output_file: Name of output file (including full path).
     :type output_file: str
+    :param output_size: Size of plot in pixels (plots are square in dimensions).  Defaults to 1024.
+    :param output_size: int
     :raises: OSError,HSTSpecPrevError
     .. note::
        This function assumes a screen resolution of 96 DPI in order to generate plots of the desired sizes.  This is because matplotlib works in units of inches and DPI rather than pixels.
     """
     dpi_val = 96.
+    if output_size is not None:
+        if not isinstance(output_size, int):
+            output_size = int(round(output_size))
+    else:
+        output_size = 1024
     """Make sure the output path exists, if not, create it."""
     if output_type != 'screen':
         if not os.path.isdir(os.path.dirname(output_file)):
@@ -136,17 +144,38 @@ def plotspec(stis_spectrum, output_type, output_file):
                     exit(1)
                 else:
                     raise
-    """Start plot figure."""
-    this_figure = pyplot.figure(figsize=(800./dpi_val,600./dpi_val),dpi=dpi_val)
-    this_figure.subplots_adjust(hspace=0.3,top=0.915)
-    this_figure.suptitle(os.path.basename(stis_spectrum.orig_file))
+
+    """If the figure size is large, then plot up to three associations, otherwise force only one association on the plot."""
     n_associations = len(stis_spectrum.associations)
-    for i in xrange(n_associations):
-        this_plotarea = pyplot.subplot(n_associations,1,i+1)
+    if output_size > 128:
+        is_bigplot = True
+        if n_associations <= 3:
+            n_subplots = n_associations
+            subplot_indexes = range(n_associations)
+        else:
+            n_subplots = 3
+            midindex = int(round(float(n_associations)/2.))
+            subplot_indexes = [0,midindex,n_associations-1]
+    else:
+        is_bigplot = False
+        n_subplots = 1
+        subplot_indexes = [0]
+
+    """Start plot figure."""
+    this_figure, these_plotareas = pyplot.subplots(nrows=n_subplots, ncols=1,figsize=(output_size/dpi_val,output_size/dpi_val),dpi=dpi_val)
+    if not isinstance(these_plotareas, numpy.ndarray):
+        these_plotareas = numpy.asarray([these_plotareas])
+    this_figure.subplots_adjust(hspace=0.3,top=0.915)
+    if is_bigplot:
+        this_figure.suptitle(os.path.basename(stis_spectrum.orig_file))   
+
+    for c,i in enumerate(subplot_indexes):
+        this_plotarea = these_plotareas[c]
         all_wls, all_fls, all_dqs, title_addendum = stitch_orders(stis_spectrum.associations[i])
-        this_plotarea.set_title(title_addendum, loc="right", size="small", color="red")
-        if n_associations > 1:
-            this_plotarea.set_title("Association "+str(i+1), loc="center", size="small", color="black")
+        if is_bigplot:
+            this_plotarea.set_title(title_addendum, loc="right", size="small", color="red")
+        if n_associations > 1 and is_bigplot:
+            this_plotarea.set_title("Association "+str(i+1)+"/"+str(n_associations), loc="center", size="small", color="black")
         """Determine optimal x-axis."""
         x_axis_range = set_plot_xrange(all_wls, all_fls)
         if all(numpy.isfinite(x_axis_range)):
@@ -154,17 +183,27 @@ def plotspec(stis_spectrum, output_type, output_file):
             avoid_regions = generate_stis_avoid_regions()
             """Determine optimal y-axis, but only provide it with fluxes from the part of the spectrum that will be plotted based on the x-axis trimming."""
             y_axis_range = set_plot_yrange(all_wls,all_fls,avoid_regions=avoid_regions,wl_range=x_axis_range)
-            pyplot.plot(all_wls, all_fls, 'k')
+            this_plotarea.plot(all_wls, all_fls, 'k')
             """Overplot the x-axis edges that are trimmed to define the y-axis plot range as a shaded area."""
-            pyplot.axvspan(numpy.nanmin(all_wls), x_axis_range[0],facecolor="lightgrey",alpha=0.5)
-            pyplot.axvspan(x_axis_range[1], numpy.nanmax(all_wls),facecolor="lightgrey",alpha=0.5)
+            this_plotarea.axvspan(numpy.nanmin(all_wls), x_axis_range[0],facecolor="lightgrey",alpha=0.5)
+            this_plotarea.axvspan(x_axis_range[1], numpy.nanmax(all_wls),facecolor="lightgrey",alpha=0.5)
             """Overplot the avoid regions in a light color as a shaded area."""
             for ar in avoid_regions:
-                pyplot.axvspan(ar.minwl,ar.maxwl,facecolor="lightgrey",alpha=0.5)
+                this_plotarea.axvspan(ar.minwl,ar.maxwl,facecolor="lightgrey",alpha=0.5)
             """Update the x-axis and y-axis range, but only adjust the ranges if this isn't an all-zero flux case."""
             """Note that we change the x-axis range here to be the min. and max. wavelength of this segment, rather than using the truncated version, so that all the plots for a similar instrument setting will have the same starting and ending plot values.  But, we still calculate the trimmed starting and ending wavelengths above for other things, such as defining the y-plot range."""
             x_axis_range = [numpy.nanmin(all_wls),numpy.nanmax(all_wls)]
             this_plotarea.set_xlim(x_axis_range)
+            """Change x-axis units to microns if a small plot, because there isn't enough space."""
+            if not is_bigplot:
+                rc('font', size=10)
+                this_plotarea.set_xticklabels(this_plotarea.get_xticks()/10000.)
+                this_plotarea.locator_params(axis="x", nbins=4)
+                this_plotarea.set_xlabel("microns")
+            else:
+                """Make sure the font properties go back to normal."""
+                pyplot.rcdefaults()
+                this_plotarea.set_xlabel("Angstroms")
             this_plotarea.set_ylim(y_axis_range)
         else:
             this_plotarea.set_axis_bgcolor("lightgrey")
@@ -172,7 +211,11 @@ def plotspec(stis_spectrum, output_type, output_file):
 
     """Display or plot to the desired format."""
     if output_type != "screen":
-        pyplot.savefig(output_file, format=output_type, dpi=dpi_val,bbox_inches='tight')
+        """Deconstruct output file to include plot size information."""
+        output_splits = os.path.split(output_file)
+        file_splits = os.path.splitext(output_splits[1])
+        revised_output_file = output_splits[0]+os.path.sep+file_splits[0]+'_{0:04d}'.format(output_size)+file_splits[1]
+        this_figure.savefig(revised_output_file, format=output_type, dpi=dpi_val,bbox_inches='tight')
     elif output_type == "screen":
         pyplot.show()
 
@@ -308,7 +351,10 @@ def stitch_orders(input_exposure):
     all_wls = []
     all_fls = []
     all_dqs = []
-    for j in xrange(len(input_exposure.orders)):
+    n_orders = len(input_exposure.orders)
+    all_dq_flags = numpy.zeros(n_orders)
+    return_title = ""
+    for j in xrange(n_orders):
         these_wls = input_exposure.orders[j].wavelengths
         these_fls = input_exposure.orders[j].fluxes
         these_dqs = input_exposure.orders[j].dqs
@@ -327,7 +373,6 @@ def stitch_orders(input_exposure):
                 end_index -= 1
         """Only append the parts of this order's spectrum that are not DQ > 0 at the edges."""
         if len(these_dqs) + end_index > start_index:
-            return_title = ""
             if end_index == -1:
                 all_wls += list(these_wls[start_index:])
                 all_fls += list(these_fls[start_index:])
@@ -337,11 +382,14 @@ def stitch_orders(input_exposure):
                 all_fls += list(these_fls[start_index:end_index+1])
                 all_dqs += list(these_dqs[start_index:end_index+1])
         else:
-            return_title = "Warning: All fluxes have DQ > 0."
+            all_dq_flags[j] = 1
             """Then the trimming from the edges passed one another, and this entire order has DQ > 0.  In this case, we include the entire order (for now, we may want to change this in the future though)."""
             all_wls += list(these_wls)
             all_fls += list(these_fls)
             all_dqs += list(these_dqs)
+    """If every single order had all DQ flags, then we print out the warning."""
+    if sum(all_dq_flags) == n_orders:
+        return_title = "Warning: All fluxes have DQ > 0."
     all_wls = numpy.asarray(all_wls)
     all_fls = numpy.asarray(all_fls)
     all_dqs = numpy.asarray(all_dqs)

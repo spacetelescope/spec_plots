@@ -97,7 +97,6 @@ def make_hst_spec_previews(args):
     :raises: HSTSpecPrevError
     """
     """Print file name, if verbose is turned on."""
-    print args.input_file
     if args.verbose:
         print "Input file: " + args.input_file
 
@@ -126,7 +125,8 @@ def make_hst_spec_previews(args):
         specutils_cos.plotspec(cos_spectrum, args.output_type, output_file)
     elif this_instrument == 'STIS':
         stis_spectrum = specutils_stis.readspec(args.input_file)
-        specutils_stis.plotspec(stis_spectrum, args.output_type, output_file)
+        specutils_stis.plotspec(stis_spectrum, args.output_type, output_file, output_size=1024)
+        specutils_stis.plotspec(stis_spectrum, args.output_type, output_file, output_size=128)
     else:
         try:
             raise HSTSpecPrevError('"INSTRUME" keyword not understood: ' + this_instrument)
