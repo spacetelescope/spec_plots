@@ -1,4 +1,4 @@
-__version__ = '1.0'
+__version__ = '1.05'
 
 """
 .. module:: specutils_stis
@@ -197,8 +197,8 @@ def plotspec(stis_spectrum, output_type, output_file, output_size=None):
             """Change x-axis units to microns if a small plot, because there isn't enough space."""
             if not is_bigplot:
                 rc('font', size=10)
-                this_plotarea.set_xticklabels(this_plotarea.get_xticks()/10000.)
-                this_plotarea.locator_params(axis="x", nbins=4)
+                this_plotarea.set_xticklabels(this_plotarea.get_xticks()/10000.,rotation=45.)
+                this_plotarea.locator_params(axis="x", nbins=4, steps=[1,2,4,6,8,10])
                 this_plotarea.set_xlabel("microns")
             else:
                 """Make sure the font properties go back to normal."""
@@ -206,8 +206,22 @@ def plotspec(stis_spectrum, output_type, output_file, output_size=None):
                 this_plotarea.set_xlabel("Angstroms")
             this_plotarea.set_ylim(y_axis_range)
         else:
+            x_axis_range = [numpy.nanmin(cos_spectrum.segments[s].wavelengths),numpy.nanmax(cos_spectrum.segments[s].wavelengths)]
+            this_plotarea.set_xlim(x_axis_range)
             this_plotarea.set_axis_bgcolor("lightgrey")
-            this_plotarea.text(0.5,0.5,"Fluxes are all 0.",horizontalalignment="center",verticalalignment="center",transform=this_plotarea.transAxes,size="x-large")
+            if not is_bigplot:
+                rc('font', size=10)
+                import ipdb; ipdb.set_trace()
+                this_plotarea.set_xticklabels(this_plotarea.get_xticks()/10000.,rotation=45.)
+                this_plotarea.locator_params(axis="x", nbins=4, steps=[1,2,4,6,8,10])
+                this_plotarea.set_xlabel("microns")
+                textsize = "small"
+            else:
+                """Make sure the font properties go back to normal."""
+                pyplot.rcdefaults()
+                this_plotarea.set_xlabel("Angstroms")
+                textsize = "x-large"
+            this_plotarea.text(0.5,0.5,"Fluxes are all 0.",horizontalalignment="center",verticalalignment="center",transform=this_plotarea.transAxes,size=textsize)
 
     """Display or plot to the desired format."""
     if output_type != "screen":
@@ -215,7 +229,7 @@ def plotspec(stis_spectrum, output_type, output_file, output_size=None):
         output_splits = os.path.split(output_file)
         file_splits = os.path.splitext(output_splits[1])
         revised_output_file = output_splits[0]+os.path.sep+file_splits[0]+'_{0:04d}'.format(output_size)+file_splits[1]
-        this_figure.savefig(revised_output_file, format=output_type, dpi=dpi_val,bbox_inches='tight')
+        this_figure.savefig(revised_output_file, format=output_type, dpi=dpi_val, bbox_inches='tight')
     elif output_type == "screen":
         pyplot.show()
 
@@ -249,12 +263,15 @@ def _set_plot_xrange_test(flux_values, median_flux):
     :type flux_values: float or list
     :param median_flux: A median flux value used in the test.
     :type median_flux: float
-    :returns: float or list -- A scalar float or list of True/False values depening on whether the input flux values pass the test.  Return type matches the type of the input flux values.  Note that if a return value is True, then the flux value is considered PART OF THE SPECTRUM TO TRIM/SKIP OVER.
+    :returns: float or list -- A scalar float or list of True/False values depening on whether the input flux values pass the test.  Return type matches the type of the input flux values.  Note that if a return value is True, then the flux value is considered PART OF THE SPECTRUM TO TRIM/SKIP OVER.  If median_flux is input as NaN, then this function returns True for all flux_values (i.e., skip all of them since median_flux is not defined).
     """
-    try:
-        return_var = [x == 0. or median_flux/x >= 5. for x in flux_values]
-    except TypeError:
-        return_var = flux_values == 0. or median_flux/flux_values >= 5.
+    if isinstance(flux_values, numpy.ndarray):
+        if numpy.isfinite(median_flux):
+            return_var = [x == 0. or median_flux/x >= 5. for x in flux_values]
+        else:
+            return_var = [True] * len(flux_values)
+    else:
+        return_var = flux_values == 0. or median_flux/flux_values >= 5. or numpy.isfinite(median_flux)
     return return_var
     
 def set_plot_xrange(wavelengths,fluxes):
@@ -272,7 +289,10 @@ def set_plot_xrange(wavelengths,fluxes):
         print "***WARNING in SPECUTILS_STIS: Wavelength array contains NaN values.  Behavior has not been fully tested in this case."
     """Find the median flux value, ignoring any NaN values or fluxes that are 0.0."""
     where_finite_and_notzero = numpy.where( (numpy.isfinite(fluxes)) & (fluxes != 0.0) )
-    median_flux = numpy.median(fluxes[where_finite_and_notzero])
+    if len(where_finite_and_notzero[0]) > 0:
+        median_flux = numpy.median(fluxes[where_finite_and_notzero])
+    else:
+        median_flux = numpy.nan
     """Find the first element in the array that is NOT considered an "edge effect", and the last element in the array that is NOT considered an "edge effect".  If the input array is all zeroes, then it will find the last and first element, respectively.  Note that the trim does not just stop at the first index that satisfies this requirement, since there can be spikes at the edges that can fool the algorithm.  Instead, it requires that the next "n_consecutive" data points after each trial location also fail the test for "edge effect"."""
     n_consecutive = 20
     start_index = 0

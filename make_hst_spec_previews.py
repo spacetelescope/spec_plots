@@ -1,4 +1,4 @@
-__version__ = '1.0'
+__version__ = '1.05'
 
 """
 .. module:: make_hst_spec_previews
@@ -99,6 +99,7 @@ def make_hst_spec_previews(args):
     """Print file name, if verbose is turned on."""
     if args.verbose:
         print "Input file: " + args.input_file
+    print args.input_file
 
     """Derive output file name from input file name."""
     if args.output_type != "screen":
@@ -121,10 +122,13 @@ def make_hst_spec_previews(args):
     if this_instrument == 'COS':
         """Get wavelengths, fluxes, flux uncertainties."""
         cos_spectrum = specutils_cos.readspec(args.input_file)
-        """Plot spectra preview plots."""
-        specutils_cos.plotspec(cos_spectrum, args.output_type, output_file)
+        """Make plots."""
+        specutils_cos.plotspec(cos_spectrum, args.output_type, output_file, output_size=1024)
+        specutils_cos.plotspec(cos_spectrum, args.output_type, output_file, output_size=128)
     elif this_instrument == 'STIS':
+        """Get wavelengths, fluxes, flux uncertainties."""
         stis_spectrum = specutils_stis.readspec(args.input_file)
+        """Make plots."""
         specutils_stis.plotspec(stis_spectrum, args.output_type, output_file, output_size=1024)
         specutils_stis.plotspec(stis_spectrum, args.output_type, output_file, output_size=128)
     else:
