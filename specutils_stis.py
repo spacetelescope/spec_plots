@@ -163,11 +163,14 @@ def plotspec(stis_spectrum, output_type, output_file, output_size=None):
 
     """Start plot figure."""
     this_figure, these_plotareas = pyplot.subplots(nrows=n_subplots, ncols=1,figsize=(output_size/dpi_val,output_size/dpi_val),dpi=dpi_val)
+
     if not isinstance(these_plotareas, numpy.ndarray):
         these_plotareas = numpy.asarray([these_plotareas])
-    this_figure.subplots_adjust(hspace=0.3,top=0.915)
     if is_bigplot:
-        this_figure.suptitle(os.path.basename(stis_spectrum.orig_file))   
+        this_figure.subplots_adjust(hspace=0.3,top=0.915)
+        this_figure.suptitle(os.path.basename(stis_spectrum.orig_file))
+    else:
+        this_figure.subplots_adjust(top=0.85,bottom=0.3,left=0.25,right=0.9)
 
     for c,i in enumerate(subplot_indexes):
         this_plotarea = these_plotareas[c]
@@ -198,23 +201,22 @@ def plotspec(stis_spectrum, output_type, output_file, output_size=None):
             if not is_bigplot:
                 rc('font', size=10)
                 this_plotarea.set_xticklabels(this_plotarea.get_xticks()/10000.,rotation=45.)
-                this_plotarea.locator_params(axis="x", nbins=4, steps=[1,2,4,6,8,10])
-                this_plotarea.set_xlabel("microns")
+                this_plotarea.locator_params(axis="both", nbins=4, steps=[1,2,4,6,8,10])
+                this_figure.suptitle(r'$\lambda (\mu$m)', position=(0.83,0.99))
             else:
                 """Make sure the font properties go back to normal."""
                 pyplot.rcdefaults()
                 this_plotarea.set_xlabel("Angstroms")
             this_plotarea.set_ylim(y_axis_range)
         else:
-            x_axis_range = [numpy.nanmin(cos_spectrum.segments[s].wavelengths),numpy.nanmax(cos_spectrum.segments[s].wavelengths)]
+            x_axis_range = [numpy.nanmin(all_wls),numpy.nanmax(all_wls)]
             this_plotarea.set_xlim(x_axis_range)
             this_plotarea.set_axis_bgcolor("lightgrey")
             if not is_bigplot:
                 rc('font', size=10)
-                import ipdb; ipdb.set_trace()
                 this_plotarea.set_xticklabels(this_plotarea.get_xticks()/10000.,rotation=45.)
-                this_plotarea.locator_params(axis="x", nbins=4, steps=[1,2,4,6,8,10])
-                this_plotarea.set_xlabel("microns")
+                this_plotarea.locator_params(axis="both", nbins=4, steps=[1,2,4,6,8,10])
+                this_figure.suptitle(r'$\lambda in {\mu}m$', position=(0.83,0.99))
                 textsize = "small"
             else:
                 """Make sure the font properties go back to normal."""
@@ -229,7 +231,7 @@ def plotspec(stis_spectrum, output_type, output_file, output_size=None):
         output_splits = os.path.split(output_file)
         file_splits = os.path.splitext(output_splits[1])
         revised_output_file = output_splits[0]+os.path.sep+file_splits[0]+'_{0:04d}'.format(output_size)+file_splits[1]
-        this_figure.savefig(revised_output_file, format=output_type, dpi=dpi_val, bbox_inches='tight')
+        this_figure.savefig(revised_output_file, format=output_type, dpi=dpi_val)
     elif output_type == "screen":
         pyplot.show()
 
