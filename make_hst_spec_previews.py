@@ -1,4 +1,4 @@
-__version__ = '1.05'
+__version__ = '1.1'
 
 """
 .. module:: make_hst_spec_previews
@@ -29,19 +29,6 @@ class HSTSpecPrevError(Exception):
         Overrides the str function for this class.
         """
         return "*** MAKE_HST_SPEC_PREVIEWS ERROR: "+repr(self.value)
-
-
-def setup_args():
-    """
-    Set up command-line arguments and options.
-    :returns: ArgumentParser -- Stores arguments and options.
-    """
-    parser = argparse.ArgumentParser(description="Create spectroscopic preview plots given an HST spectrum FITS file.")
-    parser.add_argument("-f", action="store", type=str, dest="input_file", default=None, help="[Required] Full path to input file (HST spectrum) for which to generate preview plots.  Include the file name in the path.",metavar='input file')
-    parser.add_argument("-o", action="store", type=str, dest="output_path", default="", help="[Optional] Full path to output plot files.  Do not inclue file name in path.  Default is the same directory as the input file.",metavar='output path')
-    parser.add_argument("-t", action="store", type=str, dest="output_type", default="png", help='[Optional] Specify where plots should be output.  Default = "png".', choices=['png','PNG','eps', 'EPS', 'screen','SCREEN'], metavar='{png,ps,screen}')
-    parser.add_argument("-v", action="store_true", dest="verbose", default=False, help='[Optional] Turn on verbose messages/logging.  Default = "False".')
-    return parser
 
 
 def check_input_options(args):
@@ -123,20 +110,37 @@ def make_hst_spec_previews(args):
         """Get wavelengths, fluxes, flux uncertainties."""
         cos_spectrum = specutils_cos.readspec(args.input_file)
         """Make plots."""
-        specutils_cos.plotspec(cos_spectrum, args.output_type, output_file, output_size=1024)
-        specutils_cos.plotspec(cos_spectrum, args.output_type, output_file, output_size=128)
+        specutils_cos.plotspec(cos_spectrum, args.output_type, output_file, output_size=1024, debug=args.debug, full_ylabels=args.full_ylabels)
+        if not args.debug:
+            specutils_cos.plotspec(cos_spectrum, args.output_type, output_file, output_size=128)
     elif this_instrument == 'STIS':
         """Get wavelengths, fluxes, flux uncertainties."""
         stis_spectrum = specutils_stis.readspec(args.input_file)
         """Make plots."""
-        specutils_stis.plotspec(stis_spectrum, args.output_type, output_file, output_size=1024)
-        specutils_stis.plotspec(stis_spectrum, args.output_type, output_file, output_size=128)
+        specutils_stis.plotspec(stis_spectrum, args.output_type, output_file, output_size=1024, debug=args.debug, full_ylabels=args.full_ylabels)
+        if not args.debug:
+            specutils_stis.plotspec(stis_spectrum, args.output_type, output_file, output_size=128)
     else:
         try:
             raise HSTSpecPrevError('"INSTRUME" keyword not understood: ' + this_instrument)
         except HSTSpecPrevError as error_string:
             print error_string
             exit(1)
+
+def setup_args():
+    """
+    Set up command-line arguments and options.
+    :returns: ArgumentParser -- Stores arguments and options.
+    """
+    parser = argparse.ArgumentParser(description="Create spectroscopic preview plots given an HST spectrum FITS file.")
+    parser.add_argument("-f", action="store", type=str, dest="input_file", default=None, help="[Required] Full path to input file (HST spectrum) for which to generate preview plots.  Include the file name in the path.",metavar='input file')
+    parser.add_argument("-o", action="store", type=str, dest="output_path", default="", help="[Optional] Full path to output plot files.  Do not inclue file name in path.  Default is the same directory as the input file.",metavar='output path')
+    parser.add_argument("-t", action="store", type=str, dest="output_type", default="png", help='[Optional] Specify where plots should be output.  Default = "png".', choices=['png','PNG','eps', 'EPS', 'screen','SCREEN'], metavar='{png,ps,screen}')
+    parser.add_argument("-v", action="store_true", dest="verbose", default=False, help='[Optional] Turn on verbose messages/logging.  Default = "False".')
+    parser.add_argument("-d", action="store_true", dest="debug", default=False, help='[Optional] Turn on debug mode, which will plot to the screen and color-code fluxes based on different rejection criteria.')
+    parser.add_argument("-y", action="store_true", dest="full_ylabels", default=False, help='[Optional] Label y-axis with full values, including powers of ten in scientific notation.  Default=False.')
+    return parser
+
 
 if __name__ == "__main__":
     """Create ArgumentParser object that holds arguments and options."""
