@@ -1,4 +1,4 @@
-__version__ = '1.1'
+__version__ = '1.2'
 
 """
 .. module:: specutils_stis
@@ -98,7 +98,7 @@ def generate_stis_avoid_regions():
     lya1215_ar = specutils.AvoidRegion(1214.,1217., "Lyman alpha emission line.")
     return [lya1215_ar]
 
-def plotspec(stis_spectrum, output_type, output_file, output_size=None, debug=False, full_ylabels=False):
+def plotspec(stis_spectrum, output_type, output_file, n_consecutive, flux_scale_factor, fluxerr_scale_factor, output_size=None, debug=False, full_ylabels=False):
     """
     Accepts a STIS1DSpectrum object from the READSPEC function and produces preview plots.
     :param stis_spectrum: STIS spectrum as returned by READSPEC.
@@ -107,6 +107,12 @@ def plotspec(stis_spectrum, output_type, output_file, output_size=None, debug=Fa
     :type output_type: str
     :param output_file: Name of output file (including full path).
     :type output_file: str
+    :param n_consecutive: How many consecutive points must pass the test for the index to count as the valid start/end of the spectrum?  Default = 20.
+    :type n_consecutive: int
+    :param flux_scale_factor: Max. allowed ratio between the flux and a median flux value, used in edge trimming.  Default = 10.
+    :type flux_scale_factor: float
+    :param fluxerr_scale_factor: Max. allowed ratio between the flux uncertainty and a median flux uncertainty value, used in edge trimming.  Default = 5.
+    :type fluxerr_scale_factor: float
     :param output_size: Size of plot in pixels (plots are square in dimensions).  Defaults to 1024.
     :param output_size: int
     :param full_ylabels: Should the y-labels contain the full values (including the power of 10 in scientific notation)?  Default = False.
@@ -162,14 +168,18 @@ def plotspec(stis_spectrum, output_type, output_file, output_size=None, debug=Fa
 
     for c,i in enumerate(subplot_indexes):
         this_plotarea = these_plotareas[c]
-        all_wls, all_fls, all_flerrs, all_dqs, title_addendum = specutils.stitch_components(stis_spectrum.associations[i])
+        
+        all_wls, all_fls, all_flerrs, all_dqs, title_addendum = specutils.stitch_components(stis_spectrum.associations[i], n_consecutive, flux_scale_factor, fluxerr_scale_factor)
+
+        median_flux, median_fluxerr, fluxerr_95th = specutils.get_flux_stats(all_fls, all_flerrs)
+
         if is_bigplot:
             this_plotarea.set_title(title_addendum, loc="right", size="small", color="red")
         if n_associations > 1 and is_bigplot:
             this_plotarea.set_title("Association "+str(i+1)+"/"+str(n_associations), loc="center", size="small", color="black")
 
         """Determine optimal x-axis."""
-        median_flux, flux_scale_factor, median_fluxerr, fluxerr_scale_factor, fluxerr_95th, x_axis_range = specutils.set_plot_xrange("stis",all_wls, all_fls, all_flerrs, all_dqs)
+        x_axis_range = specutils.set_plot_xrange("stis", all_wls, all_fls, all_flerrs, all_dqs, n_consecutive, flux_scale_factor, fluxerr_scale_factor, median_flux, median_fluxerr, fluxerr_95th)
         if all(numpy.isfinite(x_axis_range)):
             """Create COS avoid regions."""
             avoid_regions = generate_stis_avoid_regions()

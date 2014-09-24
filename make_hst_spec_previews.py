@@ -110,16 +110,16 @@ def make_hst_spec_previews(args):
         """Get wavelengths, fluxes, flux uncertainties."""
         cos_spectrum = specutils_cos.readspec(args.input_file)
         """Make plots."""
-        specutils_cos.plotspec(cos_spectrum, args.output_type, output_file, output_size=1024, debug=args.debug, full_ylabels=args.full_ylabels)
+        specutils_cos.plotspec(cos_spectrum, args.output_type, output_file, args.n_consecutive, args.flux_scale_factor, args.fluxerr_scale_factor, output_size=1024, debug=args.debug, full_ylabels=args.full_ylabels)
         if not args.debug:
-            specutils_cos.plotspec(cos_spectrum, args.output_type, output_file, output_size=128)
+            specutils_cos.plotspec(cos_spectrum, args.output_type, output_file, args.n_consecutive, args.flux_scale_factor, args.fluxerr_scale_factor, output_size=128)
     elif this_instrument == 'STIS':
         """Get wavelengths, fluxes, flux uncertainties."""
         stis_spectrum = specutils_stis.readspec(args.input_file)
         """Make plots."""
-        specutils_stis.plotspec(stis_spectrum, args.output_type, output_file, output_size=1024, debug=args.debug, full_ylabels=args.full_ylabels)
+        specutils_stis.plotspec(stis_spectrum, args.output_type, output_file, args.n_consecutive, args.flux_scale_factor, args.fluxerr_scale_factor, output_size=1024, debug=args.debug, full_ylabels=args.full_ylabels)
         if not args.debug:
-            specutils_stis.plotspec(stis_spectrum, args.output_type, output_file, output_size=128)
+            specutils_stis.plotspec(stis_spectrum, args.output_type, output_file, args.n_consecutive, args.flux_scale_factor, args.fluxerr_scale_factor, output_size=128)
     else:
         try:
             raise HSTSpecPrevError('"INSTRUME" keyword not understood: ' + this_instrument)
@@ -134,10 +134,13 @@ def setup_args():
     """
     parser = argparse.ArgumentParser(description="Create spectroscopic preview plots given an HST spectrum FITS file.")
     parser.add_argument("-f", action="store", type=str, dest="input_file", default=None, help="[Required] Full path to input file (HST spectrum) for which to generate preview plots.  Include the file name in the path.",metavar='input file')
+    parser.add_argument("-d", action="store_true", dest="debug", default=False, help='[Optional] Turn on debug mode, which will plot to the screen and color-code fluxes based on different rejection criteria.')
+    parser.add_argument("-e", action="store", type=float, dest="fluxerr_scale_factor", default=5., help="[Optional] Specify the ratio between the flux uncertainty and the median flux uncertainty that defines the pass/fail criterion within the edge trim test.  Default = 5.")
+    parser.add_argument("-n", action="store", type=int, dest="n_consecutive", default=20, help="[Optional] Specify the number of consecutive data points that must pass the edge trim test to define the start and end of the spectrum for plotting purposes.  Default = 20.")
     parser.add_argument("-o", action="store", type=str, dest="output_path", default="", help="[Optional] Full path to output plot files.  Do not inclue file name in path.  Default is the same directory as the input file.",metavar='output path')
+    parser.add_argument("-s", action="store", type=float, dest="flux_scale_factor", default=10., help="[Optional] Specify the ratio between the flux and the median flux that defines the pass/fail criterion within the edge trim test.  Default = 10.")
     parser.add_argument("-t", action="store", type=str, dest="output_type", default="png", help='[Optional] Specify where plots should be output.  Default = "png".', choices=['png','PNG','eps', 'EPS', 'screen','SCREEN'], metavar='{png,ps,screen}')
     parser.add_argument("-v", action="store_true", dest="verbose", default=False, help='[Optional] Turn on verbose messages/logging.  Default = "False".')
-    parser.add_argument("-d", action="store_true", dest="debug", default=False, help='[Optional] Turn on debug mode, which will plot to the screen and color-code fluxes based on different rejection criteria.')
     parser.add_argument("-y", action="store_true", dest="full_ylabels", default=False, help='[Optional] Label y-axis with full values, including powers of ten in scientific notation.  Default=False.')
     return parser
 

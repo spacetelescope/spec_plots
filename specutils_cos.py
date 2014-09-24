@@ -1,4 +1,4 @@
-__version__ = '1.1'
+__version__ = '1.2'
 
 """
 .. module:: specutils_cos
@@ -159,7 +159,7 @@ def generate_cos_avoid_regions():
     lya1215_ar = specutils.AvoidRegion(1214.,1217., "Lyman alpha emission line.")
     return [lya1215_ar]
 
-def plotspec(cos_spectrum, output_type, output_file, output_size=None, debug=False, full_ylabels=False):
+def plotspec(cos_spectrum, output_type, output_file, n_consecutive, flux_scale_factor, fluxerr_scale_factor, output_size=None, debug=False, full_ylabels=False):
     """
     Accepts a COSSpectrum object from the READSPEC function and produces preview plots.
     :param cos_spectrum: COS spectrum as returned by READSPEC.
@@ -233,12 +233,15 @@ def plotspec(cos_spectrum, output_type, output_file, output_size=None, debug=Fal
             all_dqs = cos_spectrum.segments[s].dqs
             title_addendum = ""
         else:
-            all_wls, all_fls, all_flerrs, all_dqs, title_addendum = specutils.stitch_components(cos_spectrum, segment_names)
+            all_wls, all_fls, all_flerrs, all_dqs, title_addendum = specutils.stitch_components(cos_spectrum, n_consecutive, flux_scale_factor, fluxerr_scale_factor, segment_names=segment_names)
+
+        median_flux, median_fluxerr, fluxerr_95th = specutils.get_flux_stats(all_fls, all_flerrs)
+
         if is_bigplot:
             this_plotarea.set_title(title_addendum, loc="right", size="small", color="red")
 
         """Determine optimal x-axis."""
-        median_flux, flux_scale_factor, median_fluxerr, fluxerr_scale_factor, fluxerr_95th, x_axis_range = specutils.set_plot_xrange("cos",all_wls, all_fls, all_flerrs, all_dqs)
+        x_axis_range = specutils.set_plot_xrange("cos",all_wls, all_fls, all_flerrs, all_dqs, n_consecutive, flux_scale_factor, fluxerr_scale_factor, median_flux, median_fluxerr, fluxerr_95th)
         """Plot the spectrum, but only if valid wavelength ranges for x-axis are returned, otherwise plot a special "Fluxes Are All Zero" plot."""
         if all(numpy.isfinite(x_axis_range)):
             """Create COS avoid regions."""
