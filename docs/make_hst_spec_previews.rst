@@ -1,4 +1,4 @@
-Main driver for spec-plots.
+Getting Started: Main Program
 ***************************
 
 ``make_hst_spec_previews`` -- Main driver.

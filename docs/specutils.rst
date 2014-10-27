@@ -1,4 +1,4 @@
-Functions for specific instruments or utility functions that apply to HST spectra in general.
+The work horses: specutils*.py.
 ***************************
 
 ``specutils`` -- Utility functions used in plotting HST spectra in general.
@@ -8,14 +8,14 @@ Functions for specific instruments or utility functions that apply to HST spectr
     :private-members:
     :undoc-members:
 
-``specutils_cos`` -- Utility functions specific to COS spectra.
+``specutils_cos`` -- Functions specific to COS spectra.
 ====================================================
 .. automodule:: specutils_cos
     :members: 
     :private-members:
     :undoc-members:
 
-``specutils_stis`` -- Utility functions specific to STIS spectra.
+``specutils_stis`` -- Functions specific to STIS spectra.
 ====================================================
 .. automodule:: specutils_stis
     :members: 
