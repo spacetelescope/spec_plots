@@ -1,8 +1,11 @@
 __version__ = '1.2'
 
 """
+
 .. module:: specutils_cos
+
    :synopsis: Contains functions for reading and plotting HST COS spectra.
+
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
 """
 
@@ -18,16 +21,23 @@ import specutils
 class COSSpectrum:
     """
     Defines a COS spectrum, including wavelegnth, flux, and flux errors.  A COS spectrum consists of N segments (N = {2,3}) stored as a dict object.  Each of these dicts contain a COSSegment object that contains the wavelengths, fluxes, flux errors, etc.
+
     :raises: ValueError
     """
     def __init__(self, band=None, cos_segments=None, orig_file=None):
         """
         Create a COSSpectrum object given a band choice (must be "FUV" or "NUV").
+
         :param band: Which band is this spectrum for ("FUV" or "NUV")?
+
         :type band: str
+
         :param cos_segments: [Optional] COSSegment objects to populate the COSSpectrum with.
+
         :type cos_segments: dict
+
         :param orig_file: Original FITS file read to create the spectrum (includes full path).
+
         :type orig_file: str
         """
         self.orig_file = orig_file
@@ -64,15 +74,25 @@ class COSSegment:
     def __init__(self, nelem=None, wavelengths=None, fluxes=None, fluxerrs=None, dqs=None):
         """
         Create a COSSegment object, default to empty values.  Allows user to preallocate space if they desire by setting "nelem" but not providing lists/arrays on input right away.
+
         :param nelem: Number of elements for this segment's spectrum.
+
         :type nelem: int
+
         :param wavelengths: List of wavelengths in this segment's spectrum.
+
         :type wavelengths: list
+
         :param fluxes: List of fluxes in this segment's spectrum.
+
         :type fluxes: list
+
         :param fluxerrs: List of flux uncertainties in this segment's spectrum.
+
         :type fluxerrs: list
+
         :param dqs: List of Data Quality (DQ) flags in this segment's spectrum.
+
         :type dqs: list
         """
         if nelem is not None:
@@ -100,15 +120,24 @@ class COSSegment:
 def check_segments(segments_list, input_file):
     """
     Checks that the array of "segments" in the COS spectrum header are expected values.  It returns a scalar string representing the band (either "FUV" or "NUV").  If the array is not what's expected for COS, an Exception is raised.
+
     :param segments_list: List of segment labels.
+
     :type segments_list: list
+
     :param input_file: Name of input FITS file.
+
     :type input_file: str
+
     :returns: str -- A string representation of the band, either "FUV" or "NUV".
+
     :raises: specutils.SpecUtilsError
+
     .. note::
-    This function does not attempt to access the input file, it only requires the name of the file for error reporting purposes.
+
+         This function does not attempt to access the input file, it only requires the name of the file for error reporting purposes.
     """
+
     list_len = len(segments_list)
     """Segment array must contain either one, two, or three elements."""
     if list_len == 1:
@@ -159,19 +188,33 @@ def generate_cos_avoid_regions():
 def plotspec(cos_spectrum, output_type, output_file, n_consecutive, flux_scale_factor, fluxerr_scale_factor, output_size=None, debug=False, full_ylabels=False):
     """
     Accepts a COSSpectrum object from the READSPEC function and produces preview plots.
+
     :param cos_spectrum: COS spectrum as returned by READSPEC.
+
     :type cos_spectrum: COSSpectrum
+
+
     :param output_type: What kind of output to make?
+
     :type output_type: str
+
     :param output_file: Name of output file (including full path).
+
     :type output_file: str
+
     :param output_size: Size of plot in pixels (plots are square in dimensions).  Defaults to 1024.
+
     :param output_size: int
+
     :param full_ylabels: Should the y-labels contain the full values (including the power of 10 in scientific notation)?  Default = False.
+
     :type full_ylabels: bool
+
     :raises: OSError
+
     .. note::
-    This function assumes a screen resolution of 96 DPI in order to generate plots of the desired sizes.  This is because matplotlib works in units of inches and DPI rather than pixels.
+
+         This function assumes a screen resolution of 96 DPI in order to generate plots of the desired sizes.  This is because matplotlib works in units of inches and DPI rather than pixels.
     """
     dpi_val = 96.
     if output_size is not None:
@@ -313,9 +356,13 @@ def plotspec(cos_spectrum, output_type, output_file, n_consecutive, flux_scale_f
 def readspec(input_file):
     """
     Reads in a COS spectrum FITS file (x1d, x1dsum, or x1dsum{1,2,3,4}) and returns the wavelengths, fluxes, and flux uncertainties for the two (FUV segments) or three (NUV stripes).
+
     :param input_file: Name of input FITS file.
+
     :type input_file: str
+
     :returns: COSSpectrum -- The spectroscopic data (wavelength, flux, flux error, etc):
+
     :raises: KeyError
     """
     with fits.open(input_file) as hdulist:

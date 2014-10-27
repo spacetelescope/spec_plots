@@ -2,7 +2,9 @@ __version__ = '1.2'
 
 """
 .. module:: specutils_stis
+
    :synopsis: Contains functions for reading and plotting HST STIS spectra.
+
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
 """
 
@@ -22,10 +24,15 @@ class STIS1DSpectrum:
     def __init__(self, association_spectra=None, orig_file=None):
         """
         Create a STIS1DSpectrum object out of a list of STISExposureSpectrum objects, which themselves are lists of STISOrderSpectrum objects.
+
         :param association_spectra: A list whose length is equal to the number of associations (length = "N" associations).  Each element in this list is a STISExposureSpectrum object, which itself is a list (length = "M" orders) of STISOrderSpectrum objects.
+
         :type association_spectra: list
+
         :param orig_file: Original FITS file read to create the spectrum (includes full path).
+
         :type orig_file: str
+
         :raises: ValueError
         """
         if association_spectra is not None:
@@ -41,8 +48,11 @@ class STISExposureSpectrum:
     def __init__(self, order_spectra=None):
         """
         Create a STISExposureSpectrum object out of a list of STISOrderSpectrum objects.
+
         :param order_spectra: The STISOrderSpectrum objects to build the STISExposureSpectrum object out of.
+
         :type order_spectra: list
+
         :raises: ValueError
         """
         if order_spectra is None:
@@ -59,15 +69,25 @@ class STISOrderSpectrum:
     def __init__(self, nelem=None, wavelengths=None, fluxes=None, fluxerrs=None, dqs=None):
         """
         Create a STISOrderSpectrum object, default to empty values.  Allows user to preallocate space if they desire by setting "nelem" but not providing lists/arrays on input right away.
+
         :param nelem: Number of elements for this segment's spectrum.
+
         :type nelem: int
+
         :param wavelengths: List of wavelengths in this segment's spectrum.
+
         :type wavelengths: list
+
         :param fluxes: List of fluxes in this segment's spectrum.
+
         :type fluxes: list
+
         :param fluxerrs: List of flux uncertainties in this segment's spectrum.
+
         :type fluxerrs: list
+
         :param dqs: List of data quality flags.
+
         :type dqs: list
         """
         if nelem is not None:
@@ -101,25 +121,44 @@ def generate_stis_avoid_regions():
 def plotspec(stis_spectrum, output_type, output_file, n_consecutive, flux_scale_factor, fluxerr_scale_factor, output_size=None, debug=False, full_ylabels=False):
     """
     Accepts a STIS1DSpectrum object from the READSPEC function and produces preview plots.
+
     :param stis_spectrum: STIS spectrum as returned by READSPEC.
+
     :type stis_spectrum: STIS1DSpectrum
+
     :param output_type: What kind of output to make?
+
     :type output_type: str
+
     :param output_file: Name of output file (including full path).
+
     :type output_file: str
+
     :param n_consecutive: How many consecutive points must pass the test for the index to count as the valid start/end of the spectrum?  Default = 20.
+
     :type n_consecutive: int
+
     :param flux_scale_factor: Max. allowed ratio between the flux and a median flux value, used in edge trimming.  Default = 10.
+
     :type flux_scale_factor: float
+
     :param fluxerr_scale_factor: Max. allowed ratio between the flux uncertainty and a median flux uncertainty value, used in edge trimming.  Default = 5.
+
     :type fluxerr_scale_factor: float
+
     :param output_size: Size of plot in pixels (plots are square in dimensions).  Defaults to 1024.
+
     :param output_size: int
+
     :param full_ylabels: Should the y-labels contain the full values (including the power of 10 in scientific notation)?  Default = False.
+
     :type full_ylabels: bool
+
     :raises: OSError
+
     .. note::
-    This function assumes a screen resolution of 96 DPI in order to generate plots of the desired sizes.  This is because matplotlib works in units of inches and DPI rather than pixels.
+
+         This function assumes a screen resolution of 96 DPI in order to generate plots of the desired sizes.  This is because matplotlib works in units of inches and DPI rather than pixels.
     """
     dpi_val = 96.
     if output_size is not None:
@@ -253,8 +292,11 @@ def plotspec(stis_spectrum, output_type, output_file, n_consecutive, flux_scale_
 def readspec(input_file):
     """
     Reads in a STIS spectrum FITS file (x1d, sx1) and returns the wavelengths, fluxes, and flux uncertainties for the two (FUV segments) or three (NUV stripes).
+
     :param input_file: Name of input FITS file.
+
     :type input_file: str
+
     :returns: STIS1DSpectrum -- The spectroscopic data (wavelength, flux, flux error, etc):
     """
     with fits.open(input_file) as hdulist:

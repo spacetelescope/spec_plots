@@ -2,7 +2,9 @@ __version__ = '1.1'
 
 """
 .. module:: make_hst_spec_previews
+
    :synopsis: Given an HST spectrum file name, this script will read in the data and generate preview plots of the spectra.  The plots are generated in different dimensions (large, medium, small, thumbnail) and, depending on the instrument/configuration, are plotted in different formats to maximize readability and usability.
+
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
 """
 
@@ -16,14 +18,25 @@ import specutils_stis
 
 
 class HSTSpecPrevError(Exception):
-    """ This class defines a generic Exception to use for errors raised in MAKE_HST_SPEC_PREVIEWS and specific to this module.  It simply returns the given value when raising the exception, e.g., raise HSTSpecPrevError("Print this string") -> __main__.MyError: 'Print this string.'"""
+    """
+    This class defines a generic Exception to use for errors raised in MAKE_HST_SPEC_PREVIEWS and specific to this module.  It simply returns the given value when raising the exception. e.g.,
+
+    .. code-block:: python
+     
+         raise HSTSpecPrevError("Print this string")
+         HSTSpecPrevError: *** MAKE_HST_SPEC_PREVIEWS ERROR: 'Print this string'
+    """
+
     def __init__(self, value):
         """
         Initiate the Exception.
+
         :param value: The string to print on error.
+
         :type value: str
         """
         self.value = value
+
     def __str__(self):
         """
         Overrides the str function for this class.
@@ -34,8 +47,11 @@ class HSTSpecPrevError(Exception):
 def check_input_options(args):
     """
     Check that input arguments satisfy some minimum requirements.
+
     :param args: Stores arguments and options.
+
     :type args: argparse.Namespace object.
+
     :raises: HSTSpecPrevError
     """
 
@@ -61,9 +77,13 @@ def check_input_options(args):
 def get_instrument_name(input_file):
     """
     Determines the instrument name from a FITS file primary header.
+
     :param input_file: Name of input FITS file.
+
     :type input_file: str
+
     :returns: str -- The name of the instrument based on the FITS header keyword, in uppercase with leading/trailing whitespace removed.
+
     :raises: KeyError
     """
     with pyfits.open(input_file) as hdulist:
@@ -79,10 +99,14 @@ def get_instrument_name(input_file):
 def make_hst_spec_previews(args):
     """
     Main function in the module.
+
     :param args:
+
     :type args: argparse.Namespace object.
+
     :raises: HSTSpecPrevError
     """
+
     """Print file name, if verbose is turned on."""
     if args.verbose:
         print "Input file: " + args.input_file
@@ -130,6 +154,7 @@ def make_hst_spec_previews(args):
 def setup_args():
     """
     Set up command-line arguments and options.
+
     :returns: ArgumentParser -- Stores arguments and options.
     """
     parser = argparse.ArgumentParser(description="Create spectroscopic preview plots given an HST spectrum FITS file.")
