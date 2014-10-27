@@ -15,9 +15,6 @@ import numpy
 import os
 import specutils
 
-"""These are local modules that are imported."""
-from make_hst_spec_previews import HSTSpecPrevError
-
 class COSSpectrum:
     """
     Defines a COS spectrum, including wavelegnth, flux, and flux errors.  A COS spectrum consists of N segments (N = {2,3}) stored as a dict object.  Each of these dicts contain a COSSegment object that contains the wavelengths, fluxes, flux errors, etc.
@@ -108,9 +105,9 @@ def check_segments(segments_list, input_file):
     :param input_file: Name of input FITS file.
     :type input_file: str
     :returns: str -- A string representation of the band, either "FUV" or "NUV".
-    :raises: HSTSpecPrevError
+    :raises: specutils.SpecUtilsError
     .. note::
-       This function does not attempt to access the input file, it only requires the name of the file for error reporting purposes.
+    This function does not attempt to access the input file, it only requires the name of the file for error reporting purposes.
     """
     list_len = len(segments_list)
     """Segment array must contain either one, two, or three elements."""
@@ -120,8 +117,8 @@ def check_segments(segments_list, input_file):
             this_band = "FUV"
         else:
             try:
-                raise HSTSpecPrevError("The array of SEGMENT strings contains 1 value, but is not equal to [\"FUVA\"] or [\"FUVB\"] in file " + input_file)
-            except HSTSpecPrevError as error_string:
+                raise specutils.SpecUtilsError("The array of SEGMENT strings contains 1 value, but is not equal to [\"FUVA\"] or [\"FUVB\"] in file " + input_file)
+            except specutils.SpecUtilsError as error_string:
                 print error_string
                 exit(1)
     elif list_len == 2:
@@ -130,8 +127,8 @@ def check_segments(segments_list, input_file):
             this_band = "FUV"
         else:
             try:
-                raise HSTSpecPrevError("The array of SEGMENT strings contains 2 values, but is not equal to [\"FUVA\", \"FUVB\"] in file " + input_file)
-            except HSTSpecPrevError as error_string:
+                raise specutils.SpecUtilsError("The array of SEGMENT strings contains 2 values, but is not equal to [\"FUVA\", \"FUVB\"] in file " + input_file)
+            except specutils.SpecUtilsError as error_string:
                 print error_string
                 exit(1)
     elif list_len == 3:
@@ -140,14 +137,14 @@ def check_segments(segments_list, input_file):
             this_band = "NUV"
         else:
             try:
-                raise HSTSpecPrevError("The array of SEGMENT strings contains 3 values, but is not equal to [\"NUVA\", \"NUVB\", \"NUVC\"] in file " + input_file)
-            except HSTSpecPrevError as error_string:
+                raise specutils.SpecUtilsError("The array of SEGMENT strings contains 3 values, but is not equal to [\"NUVA\", \"NUVB\", \"NUVC\"] in file " + input_file)
+            except specutils.SpecUtilsError as error_string:
                 print error_string
                 exit(1)
     else:
         try:
-            raise HSTSpecPrevError("The array of SEGMENT strings should contain 1, 2, or 3 values, found " + str(list_len) + " in file " + input_file)
-        except HSTSpecPrevError as error_string:
+            raise specutils.SpecUtilsError("The array of SEGMENT strings should contain 1, 2, or 3 values, found " + str(list_len) + " in file " + input_file)
+        except specutils.SpecUtilsError as error_string:
                 print error_string
                 exit(1)
     return this_band
@@ -172,9 +169,9 @@ def plotspec(cos_spectrum, output_type, output_file, n_consecutive, flux_scale_f
     :param output_size: int
     :param full_ylabels: Should the y-labels contain the full values (including the power of 10 in scientific notation)?  Default = False.
     :type full_ylabels: bool
-    :raises: OSError,HSTSpecPrevError
+    :raises: OSError
     .. note::
-       This function assumes a screen resolution of 96 DPI in order to generate plots of the desired sizes.  This is because matplotlib works in units of inches and DPI rather than pixels.
+    This function assumes a screen resolution of 96 DPI in order to generate plots of the desired sizes.  This is because matplotlib works in units of inches and DPI rather than pixels.
     """
     dpi_val = 96.
     if output_size is not None:

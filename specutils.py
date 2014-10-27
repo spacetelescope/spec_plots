@@ -11,6 +11,22 @@ import numpy
 import specutils_cos
 import specutils_stis
 
+class SpecUtilsError(Exception):
+    """ This class defines a generic Exception to use for errors raised in SPECUTILS* modules specific to those modules.  It simply returns the given value when raising the exception, e.g., raise SpecUtilsError("Print this string") -> __main__.MyError: 'Print this string.'"""
+    def __init__(self, value):
+        """
+        Initiate the Exception.
+        :param value: The string to print on error.
+        :type value: str
+        """
+        self.value = value
+    def __str__(self):
+        """
+        Overrides the str function for this class.
+        """
+        return "*** SPECUTILS ERROR: "+repr(self.value)
+
+
 class AvoidRegion:
     """
     Defines an avoid region, which is simply a section of wavelength space that should not be included when determining the optimal y-axis plot range.  The object consists of a starting wavelength, ending wavelength, and string description of what that region is.
@@ -286,7 +302,7 @@ def set_plot_yrange(wavelengths,fluxes,avoid_regions=None,wl_range=None):
     :type wl_range: list
     :returns: list -- Two-element list containing the optimal [ymin,ymax] values to define the y-axis plot range.
     .. note::
-       This function makes use of an internal look-up table of wavelength regions where known contaminating emission lines or other strong UV artifacts can affect the zoom level of the plot.
+    This function makes use of an internal look-up table of wavelength regions where known contaminating emission lines or other strong UV artifacts can affect the zoom level of the plot.
     """
     if wl_range is None:
         wl_range = [numpy.nanmin(wavelengths), numpy.nanmax(wavelengths)]

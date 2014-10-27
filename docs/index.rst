@@ -4,7 +4,7 @@
    contain the root `toctree` directive.
 
 Documentation for MAST's openSAIL project: spec-plots
-======================================
+=====================================================
 
 Contents:
 

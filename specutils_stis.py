@@ -117,9 +117,9 @@ def plotspec(stis_spectrum, output_type, output_file, n_consecutive, flux_scale_
     :param output_size: int
     :param full_ylabels: Should the y-labels contain the full values (including the power of 10 in scientific notation)?  Default = False.
     :type full_ylabels: bool
-    :raises: OSError,HSTSpecPrevError
+    :raises: OSError
     .. note::
-       This function assumes a screen resolution of 96 DPI in order to generate plots of the desired sizes.  This is because matplotlib works in units of inches and DPI rather than pixels.
+    This function assumes a screen resolution of 96 DPI in order to generate plots of the desired sizes.  This is because matplotlib works in units of inches and DPI rather than pixels.
     """
     dpi_val = 96.
     if output_size is not None:
