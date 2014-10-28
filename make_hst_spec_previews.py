@@ -9,8 +9,8 @@ __version__ = '1.1'
 """
 
 import argparse
+from astropy.io import fits
 from os import path
-import pyfits
 import sys
 """These are local modules that are imported."""
 import specutils_cos
@@ -86,8 +86,8 @@ def get_instrument_name(input_file):
 
     :raises: KeyError
     """
-    with pyfits.open(input_file) as hdulist:
-        """Make sure the INSTRUME keyword exists in the primary header, otherwise, catch as a PYFITS KeyError in this case."""
+    with fits.open(input_file) as hdulist:
+        """Make sure the INSTRUME keyword exists in the primary header, otherwise, catch as a FITS KeyError in this case."""
         try:
             this_instrument = hdulist[0].header['INSTRUME']
         except KeyError as header_error:

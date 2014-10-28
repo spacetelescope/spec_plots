@@ -14,7 +14,7 @@
 
 import mock,os,sys
 
-MOCK_MODULES = ['numpy', 'astropy']
+MOCK_MODULES = ['numpy', 'astropy.io']
 for mod_name in MOCK_MODULES:
     sys.modules[mod_name] = mock.Mock()
 
