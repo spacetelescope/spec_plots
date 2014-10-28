@@ -1,5 +1,5 @@
 After The Fact: Diagnostic Modules.
-*******************************
+***********************************
 
 ``make_html`` -- Utility functions used in plotting HST spectra in general.
 ===========================================================================
