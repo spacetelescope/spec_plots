@@ -193,7 +193,6 @@ def plotspec(cos_spectrum, output_type, output_file, n_consecutive, flux_scale_f
 
     :type cos_spectrum: COSSpectrum
 
-
     :param output_type: What kind of output to make?
 
     :type output_type: str

@@ -9,10 +9,11 @@ Documentation for MAST's openSAIL project: spec-plots
 Contents:
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
 
    make_hst_spec_previews
    specutils
+   diagnostics
 
 Indices and tables
 ==================
