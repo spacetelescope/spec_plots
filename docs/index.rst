@@ -9,7 +9,7 @@ Documentation for MAST's openSAIL project: spec-plots
 Contents:
 
 .. toctree::
-   :maxdepth: 3
+   :maxdepth: 2
 
    make_hst_spec_previews
    specutils
