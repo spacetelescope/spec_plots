@@ -14,7 +14,7 @@
 
 import mock,os,sys
 
-MOCK_MODULES = ['numpy', 'astropy', 'astropy.io', 'matplotlib', 'matplotlib.pyplot', 'matplotlib.ticker']
+MOCK_MODULES = ['astropy', 'astropy.io', 'matplotlib', 'matplotlib.pyplot', 'matplotlib.ticker', 'numpy']
 for mod_name in MOCK_MODULES:
     sys.modules[mod_name] = mock.Mock()
 
