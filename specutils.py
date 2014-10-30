@@ -155,7 +155,7 @@ def dq_has_flag(dq, flag_to_check):
     """
     Returns true/false if the given DQ value has a specific flag value set after unpacked into a 16-bit string.  For example:
     
-    .. code-block::python
+    .. code-block:: python
     
     print dq_has_flag(48,16)
     True
