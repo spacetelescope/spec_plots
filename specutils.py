@@ -157,10 +157,10 @@ def dq_has_flag(dq, flag_to_check):
     
     .. code-block:: python
     
-    print dq_has_flag(48,16)
-    True
-    print dq_has_flag(40, 16)
-    False
+         print dq_has_flag(48,16)
+         True
+         print dq_has_flag(40, 16)
+         False
 
     :param dq: The DQ value.
 
