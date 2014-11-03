@@ -255,20 +255,20 @@ def edge_trim(instrument, fluxes, fluxerrs, dqs, n_consecutive, median_flux, flu
             done_trimming = True
             done_trimming_withdq = True
         else:
-            """ Otherwise, test if the next `n_consecutive` points also *fail* the test, e.g., they are from the *good* part of the spectrum, and if so, then we have found a good location.  Do not take into account DQ flag values. """
+            """ Otherwise, test if the next `n_consecutive` points also *fail* the test without taking into account DQ flags, e.g., they are from the *good* part of the spectrum, and if so, then we have found a good location. """
             if not numpy.any(_set_plot_xrange_test(instrument,fluxes[start_index:start_index+n_consecutive+1], fluxerrs[start_index:start_index+n_consecutive+1], median_flux, flux_scale_factor, median_fluxerr, fluxerr_scale_factor, fluxerr_95th, dqs[start_index:start_index+n_consecutive+1], checkFluxes=True, checkFluxRatios=False, checkFluxErrRatios=True, checkFluxErrPercentile=False, checkDQs=False)) and not done_trimming:
                 start_index_nodq = start_index
                 done_trimming = True
 
-            """ Now test if the next `n_consecutive` points also *fail* the test, e.g., they are from the *good* part of the spectrum, and if so, then we have found a good location.  Do take into account DQ flag values. """
+            """ Now test if the next `n_consecutive` points also *fail* the test taking into account DQ flags, e.g., they are from the *good* part of the spectrum, and if so, then we have found a good location."""
             if not numpy.any(_set_plot_xrange_test(instrument,fluxes[start_index:start_index+n_consecutive+1], fluxerrs[start_index:start_index+n_consecutive+1], median_flux, flux_scale_factor, median_fluxerr, fluxerr_scale_factor, fluxerr_95th, dqs[start_index:start_index+n_consecutive+1], checkFluxes=True, checkFluxRatios=False, checkFluxErrRatios=True, checkFluxErrPercentile=False, checkDQs=True)) and not done_trimming_withdq:
                 start_index_withdq = start_index
                 done_trimming_withdq = True
 
-            """ Increment the start index for the next test (if at least one of the `done_trimming` flags is still set to False). """
+            """ Increment the start index for the next test (next test is started if at least one of the `done_trimming` flags is still set to False). """
             start_index += 1
 
-    """Now determine end indexes.  First reset the `done_trimming` flags to False. """
+    """ Now determine end indexes.  First reset the `done_trimming` flags to False. """
     done_trimming = False
     done_trimming_withdq = False
 
@@ -278,7 +278,7 @@ def edge_trim(instrument, fluxes, fluxerrs, dqs, n_consecutive, median_flux, flu
             done_trimming = True
             done_trimming_withdq = True
         else:
-            """ Otherwise, test if the next `n_consecutive` points also *fail* the test, e.g., they are from the *good* part of the spectrum, and if so, then we have found a good location.  Do not take into account DQ flag values. """
+            """ Otherwise, test if the next `n_consecutive` points also *fail* the test without taking into account DQ flags, e.g., they are from the *good* part of the spectrum, and if so, then we have found a good location. """
             """<DEVEL> The if...elif... statements here are needed due to the vagaries of how python slicing syntax works with negaive indexes (you can't use the general formula [i:i+1] if i=-1).  This could probably just be re-written entirely to use non-negative indexes, but the logic works either way. </DEVEL>"""
             if end_index != -1 and not numpy.any(_set_plot_xrange_test(instrument,fluxes[end_index-n_consecutive:end_index+1], fluxerrs[end_index-n_consecutive:end_index+1], median_flux, flux_scale_factor, median_fluxerr, fluxerr_scale_factor, fluxerr_95th, dqs[end_index-n_consecutive:end_index+1], checkFluxes=True, checkFluxRatios=False, checkFluxErrRatios=True, checkFluxErrPercentile=False, checkDQs=False)) and not done_trimming:
                 done_trimming = True
@@ -288,7 +288,7 @@ def edge_trim(instrument, fluxes, fluxerrs, dqs, n_consecutive, median_flux, flu
                 done_trimming = True
                 end_index_nodq = end_index
 
-            """ Now test if the next `n_consecutive` points also *fail* the test, e.g., they are from the *good* part of the spectrum, and if so, then we have found a good location.  Do take into account DQ flag values. """
+            """ Now test if the next `n_consecutive` points also *fail* the test taking into account DQ flags, e.g., they are from the *good* part of the spectrum, and if so, then we have found a good location. """
             if end_index != -1 and not numpy.any(_set_plot_xrange_test(instrument,fluxes[end_index-n_consecutive:end_index+1], fluxerrs[end_index-n_consecutive:end_index+1], median_flux, flux_scale_factor, median_fluxerr, fluxerr_scale_factor, fluxerr_95th, dqs[end_index-n_consecutive:end_index+1], checkFluxes=True, checkFluxRatios=False, checkFluxErrRatios=True, checkFluxErrPercentile=False, checkDQs=True)) and not done_trimming_withdq:
                 done_trimming_withdq = True
                 end_index_withdq = end_index
@@ -297,7 +297,7 @@ def edge_trim(instrument, fluxes, fluxerrs, dqs, n_consecutive, median_flux, flu
                 done_trimming_withdq = True
                 end_index_withdq = end_index
 
-            """ Decrement the end index for the next test (if at least one of the `done_trimming` flags is still set to False). """
+            """ Decrement the end index for the next test (next test is started if at least one of the `done_trimming` flags is still set to False). """
             end_index -= 1
 
     return start_index_nodq, end_index_nodq, start_index_withdq, end_index_withdq
@@ -306,7 +306,7 @@ def edge_trim(instrument, fluxes, fluxerrs, dqs, n_consecutive, median_flux, flu
 
 def get_flux_stats(fluxes, fluxerrs):
     """
-    Calculates various statistics related to the fluxes and flux uncertainties.
+    Calculates median values of the fluxes and flux uncertainties, and the 95th percentile flux uncertainty.
 
     :param fluxes: The fluxes to be plotted.
 
@@ -319,14 +319,17 @@ def get_flux_stats(fluxes, fluxerrs):
 
     """Find the median flux value, ignoring any NaN values or fluxes that are 0.0."""
     where_finite_and_notzero = numpy.where( (numpy.isfinite(fluxes)) & (fluxes != 0.0) )
+
     if len(where_finite_and_notzero[0]) > 0:
         median_flux = numpy.median(fluxes[where_finite_and_notzero])
         median_fluxerr = numpy.median(fluxerrs[where_finite_and_notzero])
     else:
         median_flux = numpy.nan
         median_fluxerr = numpy.nan
-    """Get the largest flux uncertainties."""
+
+    """Get the 95th percentile flux uncertainty value."""
     fluxerr_95th = numpy.percentile(fluxerrs, 95.)
+
     return median_flux, median_fluxerr, fluxerr_95th
 
 #--------------------
@@ -410,14 +413,21 @@ def _set_plot_xrange_test(instrument, flux_values, flux_err_values, median_flux,
     :type checkDQs: bool
 
     :returns: list -- A list of True/False values depening on whether the input flux values pass the test.  Note that if a return value is True, then the flux value is considered PART OF THE SPECTRUM TO TRIM/SKIP OVER.  If median_flux is input as NaN, then this function returns True for all flux_values (i.e., skip all of them since median_flux is not defined).
+
+    :raises: ValueError
     """
+    
+    """ Make sure input parameters are all numpy arrays. """
     if not isinstance(flux_values, numpy.ndarray) or not isinstance(flux_err_values, numpy.ndarray) or not isinstance(dqs, numpy.ndarray):
         raise ValueError("The flux, flux uncertainty, and DQ values must be passed as a numpy.ndarray object.")
+
+    """ Return array of boolean values for the edge_trim test. """
     if numpy.isfinite(median_flux):
-        return_var = [((instrument == "cos" and x == 0. and checkFluxes) or (instrument == "stis" and x == 0. and checkFluxes)) or (abs(x/median_flux) >= flux_scale_factor and checkFluxRatios) or (y/median_fluxerr >= fluxerr_scale_factor and checkFluxErrRatios) or (y > fluxerr_95th and checkFluxErrPercentile) or ((instrument == "stis" and z > 0 and z != 16 and checkDQs) or (instrument == "cos" and z > 0 and checkDQs)) for x,y,z in zip(flux_values, flux_err_values, dqs)]
+        bool_results = [((instrument == "cos" and x == 0. and checkFluxes) or (instrument == "stis" and x == 0. and checkFluxes)) or (abs(x/median_flux) >= flux_scale_factor and checkFluxRatios) or (y/median_fluxerr >= fluxerr_scale_factor and checkFluxErrRatios) or (y > fluxerr_95th and checkFluxErrPercentile) or ((instrument == "stis" and z > 0 and z != 16 and checkDQs) or (instrument == "cos" and z > 0 and checkDQs)) for x,y,z in zip(flux_values, flux_err_values, dqs)]
     else:
-        return_var = [True] * len(flux_values)
-    return return_var
+        bool_results = [True] * len(flux_values)
+
+    return bool_results
     
 #--------------------
 
@@ -472,14 +482,14 @@ def set_plot_xrange(instrument, wavelengths, fluxes, fluxerrs, dqs, n_consecutiv
     :returns: list -- Two-element list containing the optimal [xmin,xmax] values to define the x-axis plot range.
     """
 
-    """Test if there are any NaN's in the wavelength array.  If so, issue a warning for now..."""
-    """ NOTE: Use of the SUM here was reported on stackoverflow to be faster than MIN...it won't matter for the sizes we're dealing with here, but I thought it was a neat trick."""
+    """ Test if there are any NaN's in the wavelength array.  If so, issue a warning for now... """
     if numpy.isnan(numpy.sum(wavelengths)):
         print "***WARNING in SPECUTILS_STIS: Wavelength array contains NaN values.  Behavior has not been fully tested in this case."
-    """Find the first element in the array that is NOT considered an "edge effect", and the last element in the array that is NOT considered an "edge effect".  If the input array is all zeroes, then it will find the last and first element, respectively.  Note that the trim does not just stop at the first index that satisfies this requirement, since there can be spikes at the edges that can fool the algorithm.  Instead, it requires that the next "n_consecutive" data points after each trial location also fail the test for "edge effect"."""
+
+    """ Find the first element in the array that is NOT considered an "edge effect", and the last element in the array that is NOT considered an "edge effect".  If the input array is all zeroes, then it will find the last and first element, respectively.  Note that the trim does not just stop at the first index that satisfies this requirement, since there can be spikes at the edges that can fool the algorithm.  Instead, it requires that the next "n_consecutive" data points after each trial location also fail the test for "edge effect".  It returns start and stop indexes taking into account DQ values, as well as start and stop indexes without taking into account DQ values. """
     start_index_nodq, end_index_nodq, start_index_withdq, end_index_withdq = edge_trim(instrument, fluxes, fluxerrs, dqs, n_consecutive, median_flux, flux_scale_factor, median_fluxerr, fluxerr_scale_factor, fluxerr_95th)
 
-    """Return the optimal start and end wavelength values for defining the x-axis plot range.  Note that if the fluxes are all zeroes, then start index will be past end index, so we return NaN values to indicate a special plot should be made in that case.  The odd conditional below checks to make sure the end index (working from the back of the list via negative indexes) stops before reaching the start index (which works from the front using zero-based, positive indexes), otherwise return NaN values because the array is all zeroes."""
+    """ Return the optimal start and end wavelength values for defining the x-axis plot range.  Note that if the fluxes are all zeroes, then start index will be past end index, so we return NaN values to indicate a special plot should be made in that case.  The odd conditional below checks to make sure the end index (working from the back of the list via negative indexes) stops before reaching the start index (which works from the front using zero-based, positive indexes), otherwise return NaN values because the array is all zeroes. """
     if len(fluxes) + end_index_withdq > start_index_withdq:
         return [wavelengths[start_index_withdq], wavelengths[end_index_withdq]]
     elif len(fluxes) + end_index_nodq > start_index_nodq:
@@ -489,7 +499,7 @@ def set_plot_xrange(instrument, wavelengths, fluxes, fluxerrs, dqs, n_consecutiv
 
 #--------------------
 
-def set_plot_yrange(wavelengths,fluxes,avoid_regions=None,wl_range=None):
+def set_plot_yrange(wavelengths, fluxes, avoid_regions=None, wl_range=None):
     """
     Given an array of wavelengths, fluxes, and avoid regions, returns a list of [ymin,ymax] to define an optimal y-axis plot range.
 
@@ -512,29 +522,40 @@ def set_plot_yrange(wavelengths,fluxes,avoid_regions=None,wl_range=None):
     :returns: list -- Two-element list containing the optimal [ymin,ymax] values to define the y-axis plot range.
 
     .. note::
+
          This function makes use of an internal look-up table of wavelength regions where known contaminating emission lines or other strong UV artifacts can affect the zoom level of the plot.
     """
 
+    """ Default the wavelength range to be the entire spectrum if not specified. """
     if wl_range is None:
         wl_range = [numpy.nanmin(wavelengths), numpy.nanmax(wavelengths)]
-    """This list will keep track of which fluxes to retain when defining the y-axis plot range, where setting the value to 1 means keep this flux for consideration."""
-    keep_indices = [1] * len(wavelengths)
 
+    """ This list will keep track of which fluxes to retain when defining the y-axis plot range.  Setting the value to 1 means keep this flux for consideration. """
+    keep_indices = numpy.asarray([1] * len(wavelengths))
+
+    """ Set any fluxes to 0 (don't keep) if they fall within an Avoid Region. """
     if avoid_regions is not None:
         for i,ar in enumerate(avoid_regions):
             if i == 0:
+                """ If this is the first Avoid Region, then we need to check if the wavelengths are within the specified bounds supplied through the `wl_range` parameter, in addition to checking if they are within the Avoid Region itself. """
                 reject_indices = [i for i in range(len(wavelengths)) if wavelengths[i] >= ar.minwl and wavelengths[i] <= ar.maxwl or wavelengths[i] < wl_range[0] or wavelengths[i] > wl_range[1]]
             else:
-                """Don't need to worry about checking wavelengths within bounds after the first avoid region is examined."""
+                """ Don't need to worry about checking wavelengths within bounds after the first Avoid Region is examined ."""
                 reject_indices = [i for i in range(len(wavelengths)) if wavelengths[i] >= ar.minwl and wavelengths[i] <= ar.maxwl]
-            for j in reject_indices:
-                keep_indices[j] = 0
+            """ Set indices that we don't want to keep to 0.  Note that if reject_indices is an empty list then nothing will change."""
+            keep_indices[reject_indices] = 0
+
+    """ After all indices have been set to keep or reject, pull out just the fluxes that should be kept. """
     keep_fluxes = numpy.asarray([f for ii,f in enumerate(fluxes) if keep_indices[ii] == 1 and numpy.isfinite(fluxes[ii])])
-    """Don't just take the pure min and max, since weird defects can affect the calculation.  Instead, take the 1th and 99th percentile fluxes within the region to consider."""
+
+    """Don't just take the pure min and max, since large outliers can affect the calculation.  Instead, take the 1th and 99th percentile fluxes within the region to calculate the `min` and `max` fluxes."""
     min_flux = numpy.percentile(keep_fluxes,1.)
     max_flux = numpy.percentile(keep_fluxes,99.)
-    """Determine a y-buffer based on the difference between the max. and min. flux."""
+
+    """Determine a y-buffer based on the difference between the max. and min. fluxes."""
     ybuffer = 0.1 * (max_flux-min_flux)
+
+    """ Make sure the min. and max. fluxes aren't identical (both 0., or both the same exact value.  If so, just return the min. and max.  value nudged by 1.0. """
     if min_flux != max_flux:
         return [min_flux-ybuffer, max_flux+ybuffer]
     else:
@@ -567,8 +588,14 @@ def stitch_components(input_exposure, n_consecutive, flux_scale_factor, fluxerr_
     :type segment_names: list
 
     :returns: numpy array, numpy array, numpy array, str -- The stitched wavelengths, fluxes, flux errors, and an informational plot title in the event that all the fluxes had the DQ flag set.
+
+    :raises: ValueError
     """
+
+    """ These lits will contain the stitched spectrum. """
     all_wls = [] ; all_fls = [] ; all_flerrs = [] ; all_dqs = []
+    
+    """ Determine how many pieces there are to stitch, and how to loop through them (different depending on instrument type. """
     if isinstance(input_exposure, specutils_cos.COSSpectrum):
         if segment_names is not None:
             n_components = len(segment_names)
@@ -576,16 +603,20 @@ def stitch_components(input_exposure, n_consecutive, flux_scale_factor, fluxerr_
             inst_type = "cos"
         else:
             raise ValueError("Must provide a list of segment names for COS spectra.")
+
     elif isinstance(input_exposure, specutils_stis.STISExposureSpectrum):
         n_components = len(input_exposure.orders)
         loop_iterable = xrange(n_components)
         inst_type = "stis"
+
     else:
         raise ValueError("Input must be either a COSSpectrum or STISExposureSpectrum object.")
     
+    """ Create an array that will keep track whether each component to stitch is filled with bad DQ flags.  The return title will be set to a non-empty string if every component to stitch is filled with bad DQ flags. """
     all_dq_flags = numpy.zeros(n_components)
     return_title = ""
 
+    """ Get the wavelengths, fluxes, flux uncertainties, and DQ flags for this component. """
     for jj,j in enumerate(loop_iterable):
         if inst_type == "stis":
             these_wls = input_exposure.orders[j].wavelengths
@@ -601,11 +632,13 @@ def stitch_components(input_exposure, n_consecutive, flux_scale_factor, fluxerr_
             where_bad_dq = numpy.where(these_dqs > 0)[0]
         n_elems = len(these_wls)
 
-        
+        """ Calculate some statistics for this component. """
         median_flux, median_fluxerr, fluxerr_95th = get_flux_stats(these_fls, these_flerrs)
+
+        """ Find the start and end indices using the edge trimming function. """
         start_index_nodq, end_index_nodq, start_index_withdq, end_index_withdq = edge_trim(inst_type, these_fls, these_flerrs, these_dqs, n_consecutive, median_flux, flux_scale_factor, median_fluxerr, fluxerr_scale_factor, fluxerr_95th)
 
-        """Check if this has all bad DQ flags."""
+        """ Check if this component has all bad DQ flags. """
         if len(where_bad_dq) == n_elems:
             all_dq_flags[jj] = 1
 
@@ -624,6 +657,7 @@ def stitch_components(input_exposure, n_consecutive, flux_scale_factor, fluxerr_
         else:
             end_index_to_use = -1
 
+        """ Append the portion of this component to the spectrum we are building up. """
         if end_index_to_use == -1:
             all_wls += list(these_wls[start_index_to_use:])
             all_fls += list(these_fls[start_index_to_use:])
@@ -635,15 +669,22 @@ def stitch_components(input_exposure, n_consecutive, flux_scale_factor, fluxerr_
             all_flerrs += list(these_flerrs[start_index_to_use:end_index_to_use+1])
             all_dqs += list(these_dqs[start_index_to_use:end_index_to_use+1])
 
-    """If every single order had all DQ flags, then we want to print out the warning on the plot."""
+    """ If every single order had all DQ flags, then we want to print a warning on the plot. """
     if sum(all_dq_flags) == n_components:
-        return_title = "Warning: All fluxes have DQ > 0 and != 16."
+        if inst_type == 'stis':
+            return_title = "Warning: All fluxes have DQ > 0 and != 16."
+        elif inst_type == 'cos':
+            return_title = "Warning: All fluxes have DQ > 0."
 
+    """ Convert these to numpy arrays. """
+    """ <DEVEL> Should these just be numpy arrays to begin with? </DEVEL> """
     all_wls = numpy.asarray(all_wls)
     all_fls = numpy.asarray(all_fls)
     all_flerrs = numpy.asarray(all_flerrs)
     all_dqs = numpy.asarray(all_dqs)
 
+    """ Make sure the spectrum is sorted in wavelength. """
+    """ <DEVEL> Not sure how to handle components that might overlap in wavelength space, but are not monotonically increasing/decreasing as each component is stitched.  </DEVEL>"""
     sorted_indexes = numpy.argsort(all_wls)
     all_wls = all_wls[sorted_indexes]
     all_fls = all_fls[sorted_indexes]

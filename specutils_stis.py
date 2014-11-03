@@ -17,6 +17,8 @@ import numpy
 import os
 import specutils
 
+#--------------------
+
 class STIS1DSpectrum:
     """
     Defines a STIS 1D spectrum (either "x1d" extracted or "sx1" summed extracted), including wavelegnth, flux, and flux errors.  A STIS 1D spectrum object consists of N associations.  If the file is an association, then N > 1, otherwise N = 1.  Each of these N associations can contain M orders.  If the association is an Echelle spectrum, then 24 < M < 70, depending on instrument configuration, otherwise M = 1.  Each of these M orders contain typical spectral data (wavelengths, fluxes, etc.), stored as STISOrderSpectrum objects.  The final data structure is then <STIS1DSpectrum>.associations[n].order[m].wavelengths (or .fluxes, .fluxerrs, etc.).
@@ -41,6 +43,8 @@ class STIS1DSpectrum:
         else:
             raise ValueError("Must provide a list of STISExposureSpectrum objects.")
 
+#--------------------
+
 class STISExposureSpectrum:
     """
     Defines a STIS exposure spectrum, which consists of "M" STISOrderSpectrum objects.
@@ -61,6 +65,8 @@ class STISExposureSpectrum:
             self.orders = order_spectra
         else:
             raise ValueError("Must provide a list of at least one STISOrderSpectrum objects, input list is empty.")
+
+#--------------------
 
 class STISOrderSpectrum:
     """
@@ -111,12 +117,16 @@ class STISOrderSpectrum:
         else:
             self.dqs = numpy.zeros(self.nelem)
 
+#--------------------
+
 def generate_stis_avoid_regions():
     """
     Creates a list of AvoidRegion objects for use in the plotting routine, specifically designed for STIS spectra.
     """
     lya1215_ar = specutils.AvoidRegion(1214.,1217., "Lyman alpha emission line.")
     return [lya1215_ar]
+
+#--------------------
 
 def plotspec(stis_spectrum, output_type, output_file, n_consecutive, flux_scale_factor, fluxerr_scale_factor, output_size=None, debug=False, full_ylabels=False):
     """
@@ -289,6 +299,8 @@ def plotspec(stis_spectrum, output_type, output_file, n_consecutive, flux_scale_
     elif output_type == "screen":
         pyplot.show()
 
+#--------------------
+
 def readspec(input_file):
     """
     Reads in a STIS spectrum FITS file (x1d, sx1) and returns the wavelengths, fluxes, and flux uncertainties for the two (FUV segments) or three (NUV stripes).
@@ -314,3 +326,5 @@ def readspec(input_file):
             this_exposure_spectrum = STISExposureSpectrum(order_spectra=all_order_spectra)
             all_association_spectra.append(this_exposure_spectrum)
         return STIS1DSpectrum(association_spectra=all_association_spectra, orig_file=input_file)
+
+#--------------------

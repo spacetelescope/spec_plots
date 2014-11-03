@@ -18,6 +18,8 @@ import numpy
 import os
 import specutils
 
+#--------------------
+
 class COSSpectrum:
     """
     Defines a COS spectrum, including wavelegnth, flux, and flux errors.  A COS spectrum consists of N segments (N = {2,3}) stored as a dict object.  Each of these dicts contain a COSSegment object that contains the wavelengths, fluxes, flux errors, etc.
@@ -39,10 +41,17 @@ class COSSpectrum:
         :param orig_file: Original FITS file read to create the spectrum (includes full path).
 
         :type orig_file: str
+
+        :raises: ValueError
         """
+
+        """ Record the original file name. """
         self.orig_file = orig_file
+
         if band.strip().upper() == "FUV":
+            """ Record the band name. """
             self.band = band
+
             if cos_segments is not None:
                 if len(cos_segments) == 2:
                     self.segments = {'FUVA':cos_segments['FUVA'], 'FUVB':cos_segments['FUVB']}
@@ -52,20 +61,29 @@ class COSSpectrum:
                     self.segments = {'FUVB':cos_segments['FUVB']}
                 else:
                     raise ValueError("Band is specified as "+band.strip().upper()+", expected 1 or 2 COSSegment objects as a list but received "+str(len(cos_segments))+".")
+
             else:
+                """ Otherwise `cos_segments` was not supplied, so create with an empty `segments` property. """
                 self.segments = {'FUVA':COSSegment(), 'FUVB':COSSegment()}
+
         elif band.strip().upper() == "NUV":
+            """ Record the band name. """
             self.band = band
+
             if cos_segments is not None:
                 if len(cos_segments) == 3:
                     self.segments = {'NUVA':cos_segments['NUVA'], 'NUVB':cos_segments['NUVB'], 'NUVC':cos_segments['NUVC']}
                 else:
                     raise ValueError("Band is specified as "+band.strip().upper()+", expected 3 COSSegment objects as a list but received "+str(len(cos_segments))+".")
+
             else:
+                """ Otherwise `cos_segments` was not supplied, so create with an empty `segments` property. """
                 self.segments = {'NUVA':COSSegment(), 'NUVB':COSSegment(), 'NUVC':COSSegment()}
+
         else:
             raise ValueError("Must specify band=\"FUV\" or band=\"NUV\".")
 
+#--------------------
 
 class COSSegment:
     """
@@ -79,47 +97,54 @@ class COSSegment:
 
         :type nelem: int
 
-        :param wavelengths: List of wavelengths in this segment's spectrum.
+        :param wavelengths: [Optional] List of wavelengths in this segment's spectrum.
 
         :type wavelengths: list
 
-        :param fluxes: List of fluxes in this segment's spectrum.
+        :param fluxes: [Optional] List of fluxes in this segment's spectrum.
 
         :type fluxes: list
 
-        :param fluxerrs: List of flux uncertainties in this segment's spectrum.
+        :param fluxerrs: [Optional] List of flux uncertainties in this segment's spectrum.
 
         :type fluxerrs: list
 
-        :param dqs: List of Data Quality (DQ) flags in this segment's spectrum.
+        :param dqs: [Optional] List of Data Quality (DQ) flags in this segment's spectrum.
 
         :type dqs: list
         """
+
+        """ <DEVEL> Should it be required to have `nelem` > 0 *OR* specify arrays on input?  Otherwise they are pre-allocated to empty lists. </DEVEL> """
         if nelem is not None:
             self.nelem = nelem
         else:
             self.nelem = 0
+
         if wavelengths is not None:
             self.wavelengths = numpy.asarray(wavelengths)
         else:
             self.wavelengths = numpy.zeros(self.nelem)
+
         if fluxes is not None:
             self.fluxes = numpy.asarray(fluxes)
         else:
             self.fluxes = numpy.zeros(self.nelem)
+
         if fluxerrs is not None:
             self.fluxerrs = numpy.asarray(fluxerrs)
         else:
             self.fluxerrs = numpy.zeros(self.nelem)
+
         if dqs is not None:
             self.dqs = numpy.asarray(dqs)
         else:
             self.dqs = numpy.zeros(self.nelem)
 
+#--------------------
 
 def check_segments(segments_list, input_file):
     """
-    Checks that the array of "segments" in the COS spectrum header are expected values.  It returns a scalar string representing the band (either "FUV" or "NUV").  If the array is not what's expected for COS, an Exception is raised.
+    Checks that the array of "segments" in the COS spectrum header are expected values.  It returns a scalar string representing the band (either "FUV" or "NUV").  If the array is not what's expected, an Exception is raised.
 
     :param segments_list: List of segment labels.
 
@@ -138,52 +163,48 @@ def check_segments(segments_list, input_file):
          This function does not attempt to access the input file, it only requires the name of the file for error reporting purposes.
     """
 
-    list_len = len(segments_list)
-    """Segment array must contain either one, two, or three elements."""
-    if list_len == 1:
-        """Can happen with FUV data for some reason, so it can be either "FUVA" or "FUVB"."""
+    """ Get number of segments. """
+    n_segments = len(segments_list)
+
+    """ Segment array must contain either one, two, or three elements. """
+    if n_segments == 1:
+        """ This can happen with FUV data for some reason, so it can be either "FUVA" or "FUVB". """
         if numpy.array_equal(segments_list, ["FUVA"]) or numpy.array_equal(segments_list, ["FUVB"]):
             this_band = "FUV"
         else:
-            try:
-                raise specutils.SpecUtilsError("The array of SEGMENT strings contains 1 value, but is not equal to [\"FUVA\"] or [\"FUVB\"] in file " + input_file)
-            except specutils.SpecUtilsError as error_string:
-                print error_string
-                exit(1)
-    elif list_len == 2:
+            raise specutils.SpecUtilsError("The array of SEGMENT strings contains 1 value, but is not equal to [\"FUVA\"] or [\"FUVB\"] in file " + input_file)
+
+    elif n_segments == 2:
         """Must be ["FUVA", "FUVB"]."""
         if numpy.array_equal(segments_list, ["FUVA", "FUVB"]):
             this_band = "FUV"
         else:
-            try:
-                raise specutils.SpecUtilsError("The array of SEGMENT strings contains 2 values, but is not equal to [\"FUVA\", \"FUVB\"] in file " + input_file)
-            except specutils.SpecUtilsError as error_string:
-                print error_string
-                exit(1)
-    elif list_len == 3:
+            raise specutils.SpecUtilsError("The array of SEGMENT strings contains 2 values, but is not equal to [\"FUVA\", \"FUVB\"] in file " + input_file)
+
+    elif n_segments == 3:
         """Must be ["NUVA", "NUVB", "NUVC"]."""
         if numpy.array_equal(segments_list, ["NUVA", "NUVB", "NUVC"]):
             this_band = "NUV"
         else:
-            try:
-                raise specutils.SpecUtilsError("The array of SEGMENT strings contains 3 values, but is not equal to [\"NUVA\", \"NUVB\", \"NUVC\"] in file " + input_file)
-            except specutils.SpecUtilsError as error_string:
-                print error_string
-                exit(1)
+            raise specutils.SpecUtilsError("The array of SEGMENT strings contains 3 values, but is not equal to [\"NUVA\", \"NUVB\", \"NUVC\"] in file " + input_file)
+
     else:
-        try:
-            raise specutils.SpecUtilsError("The array of SEGMENT strings should contain 1, 2, or 3 values, found " + str(list_len) + " in file " + input_file)
-        except specutils.SpecUtilsError as error_string:
-                print error_string
-                exit(1)
+        raise specutils.SpecUtilsError("The array of SEGMENT strings should contain 1, 2, or 3 values, found " + str(n_segments) + " in file " + input_file)
+
     return this_band
+
+#--------------------
 
 def generate_cos_avoid_regions():
     """
     Creates a list of AvoidRegion objects for use in the plotting routine, specifically designed for COS spectra.
     """
+
     lya1215_ar = specutils.AvoidRegion(1214.,1217., "Lyman alpha emission line.")
+
     return [lya1215_ar]
+
+#--------------------
 
 def plotspec(cos_spectrum, output_type, output_file, n_consecutive, flux_scale_factor, fluxerr_scale_factor, output_size=None, debug=False, full_ylabels=False):
     """
@@ -215,33 +236,40 @@ def plotspec(cos_spectrum, output_type, output_file, n_consecutive, flux_scale_f
 
          This function assumes a screen resolution of 96 DPI in order to generate plots of the desired sizes.  This is because matplotlib works in units of inches and DPI rather than pixels.
     """
+
+    """ Specify DPI value (assumes typical value) and make sure the plot size is set. """
     dpi_val = 96.
     if output_size is not None:
         if not isinstance(output_size, int):
             output_size = int(round(output_size))
     else:
         output_size = 1024
-    """Make sure the output path exists, if not, create it."""
+
+    """ Make sure the output path exists, if not, create it. """
     if output_type != 'screen':
         if not os.path.isdir(os.path.dirname(output_file)):
             try:
                 os.mkdir(os.path.dirname(output_file))
             except OSError as this_error:
-                if this_error.errno == 13: 
+                if this_error.errno == 13:
                     print "*** MAKE_HST_SPEC_PREVIEWS ERROR: Output directory could not be created, "+repr(this_error.strerror)
                     exit(1)
                 else:
                     raise
-    """Extract the band type (FUV, NUV)."""
-    this_band = cos_spectrum.band
+
+    """ Get list of segment names. """
     segment_names = cos_spectrum.segments.keys()
-    """Reverse the list of segment names FOR FUV DATA, becaue the bluest segment is latter in the alphabet. but only for the FUV spectra.  If NUV, then just make sure the segments are sorted alphabetically."""
-    if this_band == 'FUV':
+
+    """ Reverse the list of segment names *FOR FUV DATA*, becaue the bluest segment is the latter in the alphabet, but only for the FUV spectra.  If NUV, then just make sure the segments are sorted alphabetically. """
+    if cos_spectrum.band == 'FUV':
         segment_names.sort(reverse=True)
     else:
         segment_names.sort(reverse=False)
+
+    """ How many total segments are there? """
     n_segments = len(segment_names)
 
+    """ Determine the number of subplots to make depending on output size.  Get a list of subplot segment names to iterate over when plotting the figure. """
     if output_size > 128:
         is_bigplot = True
         n_subplots = n_segments
@@ -252,19 +280,24 @@ def plotspec(cos_spectrum, output_type, output_file, n_consecutive, flux_scale_f
         n_subplots = 1
         subplot_segment_names = ["-".join(segment_names)]
 
-    """Start plot figure."""
+    """Start the plot figure."""
     this_figure, these_plotareas = pyplot.subplots(nrows=n_subplots, ncols=1, figsize=(output_size/dpi_val, output_size/dpi_val), dpi=dpi_val)
 
+    """ Make sure the subplots are in a numpy array (I think by default it is not if there is only one). """
     if not isinstance(these_plotareas, numpy.ndarray):
         these_plotareas = numpy.asarray([these_plotareas])
+
+    """ Adjust the plot geometry (margins, etc.) based on plot size. """
     if is_bigplot:
         this_figure.subplots_adjust(hspace=0.3,top=0.915)
         this_figure.suptitle(os.path.basename(cos_spectrum.orig_file))
     else:
         this_figure.subplots_adjust(top=0.85,bottom=0.3,left=0.25,right=0.9)
 
+    """ Loop over each segment. """
     for i,s in enumerate(subplot_segment_names):
         this_plotarea = these_plotareas[i]
+        """ If this is a large plot, then get the spectrum for this segment.  Otherwise, stitch all the segments together (there is only one subplot in this case). """
         if is_bigplot:
             all_wls = cos_spectrum.segments[s].wavelengths
             all_fls = cos_spectrum.segments[s].fluxes
@@ -274,14 +307,19 @@ def plotspec(cos_spectrum, output_type, output_file, n_consecutive, flux_scale_f
         else:
             all_wls, all_fls, all_flerrs, all_dqs, title_addendum = specutils.stitch_components(cos_spectrum, n_consecutive, flux_scale_factor, fluxerr_scale_factor, segment_names=segment_names)
 
+        """ Calculate statistics on the fluxes for this subplot. """
         median_flux, median_fluxerr, fluxerr_95th = specutils.get_flux_stats(all_fls, all_flerrs)
 
+        """ Only plot information in the plot title if the plot is large (and therefore sufficient space exists on the plot). """
         if is_bigplot:
             this_plotarea.set_title(title_addendum, loc="right", size="small", color="red")
 
-        """Determine optimal x-axis."""
+        """ Determine optimal x-axis. """
         x_axis_range = specutils.set_plot_xrange("cos",all_wls, all_fls, all_flerrs, all_dqs, n_consecutive, flux_scale_factor, fluxerr_scale_factor, median_flux, median_fluxerr, fluxerr_95th)
-        """Plot the spectrum, but only if valid wavelength ranges for x-axis are returned, otherwise plot a special "Fluxes Are All Zero" plot."""
+
+        """ <DEVEL> LEFT OFF HERE </DEVEL>
+
+        """ Plot the spectrum, but only if valid wavelength ranges for x-axis are returned, otherwise plot a special "Fluxes Are All Zero" plot. """
         if all(numpy.isfinite(x_axis_range)):
             """Create COS avoid regions."""
             avoid_regions = generate_cos_avoid_regions()
@@ -351,6 +389,8 @@ def plotspec(cos_spectrum, output_type, output_file, n_consecutive, flux_scale_f
         this_figure.savefig(revised_output_file, format=output_type, dpi=dpi_val)
     elif output_type == "screen":
         pyplot.show()
+
+#--------------------
 
 def readspec(input_file):
     """
@@ -435,3 +475,5 @@ def readspec(input_file):
         elif band == 'NUV':
             return_spec = COSSpectrum(band=band, cos_segments={'NUVA':nuva_cossegment,'NUVB':nuvb_cossegment,'NUVC':nuvc_cossegment}, orig_file=input_file)
         return return_spec
+
+#--------------------
