@@ -22,6 +22,8 @@ import specutils
 class STIS1DSpectrum:
     """
     Defines a STIS 1D spectrum (either "x1d" extracted or "sx1" summed extracted), including wavelegnth, flux, and flux errors.  A STIS 1D spectrum object consists of N associations.  If the file is an association, then N > 1, otherwise N = 1.  Each of these N associations can contain M orders.  If the association is an Echelle spectrum, then 24 < M < 70, depending on instrument configuration, otherwise M = 1.  Each of these M orders contain typical spectral data (wavelengths, fluxes, etc.), stored as STISOrderSpectrum objects.  The final data structure is then <STIS1DSpectrum>.associations[n].order[m].wavelengths (or .fluxes, .fluxerrs, etc.).
+    
+    :raises: ValueError
     """
     def __init__(self, association_spectra=None, orig_file=None):
         """
@@ -37,6 +39,8 @@ class STIS1DSpectrum:
 
         :raises: ValueError
         """
+
+        """ Record the original file name along with the list of associations. """
         if association_spectra is not None:
             self.orig_file = orig_file
             self.associations = association_spectra
@@ -70,7 +74,7 @@ class STISExposureSpectrum:
 
 class STISOrderSpectrum:
     """
-    Defines a STIS order spectrum, including wavelength, flux, and flux errors, which are stored as numpy arrays.  A scalar int property provides the number of elements in this segment.
+    Defines a STIS order spectrum, including wavelength, flux, flux errors, and data quality flags, which are stored as numpy arrays.  A scalar int property provides the number of elements in this segment.
     """
     def __init__(self, nelem=None, wavelengths=None, fluxes=None, fluxerrs=None, dqs=None):
         """
@@ -96,22 +100,28 @@ class STISOrderSpectrum:
 
         :type dqs: list
         """
+
+        """ <DEVEL> Should it be required to have `nelem` > 0 *OR* specify arrays on input?  Otherwise they are pre-allocated to empty lists. </DEVEL> """
         if nelem is not None:
             self.nelem = nelem
         else:
             self.nelem = 0
+
         if wavelengths is not None:
             self.wavelengths = numpy.asarray(wavelengths)
         else:
             self.wavelengths = numpy.zeros(self.nelem)
+
         if fluxes is not None:
             self.fluxes = numpy.asarray(fluxes)
         else:
             self.fluxes = numpy.zeros(self.nelem)
+
         if fluxerrs is not None:
             self.fluxerrs = numpy.asarray(fluxerrs)
         else:
             self.fluxerrs = numpy.zeros(self.nelem)
+
         if dqs is not None:
             self.dqs = numpy.asarray(dqs)
         else:
@@ -123,7 +133,9 @@ def generate_stis_avoid_regions():
     """
     Creates a list of AvoidRegion objects for use in the plotting routine, specifically designed for STIS spectra.
     """
+
     lya1215_ar = specutils.AvoidRegion(1214.,1217., "Lyman alpha emission line.")
+
     return [lya1215_ar]
 
 #--------------------
@@ -170,13 +182,16 @@ def plotspec(stis_spectrum, output_type, output_file, n_consecutive, flux_scale_
 
          This function assumes a screen resolution of 96 DPI in order to generate plots of the desired sizes.  This is because matplotlib works in units of inches and DPI rather than pixels.
     """
+
+    """ Specify DPI value (assumes typical value) and make sure the plot size is set. """
     dpi_val = 96.
     if output_size is not None:
         if not isinstance(output_size, int):
             output_size = int(round(output_size))
     else:
         output_size = 1024
-    """Make sure the output path exists, if not, create it."""
+
+    """ Make sure the output path exists, if not, create it. """
     if output_type != 'screen':
         if not os.path.isdir(os.path.dirname(output_file)):
             try:
@@ -188,7 +203,7 @@ def plotspec(stis_spectrum, output_type, output_file, n_consecutive, flux_scale_
                 else:
                     raise
 
-    """If the figure size is large, then plot up to three associations, otherwise force only one association on the plot."""
+    """ If the figure size is large, then plot up to three associations, otherwise force only one association on the plot. """
     n_associations = len(stis_spectrum.associations)
     if output_size > 128:
         is_bigplot = True
@@ -204,22 +219,28 @@ def plotspec(stis_spectrum, output_type, output_file, n_consecutive, flux_scale_
         n_subplots = 1
         subplot_indexes = [0]
 
-    """Start plot figure."""
+    """ Start plot figure. """
     this_figure, these_plotareas = pyplot.subplots(nrows=n_subplots, ncols=1, figsize=(output_size/dpi_val, output_size/dpi_val), dpi=dpi_val)
 
+    """ Make sure the subplots are in a numpy array (I think by default it is not if there is only one). """
     if not isinstance(these_plotareas, numpy.ndarray):
         these_plotareas = numpy.asarray([these_plotareas])
+
+    """ Adjust the plot geometry (margins, etc.) based on plot size. """
     if is_bigplot:
         this_figure.subplots_adjust(hspace=0.3,top=0.915)
         this_figure.suptitle(os.path.basename(stis_spectrum.orig_file))
     else:
         this_figure.subplots_adjust(top=0.85,bottom=0.3,left=0.25,right=0.9)
 
+    """ Loop over each segment. """
     for c,i in enumerate(subplot_indexes):
         this_plotarea = these_plotareas[c]
         
+        """ Stitch all the orders together for this association. """
         all_wls, all_fls, all_flerrs, all_dqs, title_addendum = specutils.stitch_components(stis_spectrum.associations[i], n_consecutive, flux_scale_factor, fluxerr_scale_factor)
 
+        """ Calculate statistics on the fluxes for this subplot. """
         median_flux, median_fluxerr, fluxerr_95th = specutils.get_flux_stats(all_fls, all_flerrs)
 
         if is_bigplot:
@@ -227,50 +248,72 @@ def plotspec(stis_spectrum, output_type, output_file, n_consecutive, flux_scale_
         if n_associations > 1 and is_bigplot:
             this_plotarea.set_title("Association "+str(i+1)+"/"+str(n_associations), loc="center", size="small", color="black")
 
-        """Determine optimal x-axis."""
-        x_axis_range = specutils.set_plot_xrange("stis", all_wls, all_fls, all_flerrs, all_dqs, n_consecutive, flux_scale_factor, fluxerr_scale_factor, median_flux, median_fluxerr, fluxerr_95th)
-        if all(numpy.isfinite(x_axis_range)):
-            """Create COS avoid regions."""
+        """ Determine optimal x-axis.  This is not the x-axis plot range used, but rather the area of the plot that is considered when scaling the y-axis. """
+        optimal_xaxis_range = specutils.set_plot_xrange("stis", all_wls, all_fls, all_flerrs, all_dqs, n_consecutive, flux_scale_factor, fluxerr_scale_factor, median_flux, median_fluxerr, fluxerr_95th)
+
+        """ Plot the spectrum, but only if valid wavelength ranges for x-axis are returned, otherwise plot a special "Fluxes Are All Zero" plot. """
+        if all(numpy.isfinite(optimal_xaxis_range)):
+
+            """ Create COS avoid regions. """
             avoid_regions = generate_stis_avoid_regions()
-            """Determine optimal y-axis, but only provide it with fluxes from the part of the spectrum that will be plotted based on the x-axis trimming."""
-            y_axis_range = specutils.set_plot_yrange(all_wls, all_fls, avoid_regions=avoid_regions, wl_range=x_axis_range)
+
+            """ Determine optimal y-axis, but only provide it with fluxes from the part of the spectrum that will be plotted based on the x-axis trimming. """
+            y_axis_range = specutils.set_plot_yrange(all_wls, all_fls, avoid_regions=avoid_regions, wl_range=optimal_xaxis_range)
+
+            """ Plot the spectrum, turn on plot grid lines. """
             this_plotarea.plot(all_wls, all_fls, 'b')
             this_plotarea.grid(True)
-            """Get the values of the x- and y-axes plot limits that *would* have been used by pyplot automatically."""
+
+            """ Get the values of the x- and y-axes plot limits that *would* have been used by pyplot automatically.  We still use these x-axis plot ranges so that plots from the same instrument configuration have the same x-axis range. """
             pyplot_xrange = this_plotarea.get_xlim()
             pyplot_yrange = this_plotarea.get_ylim()
+
             if debug:
-                """Overplot points color-coded based on rejection criteria."""
+                """ Overplot points color-coded based on rejection criteria. """
                 specutils.debug_oplot(this_plotarea, all_wls, all_fls, all_flerrs, all_dqs, median_flux, median_fluxerr, flux_scale_factor, fluxerr_scale_factor, fluxerr_95th)
-                """Overplot the x-axis edges that are trimmed to define the y-axis plot range as a shaded area."""
-                this_plotarea.axvspan(numpy.nanmin(all_wls), x_axis_range[0],facecolor="lightgrey",alpha=0.5)
-                this_plotarea.axvspan(x_axis_range[1], numpy.nanmax(all_wls),facecolor="lightgrey",alpha=0.5)
-                """Overplot the avoid regions in a light color as a shaded area."""
+
+                """ Overplot the x-axis edges that are trimmed to define the y-axis plot range as a shaded area. """
+                this_plotarea.axvspan(numpy.nanmin(all_wls), optimal_xaxis_range[0],facecolor="lightgrey",alpha=0.5)
+                this_plotarea.axvspan(optimal_xaxis_range[1], numpy.nanmax(all_wls),facecolor="lightgrey",alpha=0.5)
+
+                """ Overplot the avoid regions in a light color as a shaded area. """
                 for ar in avoid_regions:
                     this_plotarea.axvspan(ar.minwl,ar.maxwl,facecolor="lightgrey",alpha=0.5)
-            """Note that we change the x-axis range here to be the min. and max. wavelength of this segment, rather than using the truncated version, so that all the plots for a similar instrument setting will have the same starting and ending plot values.  But, we still calculate the trimmed starting and ending wavelengths above for other things, such as defining the y-plot range."""
+
+            """ This is where we ensure the x-axis range is set to the pyplot-determined x-axis range, rather than using the optimum x-axis range.  This is done so that all the plots for a similar instrument setting will have the same starting and ending plot values. """
             this_plotarea.set_xlim(pyplot_xrange)
-            """Change x-axis units to microns if a small plot, because there isn't enough space."""
+
+            """ Change x-axis units to microns if a small plot, because there isn't enough space. """
+            """ <DEVEL> Note this assumes the wavelengths are always in Angstroms.  If a file format ever reports the wavelengths as something else, this would be an incorrect conversion. </DEVEL> """
             if not is_bigplot:
                 rc('font', size=10)
                 this_plotarea.set_xticklabels(this_plotarea.get_xticks()/10000.,rotation=45.)
                 this_plotarea.locator_params(axis="both", nbins=4, steps=[1,2,4,6,8,10])
                 this_figure.suptitle(r'$\lambda (\mu$m)', position=(0.83,0.99))
             else:
-                """Make sure the font properties go back to normal."""
+                """ Make sure the font properties go back to normal. """
                 pyplot.rcdefaults()
                 this_plotarea.set_xlabel(r"Wavelength $(\AA)$")
                 this_plotarea.set_ylabel(r"Flux $\mathrm{(erg/s/cm^2\!/\AA)}$")
+
+                """ If requested, include the powers of 10 part of the y-axis tickmarks. """
                 if full_ylabels:
                     this_plotarea.yaxis.set_major_formatter(FormatStrFormatter('%3.2E'))
-            """Update y-axis range, but only adjust the ranges if this isn't an all-zero flux case (and not in debug mode, in which case I want to see the entire y-axis range)."""
+
+            """ Update y-axis range, but only adjust the ranges if this isn't an all-zero flux case (and not in debug mode, in which case I want to see the entire y-axis range). """
             if not debug:
                 this_plotarea.set_ylim(y_axis_range)
+
         else:
-            x_axis_range = [numpy.nanmin(all_wls),numpy.nanmax(all_wls)]
-            this_plotarea.set_xlim(x_axis_range)
+            """ Otherwise this is a spectrum that has all zero fluxes, or some other problem, and we make a default plot.  Define the optimal x-axis range to span the original spectrum. """
+            optimal_xaxis_range = [numpy.nanmin(all_wls),numpy.nanmax(all_wls)]
+            this_plotarea.set_xlim(optimal_xaxis_range)
+
+            """ Make the plot background grey to distinguish that this is a `special` plot.  Turn off y-tick labels. """
             this_plotarea.set_axis_bgcolor("lightgrey")
             this_plotarea.set_yticklabels([])
+
+            """ Configure the plot units, text size, and other markings based on whether this is a large or thumbnail-sized plot. """
             if not is_bigplot:
                 rc('font', size=10)
                 this_plotarea.set_xticklabels(this_plotarea.get_xticks()/10000.,rotation=45.)
@@ -279,23 +322,31 @@ def plotspec(stis_spectrum, output_type, output_file, n_consecutive, flux_scale_
                 textsize = "small"
                 plottext = "Fluxes are \n all 0."
             else:
-                """Make sure the font properties go back to normal."""
+                """ Make sure the font properties go back to normal. """
                 pyplot.rcdefaults()
                 this_plotarea.set_xlabel(r"Wavelength $(\AA)$")
                 this_plotarea.set_ylabel(r"Flux $\mathrm{(erg/s/cm^2\!/\AA)}$")
+
+                """ If requested, include the powers of 10 part of the y-axis tickmarks. """
                 if full_ylabels:
                     this_plotarea.yaxis.set_major_formatter(FormatStrFormatter('%3.2E'))
+
                 textsize = "x-large"
                 plottext = "Fluxes are all 0."
+
+            """ Place the text with the informational message in the center of the plot. """
             this_plotarea.text(0.5,0.5,plottext,horizontalalignment="center",verticalalignment="center",transform=this_plotarea.transAxes,size=textsize)
 
-    """Display or plot to the desired format."""
+    """ Display or plot to the desired format. """
     if output_type != "screen":
-        """Deconstruct output file to include plot size information."""
+        """ Deconstruct output file to include plot size information. """
         output_splits = os.path.split(output_file)
         file_splits = os.path.splitext(output_splits[1])
         revised_output_file = output_splits[0]+os.path.sep+file_splits[0]+'_{0:04d}'.format(output_size)+file_splits[1]
+
+        """ Save figure. """
         this_figure.savefig(revised_output_file, format=output_type, dpi=dpi_val)
+
     elif output_type == "screen":
         pyplot.show()
 
@@ -312,19 +363,26 @@ def readspec(input_file):
     :returns: STIS1DSpectrum -- The spectroscopic data (wavelength, flux, flux error, etc):
     """
     with fits.open(input_file) as hdulist:
-        """ Read in the number of extensions from the primary header.  This will determine whether this is an association (N > 1) or not (N = 1)."""
+        """ Read in the number of extensions from the primary header.  This will determine whether this is an association (N > 1) or not (N = 1). """
         n_associations = hdulist[0].header["NEXTEND"]
-        """Create an initially empty list that will contain each extension's (association's) spectrum object."""
+
+        """ Create an initially empty list that will contain each extension's (association's) spectrum object. """
         all_association_spectra = []
+
+        """ Loop over each association and create the COS spectrum objects. """
         for exten in xrange(n_associations):
             exten_data_table = hdulist[exten+1].data
-            """How many orders (table rows) in this extension?"""
+
+            """ How many orders (table rows) in this extension? """
             n_orders = len(exten_data_table["sporder"])
-            """Create a list of STISOrderSpectra for this extension."""
+
+            """ Create a list of STISOrderSpectra for this extension. """
             all_order_spectra = [STISOrderSpectrum(nelem=exten_data_table["nelem"][order], wavelengths=exten_data_table["WAVELENGTH"][order], fluxes=exten_data_table["FLUX"][order], fluxerrs=exten_data_table["ERROR"][order], dqs=exten_data_table["DQ"][order]) for order in xrange(n_orders)]
-            """Create a STISExposureSpectrum from the STISOrderSpectrum objects."""
+
+            """ Create a STISExposureSpectrum from the STISOrderSpectrum objects.  Append to the running list of them. """
             this_exposure_spectrum = STISExposureSpectrum(order_spectra=all_order_spectra)
             all_association_spectra.append(this_exposure_spectrum)
+
         return STIS1DSpectrum(association_spectra=all_association_spectra, orig_file=input_file)
 
 #--------------------

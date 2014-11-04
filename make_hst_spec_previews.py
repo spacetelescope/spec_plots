@@ -11,7 +11,7 @@ __version__ = '1.2'
 import argparse
 from astropy.io import fits
 from os import path
-"""These are local modules that are imported."""
+""" These are local modules that are imported. """
 import specutils_cos
 import specutils_stis
 
@@ -56,7 +56,7 @@ def check_input_options(args):
     :raises: HSTSpecPrevError
     """
 
-    """Make sure the input file is specified on input (non-empty string), and remove any leading/trailing whitespace.  Catch as an ArgumentsParser error in this case.  If it does exist, check that the input file exists at the time of the command-line parameter checking."""
+    """ Make sure the input file is specified on input (non-empty string), and remove any leading/trailing whitespace.  Catch as an ArgumentsParser error in this case.  If it does exist, check that the input file exists at the time of the command-line parameter checking. """
     if not args.input_file:
         raise HSTSpecPrevError("File name must be specified.")
     else:
@@ -64,7 +64,7 @@ def check_input_options(args):
         if not path.isfile(args.input_file):
             raise HSTSpecPrevError("Input file not found, looking for "+args.input_file)
 
-    """Make sure the output_type string is trimmed and lowercase."""
+    """ Make sure the output_type string is trimmed and lowercase. """
     args.output_type = args.output_type.strip().lower()
 
 #--------------------
@@ -82,7 +82,7 @@ def get_instrument_name(input_file):
     :raises: KeyError
     """
     with fits.open(input_file) as hdulist:
-        """Make sure the INSTRUME keyword exists in the primary header, otherwise, catch as a KeyError in this case."""
+        """ Make sure the INSTRUME keyword exists in the primary header, otherwise, catch as a KeyError in this case. """
         try:
             this_instrument = hdulist[0].header['INSTRUME']
         except KeyError:
@@ -103,42 +103,42 @@ def make_hst_spec_previews(args):
     :raises: HSTSpecPrevError
     """
 
-    """Print file name, if verbose is turned on."""
+    """ Print file name, if verbose is turned on. """
     if args.verbose:
         print "Input file: " + args.input_file
 
-    """Derive output file name from input file name."""
+    """ Derive output file name from input file name. """
     if args.output_type != "screen":
         output_file = path.join(args.output_path,"") + path.basename(args.input_file).split(".fits")[0] + "." + args.output_type
     else:
         output_file = None
 
-    """Print name of output file, if verbose is turned on and not plotting to screen."""
+    """ Print name of output file, if verbose is turned on and not plotting to screen. """
     if args.verbose and args.output_type != "screen":
         print "Output file: " + output_file
     elif args.verbose:
         print "Output file: Plotting to screen."
 
-    """Read in the FITS file to determine which instrument it comes from.  Print the name of the instrument found in the header if verbose is turned on."""
+    """ Read in the FITS file to determine which instrument it comes from.  Print the name of the instrument found in the header if verbose is turned on. """
     this_instrument = get_instrument_name(args.input_file)
     if args.verbose:
         print "Instrument: " + this_instrument
 
-    """Read in the FITS file to extract wavelengths, fluxes, and flux uncertainties, using the local package appropriate for the instrument used in the input file."""
+    """ Read in the FITS file to extract wavelengths, fluxes, and flux uncertainties, using the local package appropriate for the instrument used in the input file. """
     if this_instrument == 'COS':
-        """Get wavelengths, fluxes, flux uncertainties."""
+        """ Get wavelengths, fluxes, flux uncertainties. """
         cos_spectrum = specutils_cos.readspec(args.input_file)
-        """Make "large-size" plot."""
+        """ Make "large-size" plot. """
         specutils_cos.plotspec(cos_spectrum, args.output_type, output_file, args.n_consecutive, args.flux_scale_factor, args.fluxerr_scale_factor, output_size=1024, debug=args.debug, full_ylabels=args.full_ylabels)
-        """Make "thumbnail-size" plot, if requested."""
+        """ Make "thumbnail-size" plot, if requested. """
         if not args.debug:
             specutils_cos.plotspec(cos_spectrum, args.output_type, output_file, args.n_consecutive, args.flux_scale_factor, args.fluxerr_scale_factor, output_size=128)
     elif this_instrument == 'STIS':
-        """Get wavelengths, fluxes, flux uncertainties."""
+        """ Get wavelengths, fluxes, flux uncertainties. """
         stis_spectrum = specutils_stis.readspec(args.input_file)
-        """Make "large-size" plot."""
+        """ Make "large-size" plot. """
         specutils_stis.plotspec(stis_spectrum, args.output_type, output_file, args.n_consecutive, args.flux_scale_factor, args.fluxerr_scale_factor, output_size=1024, debug=args.debug, full_ylabels=args.full_ylabels)
-        """Make "thumbnail-size" plot, if requested."""
+        """ Make "thumbnail-size" plot, if requested. """
         if not args.debug:
             specutils_stis.plotspec(stis_spectrum, args.output_type, output_file, args.n_consecutive, args.flux_scale_factor, args.fluxerr_scale_factor, output_size=128)
     else:
@@ -178,13 +178,13 @@ def setup_args():
 
 if __name__ == "__main__":
 
-    """Create ArgumentParser object that holds arguments and options."""
+    """ Create ArgumentParser object that holds arguments and options. """
     args = setup_args().parse_args()
 
-    """Check arguments and options."""
+    """ Check arguments and options. """
     check_input_options(args)
 
-    """Call main function."""
+    """ Call main function. """
     make_hst_spec_previews(args)
 
 #--------------------

@@ -73,8 +73,22 @@ class COSSpectrum:
             if cos_segments is not None:
                 if len(cos_segments) == 3:
                     self.segments = {'NUVA':cos_segments['NUVA'], 'NUVB':cos_segments['NUVB'], 'NUVC':cos_segments['NUVC']}
+                elif len(cos_segments) == 2:
+                    if 'NUVA' in cos_segments and 'NUVB' in cos_segments:
+                        self.segments = {'NUVA':cos_segments['NUVA'], 'NUVB':cos_segments['NUVB']}
+                    if 'NUVA' in cos_segments and 'NUVC' in cos_segments:
+                        self.segments = {'NUVA':cos_segments['NUVA'], 'NUVC':cos_segments['NUVC']}
+                    if 'NUVB' in cos_segments and 'NUVC' in cos_segments:
+                        self.segments = {'NUVB':cos_segments['NUVB'], 'NUVC':cos_segments['NUVC']}
+                elif len(cos_segments) == 1:
+                    if 'NUVA' in cos_segments:
+                        self.segments = {'NUVA':cos_segments['NUVA']}
+                    if 'NUVB' in cos_segments:
+                        self.segments = {'NUVB':cos_segments['NUVB']}
+                    if 'NUVC' in cos_segments:
+                        self.segments = {'NUVC':cos_segments['NUVC']}
                 else:
-                    raise ValueError("Band is specified as "+band.strip().upper()+", expected 3 COSSegment objects as a list but received "+str(len(cos_segments))+".")
+                    raise ValueError("Band is specified as "+band.strip().upper()+", expected 1, 2, or 3 COSSegment objects as a list but received "+str(len(cos_segments))+".")
 
             else:
                 """ Otherwise `cos_segments` was not supplied, so create with an empty `segments` property. """
@@ -175,14 +189,14 @@ def check_segments(segments_list, input_file):
             raise specutils.SpecUtilsError("The array of SEGMENT strings contains 1 value, but is not equal to [\"FUVA\"] or [\"FUVB\"] in file " + input_file)
 
     elif n_segments == 2:
-        """Must be ["FUVA", "FUVB"]."""
+        """ Must be ["FUVA", "FUVB"]. """
         if numpy.array_equal(segments_list, ["FUVA", "FUVB"]):
             this_band = "FUV"
         else:
             raise specutils.SpecUtilsError("The array of SEGMENT strings contains 2 values, but is not equal to [\"FUVA\", \"FUVB\"] in file " + input_file)
 
     elif n_segments == 3:
-        """Must be ["NUVA", "NUVB", "NUVC"]."""
+        """ Must be ["NUVA", "NUVB", "NUVC"]. """
         if numpy.array_equal(segments_list, ["NUVA", "NUVB", "NUVC"]):
             this_band = "NUV"
         else:
@@ -276,11 +290,11 @@ def plotspec(cos_spectrum, output_type, output_file, n_consecutive, flux_scale_f
         subplot_segment_names = segment_names
     else:
         is_bigplot = False
-        """Change segment_names to be a one-element array, because we need to join all the segments into a single array if making a thumbnail plot.  Make sure it's still a list..."""
+        """ Change segment_names to be a one-element array, because we need to join all the segments into a single array if making a thumbnail plot.  Make sure it's still a list... """
         n_subplots = 1
         subplot_segment_names = ["-".join(segment_names)]
 
-    """Start the plot figure."""
+    """ Start the plot figure. """
     this_figure, these_plotareas = pyplot.subplots(nrows=n_subplots, ncols=1, figsize=(output_size/dpi_val, output_size/dpi_val), dpi=dpi_val)
 
     """ Make sure the subplots are in a numpy array (I think by default it is not if there is only one). """
@@ -297,6 +311,7 @@ def plotspec(cos_spectrum, output_type, output_file, n_consecutive, flux_scale_f
     """ Loop over each segment. """
     for i,s in enumerate(subplot_segment_names):
         this_plotarea = these_plotareas[i]
+
         """ If this is a large plot, then get the spectrum for this segment.  Otherwise, stitch all the segments together (there is only one subplot in this case). """
         if is_bigplot:
             all_wls = cos_spectrum.segments[s].wavelengths
@@ -314,54 +329,72 @@ def plotspec(cos_spectrum, output_type, output_file, n_consecutive, flux_scale_f
         if is_bigplot:
             this_plotarea.set_title(title_addendum, loc="right", size="small", color="red")
 
-        """ Determine optimal x-axis. """
-        x_axis_range = specutils.set_plot_xrange("cos",all_wls, all_fls, all_flerrs, all_dqs, n_consecutive, flux_scale_factor, fluxerr_scale_factor, median_flux, median_fluxerr, fluxerr_95th)
-
-        """ <DEVEL> LEFT OFF HERE </DEVEL>
+        """ Determine optimal x-axis.  This is not the x-axis plot range used, but rather the area of the plot that is considered when scaling the y-axis. """
+        optimal_xaxis_range = specutils.set_plot_xrange("cos",all_wls, all_fls, all_flerrs, all_dqs, n_consecutive, flux_scale_factor, fluxerr_scale_factor, median_flux, median_fluxerr, fluxerr_95th)
 
         """ Plot the spectrum, but only if valid wavelength ranges for x-axis are returned, otherwise plot a special "Fluxes Are All Zero" plot. """
-        if all(numpy.isfinite(x_axis_range)):
-            """Create COS avoid regions."""
+        if all(numpy.isfinite(optimal_xaxis_range)):
+
+            """ Create COS avoid regions. """
             avoid_regions = generate_cos_avoid_regions()
-            """Determine optimal y-axis, but only provide it with fluxes from the part of the spectrum that will be plotted based on the x-axis trimming."""
-            y_axis_range = specutils.set_plot_yrange(all_wls, all_fls, avoid_regions=avoid_regions, wl_range=x_axis_range)
+
+            """ Determine optimal y-axis, but only provide it with fluxes from the part of the spectrum that will be plotted based on the x-axis trimming. """
+            y_axis_range = specutils.set_plot_yrange(all_wls, all_fls, avoid_regions=avoid_regions, wl_range=optimal_xaxis_range)
+
+            """ Plot the spectrum, turn on plot grid lines. """
             this_plotarea.plot(all_wls, all_fls, 'b')
             this_plotarea.grid(True)
-            """Get the values of the x- and y-axes plot limits that *would* have been used by pyplot automatically."""
+
+            """ Get the values of the x- and y-axes plot limits that *would* have been used by pyplot automatically.  We still use these x-axis plot ranges so that plots from the same instrument configuration have the same x-axis range. """
             pyplot_xrange = this_plotarea.get_xlim()
             pyplot_yrange = this_plotarea.get_ylim()
+
             if debug:
-                """Overplot points color-coded based on rejection criteria."""
+                """ Overplot points color-coded based on rejection criteria. """
                 specutils.debug_oplot(this_plotarea, all_wls, all_fls, all_flerrs, all_dqs, median_flux, median_fluxerr, flux_scale_factor, fluxerr_scale_factor, fluxerr_95th)
-                """Overplot the x-axis edges that are trimmed to define the y-axis plot range as a shaded area."""
-                this_plotarea.axvspan(numpy.nanmin(all_wls), x_axis_range[0],facecolor="lightgrey",alpha=0.5)
-                this_plotarea.axvspan(x_axis_range[1], numpy.nanmax(all_wls),facecolor="lightgrey",alpha=0.5)
-                """Overplot the avoid regions in a light color as a shaded area."""
+
+                """ Overplot regions excluded by the optimal x-axis range as a shaded area. """
+                this_plotarea.axvspan(numpy.nanmin(all_wls), optimal_xaxis_range[0],facecolor="lightgrey",alpha=0.5)
+                this_plotarea.axvspan(optimal_xaxis_range[1], numpy.nanmax(all_wls),facecolor="lightgrey",alpha=0.5)
+
+                """ Overplot the Avoid Regions as a shaded area. """
                 for ar in avoid_regions:
                     this_plotarea.axvspan(ar.minwl,ar.maxwl,facecolor="lightgrey",alpha=0.5)
-            """Note that we change the x-axis range here to be the min. and max. wavelength of this segment, rather than using the truncated version, so that all the plots for a similar instrument setting will have the same starting and ending plot values.  But, we still calculate the trimmed starting and ending wavelengths above for other things, such as defining the y-plot range."""
+
+            """ This is where we ensure the x-axis range is set to the pyplot-determined x-axis range, rather than using the optimum x-axis range.  This is done so that all the plots for a similar instrument setting will have the same starting and ending plot values. """
             this_plotarea.set_xlim(pyplot_xrange)
-            """Change x-axis units to microns if a small plot, because there isn't enough space."""
+
+            """ Change x-axis units to microns if a small plot, because there isn't enough space. """
+            """ <DEVEL> Note this assumes the wavelengths are always in Angstroms.  If a file format ever reports the wavelengths as something else, this would be an incorrect conversion. </DEVEL> """
             if not is_bigplot:
                 rc('font', size=10)
                 this_plotarea.set_xticklabels(this_plotarea.get_xticks()/10000.,rotation=45.)
                 this_plotarea.locator_params(axis="both", nbins=4, steps=[1,2,4,6,8,10])
                 this_figure.suptitle(r'$\lambda (\mu$m)', position=(0.83,0.99))
             else:
-                """Make sure the font properties go back to normal."""
+                """ Make sure the font properties go back to normal. """
                 pyplot.rcdefaults()
                 this_plotarea.set_xlabel(r"Wavelength $(\AA)$")
                 this_plotarea.set_ylabel(r"Flux $\mathrm{(erg/s/cm^2\!/\AA)}$")
+
+                """ If requested, include the powers of 10 part of the y-axis tickmarks. """
                 if full_ylabels:
                     this_plotarea.yaxis.set_major_formatter(FormatStrFormatter('%3.2E'))
-            """Update y-axis range, but only adjust the ranges if this isn't an all-zero flux case (and not in debug mode, in which case I want to see the entire y-axis range)."""
+
+            """ Update y-axis range, but only adjust the ranges if this isn't an all-zero flux case (and not in debug mode, in which case I want to see the entire y-axis range). """
             if not debug:
                 this_plotarea.set_ylim(y_axis_range)
+
         else:
-            x_axis_range = [numpy.nanmin(all_wls),numpy.nanmax(all_wls)]
-            this_plotarea.set_xlim(x_axis_range)
+            """ Otherwise this is a spectrum that has all zero fluxes, or some other problem, and we make a default plot.  Define the optimal x-axis range to span the original spectrum. """
+            optimal_xaxis_range = [numpy.nanmin(all_wls),numpy.nanmax(all_wls)]
+            this_plotarea.set_xlim(optimal_xaxis_range)
+
+            """ Make the plot background grey to distinguish that this is a `special` plot.  Turn off y-tick labels. """
             this_plotarea.set_axis_bgcolor("lightgrey")
             this_plotarea.set_yticklabels([])
+
+            """ Configure the plot units, text size, and other markings based on whether this is a large or thumbnail-sized plot. """
             if not is_bigplot:
                 rc('font', size=10)
                 this_plotarea.set_xticklabels(this_plotarea.get_xticks()/10000.,rotation=45.)
@@ -370,23 +403,31 @@ def plotspec(cos_spectrum, output_type, output_file, n_consecutive, flux_scale_f
                 textsize = "small"
                 plottext = "Fluxes are \n all 0."
             else:
-                """Make sure the font properties go back to normal."""
+                """ Make sure the font properties go back to normal. """
                 pyplot.rcdefaults()
                 this_plotarea.set_xlabel(r"Wavelength $(\AA)$")
                 this_plotarea.set_ylabel(r"Flux $\mathrm{(erg/s/cm^2\!/\AA)}$")
+
+                """ If requested, include the powers of 10 part of the y-axis tickmarks. """
                 if full_ylabels:
                     this_plotarea.yaxis.set_major_formatter(FormatStrFormatter('%3.2E'))
+
                 textsize = "x-large"
                 plottext = "Fluxes are all 0."
+
+            """ Place the text with the informational message in the center of the plot. """
             this_plotarea.text(0.5,0.5,plottext,horizontalalignment="center",verticalalignment="center",transform=this_plotarea.transAxes,size=textsize)
 
-    """Display or plot to the desired format."""
+    """ Display or plot to the desired device. """
     if output_type != "screen":
-        """Deconstruct output file to include plot size information."""
+        """ Deconstruct output file to include plot size information. """
         output_splits = os.path.split(output_file)
         file_splits = os.path.splitext(output_splits[1])
         revised_output_file = output_splits[0]+os.path.sep+file_splits[0]+'_{0:04d}'.format(output_size)+file_splits[1]
+
+        """ Save figure. """
         this_figure.savefig(revised_output_file, format=output_type, dpi=dpi_val)
+
     elif output_type == "screen":
         pyplot.show()
 
@@ -405,75 +446,134 @@ def readspec(input_file):
     :raises: KeyError
     """
     with fits.open(input_file) as hdulist:
-        """Read the data from the first extension.  For COS, the spectra are always stored as tables in the first FITS extension."""
+
+        """ Read the data from the first extension.  For COS, the spectra are always stored as tables in the first FITS extension. """
         cos_tabledata = hdulist[1].data
-        """Extract the SEGMENTS.  This is either a 2-element array of ["FUVA", "FUVB"], or a 3-element array of ["NUVA", "NUVB", "NUVC"]."""
+
+        """ Extract the SEGMENTS.  This is either a 2-element array of ["FUVA", "FUVB"], or a 3-element array of ["NUVA", "NUVB", "NUVC"]. """
         try:
             segment_arr = cos_tabledata.field("SEGMENT")
         except KeyError:
             print "*** MAKE_HST_SPEC_PREVIEWS ERROR: SEGMENT column not found in first extension's binary table."
             exit(1)
+
+        """ Determine which band this is (NUV, FUV). """
         band = check_segments(segment_arr, input_file)
-        """Extract the number of elements (n_wavelengths, n_fluxes, etc.) for each segment.  This will also be either a 2-element array (FUV) or 3-element array (NUV)."""
+
+        """ Extract the number of elements (n_wavelengths, n_fluxes, etc.) for each segment.  This will also be either a 2-element array (FUV) or 3-element array (NUV). """
         try:
             nelems_arr = cos_tabledata.field("NELEM")
         except KeyError:
             print "*** MAKE_HST_SPEC_PREVIEWS ERROR: NELEM column not found in first extension's binary table."
             exit(1)
-        """Extract wavelength, fluxes, and flux uncertainties for each segment.  These will be either 2xn (FUV) or 3xn (NUV) tables."""
+
+        """ Extract wavelength, fluxes, flux uncertainties, and DQ flags for each segment.  These will be either 2xn (FUV) or 3xn (NUV) tables. """
         try:
             wavelength_table = cos_tabledata.field("WAVELENGTH")
         except KeyError:
             print "*** MAKE_HST_SPEC_PREVIEWS ERROR: WAVELENGTH column not found in first extension's binary table."
             exit(1)
+
         try:
             flux_table = cos_tabledata.field("FLUX")
         except KeyError:
             print "*** MAKE_HST_SPEC_PREVIEWS ERROR: FLUX column not found in first extension's binary table."
             exit(1)
+
         try:
             fluxerr_table = cos_tabledata.field("ERROR")
         except KeyError:
             print "*** MAKE_HST_SPEC_PREVIEWS ERROR: ERROR column not found in first extension's binary table."
             exit(1)
+
         try:
             dq_table = cos_tabledata.field("DQ")
         except KeyError:
             print "*** MAKE_HST_SPEC_PREVIEWS ERROR: DQ column not found in first extension's binary table."
             exit(1)
-        """Create COSSegment objects to populate the COSSpectrum object with"""
+
+        """ Create COSSegment objects to populate the COSSpectrum object with. """
         if band == 'FUV':
+            """ Try creating FUVA COSSegment object. """
             try:
                 fuva_index = numpy.where(segment_arr == "FUVA")[0][0]
             except IndexError:
-                """Then there is no FUVA segment, normally this happends if there is only one segment present (in which case it's the other one of the two)."""
+                """ Then there is no FUVA segment, normally this happends if there is only one segment present (in which case it's the other one of the two). """
                 fuva_index = None
             if fuva_index is not None:
                 fuva_cossegment = COSSegment(nelem=nelems_arr[fuva_index], wavelengths=wavelength_table[fuva_index,:], fluxes=flux_table[fuva_index,:], fluxerrs=fluxerr_table[fuva_index,:], dqs=dq_table[fuva_index,:])
+
+            """ Try creating FUVB COSSegment object. """
             try:
                 fuvb_index = numpy.where(segment_arr == "FUVB")[0][0]
             except IndexError:
-                """Then there is no FUVB segment, normally this happends if there is only one segment present (in which case it's the other one of the two)."""
+                """ Then there is no FUVB segment, normally this happends if there is only one segment present (in which case it's the other one of the two). """
                 fuvb_index = None
             if fuvb_index is not None:
                 fuvb_cossegment = COSSegment(nelem=nelems_arr[fuvb_index], wavelengths=wavelength_table[fuvb_index,:], fluxes=flux_table[fuvb_index,:], fluxerrs=fluxerr_table[fuvb_index,:], dqs=dq_table[fuvb_index,:])
+
         elif band == 'NUV':
-            nuva_index = numpy.where(segment_arr == "NUVA")[0][0]
-            nuva_cossegment = COSSegment(nelem=nelems_arr[nuva_index], wavelengths=wavelength_table[nuva_index,:], fluxes=flux_table[nuva_index,:], fluxerrs=fluxerr_table[nuva_index,:], dqs=dq_table[nuva_index,:])
-            nuvb_index = numpy.where(segment_arr == "NUVB")[0][0]
-            nuvb_cossegment = COSSegment(nelem=nelems_arr[nuvb_index], wavelengths=wavelength_table[nuvb_index,:], fluxes=flux_table[nuvb_index,:], fluxerrs=fluxerr_table[nuvb_index,:], dqs=dq_table[nuvb_index,:])
-            nuvc_index = numpy.where(segment_arr == "NUVC")[0][0]
-            nuvc_cossegment = COSSegment(nelem=nelems_arr[nuvc_index], wavelengths=wavelength_table[nuvc_index,:], fluxes=flux_table[nuvc_index,:], fluxerrs=fluxerr_table[nuvc_index,:], dqs=dq_table[nuvc_index,:])
-        """Create COSSpectrum object."""
+            """ Try creating NUVA COSSegment object. """
+            try:
+                nuva_index = numpy.where(segment_arr == "NUVA")[0][0]
+            except IndexError:
+                """ Then there is no NUVA segment, not sure this is possible but handle the case anyways. """
+                nuva_index = None
+            if nuva_index is not None:
+                nuva_cossegment = COSSegment(nelem=nelems_arr[nuva_index], wavelengths=wavelength_table[nuva_index,:], fluxes=flux_table[nuva_index,:], fluxerrs=fluxerr_table[nuva_index,:], dqs=dq_table[nuva_index,:])
+
+            """ Try creating NUVB COSSegment object. """
+            try:
+                nuvb_index = numpy.where(segment_arr == "NUVB")[0][0]
+            except IndexError:
+                """ Then there is no NUVB segment, not sure this is possible but handle the case anyways. """
+                nuvb_index = None
+            if nuvb_index is not None:
+                nuvb_cossegment = COSSegment(nelem=nelems_arr[nuvb_index], wavelengths=wavelength_table[nuvb_index,:], fluxes=flux_table[nuvb_index,:], fluxerrs=fluxerr_table[nuvb_index,:], dqs=dq_table[nuvb_index,:])
+
+            """ Try creating NUVC COSSegment object. """
+            try:
+                nuvc_index = numpy.where(segment_arr == "NUVC")[0][0]
+            except IndexError:
+                """ Then there is no NUVC segment, not sure this is possible but handle the case anyways. """
+                nuvc_index = None
+            if nuvc_index is not None:
+                nuvc_cossegment = COSSegment(nelem=nelems_arr[nuvc_index], wavelengths=wavelength_table[nuvc_index,:], fluxes=flux_table[nuvc_index,:], fluxerrs=fluxerr_table[nuvc_index,:], dqs=dq_table[nuvc_index,:])
+
+        """ Create COSSpectrum object. """
         if band == 'FUV':
+            """ Handle case where both are supplied. """
             if fuva_index is not None and fuvb_index is not None:
                 return_spec = COSSpectrum(band=band, cos_segments={'FUVA':fuva_cossegment,'FUVB':fuvb_cossegment}, orig_file=input_file)
             elif fuva_index is not None:
+                """ Handle cases where only one is supplied. """
                 return_spec = COSSpectrum(band=band, cos_segments={'FUVA':fuva_cossegment}, orig_file=input_file)
-            else:
+            elif fuvb_index is not None:
                 return_spec = COSSpectrum(band=band, cos_segments={'FUVB':fuvb_cossegment}, orig_file=input_file)
+            else:
+                raise ValueError("Neither FUVA or FUVB segments were found, unable to create COS spectrum object.")
+
         elif band == 'NUV':
-            return_spec = COSSpectrum(band=band, cos_segments={'NUVA':nuva_cossegment,'NUVB':nuvb_cossegment,'NUVC':nuvc_cossegment}, orig_file=input_file)
+            """ Handle case where all three are supplied. """
+            if nuva_index is not None and nuvb_index is not None and nuvc_index is not None:
+                return_spec = COSSpectrum(band=band, cos_segments={'NUVA':nuva_cossegment,'NUVB':nuvb_cossegment,'NUVC':nuvc_cossegment}, orig_file=input_file)
+            elif nuva_index is not None and nuvb_index is not None:
+                """ Handle cases where only two are supplied. """
+                return_spec = COSSpectrum(band=band, cos_segments={'NUVA':nuva_cossegment,'NUVB':nuvb_cossegment}, orig_file=input_file)
+            elif nuva_index is not None and nuvc_index is not None:
+                return_spec = COSSpectrum(band=band, cos_segments={'NUVA':nuva_cossegment,'NUVC':nuvc_cossegment}, orig_file=input_file)
+            elif nuvb_index is not None and nuvc_index is not None:
+                return_spec = COSSpectrum(band=band, cos_segments={'NUVB':nuvb_cossegment,'NUVC':nuvc_cossegment}, orig_file=input_file)
+            elif nuva_index is not None:
+                """ Handle cases where only one is supplied. """
+                return_spec = COSSpectrum(band=band, cos_segments={'NUVA':nuva_cossegment}, orig_file=input_file)
+            elif nuvb_index is not None:
+                return_spec = COSSpectrum(band=band, cos_segments={'NUVB':nuvb_cossegment}, orig_file=input_file)
+            elif nuvc_index is not None:
+                return_spec = COSSpectrum(band=band, cos_segments={'NUVC':nuvc_cossegment}, orig_file=input_file)
+            else:
+                raise ValueError("None of the NUVA, NUVB, or NUVC segments were found, unable to create COS spectrum object.")
+
         return return_spec
 
 #--------------------

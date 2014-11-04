@@ -30,10 +30,10 @@ def make_html(idir=None, ofile="plot_previews.html"):
     :raises: OSError, IOError, ValueError
     """
 
-    """Get the path of the desired output file."""
+    """ Get the path of the desired output file. """
     ofile_dir = os.path.dirname(ofile)
 
-    """Get all of the thumb and full-size .png files in this directory."""
+    """ Get all of the thumb and full-size .png files in this directory. """
     if idir is not None:
         if os.path.isdir(idir):
             all_thumb_png_files = numpy.asarray(glob(idir+'/*0128.png'))
@@ -43,7 +43,7 @@ def make_html(idir=None, ofile="plot_previews.html"):
             n_large_png_files = len(all_large_png_files)
 
             """ <DEVEL> The code blocks that create the file roots should be generators and not arrays, since the array size might be quite large. </DEVEL> """
-            """Get the file root of the theumb-size spec-plots preview images, which are the first two parts of the file name separated by underscores.  E.g., la7803fkq_x1d_0128.png -> la7803fkq_x1d."""
+            """ Get the file root of the theumb-size spec-plots preview images, which are the first two parts of the file name separated by underscores.  E.g., la7803fkq_x1d_0128.png -> la7803fkq_x1d. """
             if n_thumb_png_files > 0:
                 all_thumb_png_files_froots = numpy.asarray(['_'.join(os.path.basename(x).split('_')[0:2]) for x in all_thumb_png_files])
                 thumb_sort_indexes = numpy.argsort(all_thumb_png_files_froots)
@@ -51,7 +51,7 @@ def make_html(idir=None, ofile="plot_previews.html"):
                 all_thumb_png_files = all_thumb_png_files[thumb_sort_indexes]
 
 
-            """Get the file root for the large-size spec-plots preview files."""
+            """ Get the file root for the large-size spec-plots preview files. """
             if n_large_png_files > 0:
                 all_large_png_files_froots = numpy.asarray(['_'.join(os.path.basename(x).split('_')[0:2]) for x in all_large_png_files])
                 large_sort_indexes = numpy.argsort(all_large_png_files_froots)
@@ -61,11 +61,11 @@ def make_html(idir=None, ofile="plot_previews.html"):
         else:
             raise IOError("Could not find directory " + idir)
 
-        """Get a list of unique <IPPPSSOOT_filetype> base names from both the all_thumb and all_large arrays of spec-plots file names.  This is because, in principle, there might only be a preview thumbnail or a full-size preview for a given IPPPSSOOT_filetype.  Note that this array should be sorted since the "unique" function returns a sorted array."""
+        """ Get a list of unique <IPPPSSOOT_filetype> base names from both the all_thumb and all_large arrays of spec-plots file names.  This is because, in principle, there might only be a preview thumbnail or a full-size preview for a given IPPPSSOOT_filetype.  Note that this array should be sorted since the "unique" function returns a sorted array. """
         """ <DEVEL> Concatenating the arrays here can be expensive if trying to make webpage for a very large number of preview plots.  Consider an alternative way of getting the unique set between the two without creating a new array. </DEVEL> """
         uniq_fileroots = numpy.sort(numpy.unique(numpy.concatenate([all_thumb_png_files_froots,all_large_png_files_froots])))
 
-        """Create the output directory if needed."""
+        """ Create the output directory if needed. """
         if ofile_dir != '' and not os.path.isdir(ofile_dir):
             try:
                 os.mkdir(ofile_dir)
@@ -76,7 +76,7 @@ def make_html(idir=None, ofile="plot_previews.html"):
                 else:
                     raise
 
-        """Open HTML for writing and begin printing the HTML table, where each row is one of the unique fileroots."""
+        """ Open HTML for writing and begin printing the HTML table, where each row is one of the unique fileroots. """
         cur_thumb_index = 0; cur_large_index = 0
 
         with open(ofile, 'w') as of:
@@ -85,23 +85,23 @@ def make_html(idir=None, ofile="plot_previews.html"):
 
             for ufr in uniq_fileroots:
 
-                """Check if the thumb version of the preview exists."""
+                """ Check if the thumb version of the preview exists. """
                 if n_thumb_png_files > 0 and all_thumb_png_files_froots[cur_thumb_index] == ufr:
                     has_thumb = True
                 else:
                     has_thumb = False
                     
-                """Check if the large version of the preview exists."""
+                """ Check if the large version of the preview exists. """
                 if n_large_png_files > 0 and all_large_png_files_froots[cur_large_index] == ufr:
                     has_large = True
                 else:
                     has_large = False
 
-                """If it has at least one preview image, then print this table row."""
+                """ If it has at least one preview image, then print this table row. """
                 if has_thumb or has_large:
                     of.write('  <tr>\n')
 
-                    """Write the cell containing the thumbnail preview, (or just fill it grey if missing)."""
+                    """ Write the cell containing the thumbnail preview, (or just fill it grey if missing). """
                     of.write('    <td style="border:1px solid black;width:135px;vertical-align:top"><div style="width:128px;text-align:center"><span style="font-weight:bold">'+ufr+'</span></div>')
                     if has_thumb:
                         of.write('<img src="'+os.path.relpath(all_thumb_png_files[cur_thumb_index],ofile_dir)+'" width="128px">')
@@ -109,7 +109,7 @@ def make_html(idir=None, ofile="plot_previews.html"):
                         of.write('<div style="background-color:#86867D;width:128px;height:128px"></div>')
                     of.write('</td>\n')
 
-                    """Write the cell containing the large preview, (or just fill it grey if missing)."""
+                    """ Write the cell containing the large preview, (or just fill it grey if missing). """
                     of.write('    <td style="border:1px solid black;width:1030px">')
                     if has_large:
                         of.write('<img src="'+os.path.relpath(all_large_png_files[cur_large_index],ofile_dir)+'" width="1024px">')
@@ -137,15 +137,15 @@ def make_html(idir=None, ofile="plot_previews.html"):
 #--------------------
 
 if __name__ == "__main__":
-    """Create argument parser."""
+    """ Create argument parser. """
     parser = argparse.ArgumentParser(description="Create HTML page of preview plots, given an output directory.")
     parser.add_argument("-d", action="store", type=str, dest="input_dir", default=None, help="[Required] Full path to directory containing preview plots.",metavar='location of plots')
     parser.add_argument("-o", action="store", type=str, dest="output_file", default="html/plot_previews.html", help='[Optional] Full path and file name of the output HTML file.  If the file already exists, it will be overwritten.  Defualt = "html/plot_previews.html".')
 
-    """Parse arguments."""
+    """ Parse arguments. """
     args = parser.parse_args()
 
-    """Call main method."""
+    """ Call main method. """
     make_html(args.input_dir, args.output_file)
 
 #--------------------
