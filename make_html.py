@@ -12,6 +12,7 @@ import argparse
 from glob import glob
 import numpy
 import os
+import sys
 
 #--------------------
 
@@ -71,7 +72,7 @@ def make_html(idir=None, ofile="plot_previews.html"):
                 os.mkdir(ofile_dir)
             except OSError as this_error:
                 if this_error.errno == 13: 
-                    print "*** MAKE_HTML ERROR: Output directory could not be created, "+repr(this_error.strerror)
+                    sys.stderr.write("*** MAKE_HTML ERROR: Output directory could not be created, "+repr(this_error.strerror)+"\n")
                     exit(1)
                 else:
                     raise

@@ -16,6 +16,7 @@ from matplotlib.ticker import FormatStrFormatter
 import numpy
 import os
 import specutils
+import sys
 
 #--------------------
 
@@ -25,7 +26,7 @@ class STIS1DSpectrum:
     
     :raises: ValueError
     """
-    def __init__(self, association_spectra=None, orig_file=None):
+    def __init__(self, association_spectra, orig_file=None):
         """
         Create a STIS1DSpectrum object out of a list of STISExposureSpectrum objects, which themselves are lists of STISOrderSpectrum objects.
 
@@ -36,16 +37,11 @@ class STIS1DSpectrum:
         :param orig_file: Original FITS file read to create the spectrum (includes full path).
 
         :type orig_file: str
-
-        :raises: ValueError
         """
 
         """ Record the original file name along with the list of associations. """
-        if association_spectra is not None:
-            self.orig_file = orig_file
-            self.associations = association_spectra
-        else:
-            raise ValueError("Must provide a list of STISExposureSpectrum objects.")
+        self.orig_file = orig_file
+        self.associations = association_spectra
 
 #--------------------
 
@@ -53,7 +49,7 @@ class STISExposureSpectrum:
     """
     Defines a STIS exposure spectrum, which consists of "M" STISOrderSpectrum objects.
     """
-    def __init__(self, order_spectra=None):
+    def __init__(self, order_spectra):
         """
         Create a STISExposureSpectrum object out of a list of STISOrderSpectrum objects.
 
@@ -63,12 +59,10 @@ class STISExposureSpectrum:
 
         :raises: ValueError
         """
-        if order_spectra is None:
-            raise ValueError("Must provide a list of STISOrderSpectrum objects.")
-        elif len(order_spectra) > 0:
+        if len(order_spectra) > 0:
             self.orders = order_spectra
         else:
-            raise ValueError("Must provide a list of at least one STISOrderSpectrum objects, input list is empty.")
+            raise ValueError("Must provide a list of at least one STISOrderSpectrum object, input list is empty.")
 
 #--------------------
 
@@ -140,7 +134,7 @@ def generate_stis_avoid_regions():
 
 #--------------------
 
-def plotspec(stis_spectrum, output_type, output_file, n_consecutive, flux_scale_factor, fluxerr_scale_factor, output_size=None, debug=False, full_ylabels=False):
+def plotspec(stis_spectrum, output_type, output_file, n_consecutive, flux_scale_factor, fluxerr_scale_factor, dpi_val=96., output_size=1024, debug=False, full_ylabels=False):
     """
     Accepts a STIS1DSpectrum object from the READSPEC function and produces preview plots.
 
@@ -168,9 +162,17 @@ def plotspec(stis_spectrum, output_type, output_file, n_consecutive, flux_scale_
 
     :type fluxerr_scale_factor: float
 
+    :param dpi_val: The DPI value of your device's monitor.  Affects the size of the output plots.  Default = 96. (applicable to most modern monitors).
+    
+    :type dpi_val: float
+
     :param output_size: Size of plot in pixels (plots are square in dimensions).  Defaults to 1024.
 
     :param output_size: int
+
+    :param debug: Should the output plots include debugging information (color-coded data points based on rejection criteria, shaded exclude regions)?  Default = False.
+
+    :type debug: bool
 
     :param full_ylabels: Should the y-labels contain the full values (including the power of 10 in scientific notation)?  Default = False.
 
@@ -183,13 +185,10 @@ def plotspec(stis_spectrum, output_type, output_file, n_consecutive, flux_scale_
          This function assumes a screen resolution of 96 DPI in order to generate plots of the desired sizes.  This is because matplotlib works in units of inches and DPI rather than pixels.
     """
 
-    """ Specify DPI value (assumes typical value) and make sure the plot size is set. """
-    dpi_val = 96.
+    """ Make sure the plot size is set to an integer value. """
     if output_size is not None:
         if not isinstance(output_size, int):
             output_size = int(round(output_size))
-    else:
-        output_size = 1024
 
     """ Make sure the output path exists, if not, create it. """
     if output_type != 'screen':
@@ -198,7 +197,7 @@ def plotspec(stis_spectrum, output_type, output_file, n_consecutive, flux_scale_
                 os.mkdir(os.path.dirname(output_file))
             except OSError as this_error:
                 if this_error.errno == 13: 
-                    print "*** MAKE_HST_SPEC_PREVIEWS ERROR: Output directory could not be created, "+repr(this_error.strerror)
+                    sys.stderr.write("*** MAKE_HST_SPEC_PREVIEWS ERROR: Output directory could not be created, "+repr(this_error.strerror)+"\n")
                     exit(1)
                 else:
                     raise
@@ -380,9 +379,9 @@ def readspec(input_file):
             all_order_spectra = [STISOrderSpectrum(nelem=exten_data_table["nelem"][order], wavelengths=exten_data_table["WAVELENGTH"][order], fluxes=exten_data_table["FLUX"][order], fluxerrs=exten_data_table["ERROR"][order], dqs=exten_data_table["DQ"][order]) for order in xrange(n_orders)]
 
             """ Create a STISExposureSpectrum from the STISOrderSpectrum objects.  Append to the running list of them. """
-            this_exposure_spectrum = STISExposureSpectrum(order_spectra=all_order_spectra)
+            this_exposure_spectrum = STISExposureSpectrum(all_order_spectra)
             all_association_spectra.append(this_exposure_spectrum)
 
-        return STIS1DSpectrum(association_spectra=all_association_spectra, orig_file=input_file)
+        return STIS1DSpectrum(all_association_spectra, orig_file=input_file)
 
 #--------------------

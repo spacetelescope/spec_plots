@@ -17,6 +17,7 @@ from matplotlib.ticker import FormatStrFormatter
 import numpy
 import os
 import specutils
+import sys
 
 #--------------------
 
@@ -220,7 +221,7 @@ def generate_cos_avoid_regions():
 
 #--------------------
 
-def plotspec(cos_spectrum, output_type, output_file, n_consecutive, flux_scale_factor, fluxerr_scale_factor, output_size=None, debug=False, full_ylabels=False):
+def plotspec(cos_spectrum, output_type, output_file, n_consecutive, flux_scale_factor, fluxerr_scale_factor, dpi_val=96., output_size=1024, debug=False, full_ylabels=False):
     """
     Accepts a COSSpectrum object from the READSPEC function and produces preview plots.
 
@@ -236,9 +237,29 @@ def plotspec(cos_spectrum, output_type, output_file, n_consecutive, flux_scale_f
 
     :type output_file: str
 
+    :param n_consecutive: How many consecutive points must pass the test for the index to count as the valid start/end of the spectrum?  Default = 20.
+
+    :type n_consecutive: int
+
+    :param flux_scale_factor: Max. allowed ratio between the flux and a median flux value, used in edge trimming.  Default = 10.
+
+    :type flux_scale_factor: float
+
+    :param fluxerr_scale_factor: Max. allowed ratio between the flux uncertainty and a median flux uncertainty value, used in edge trimming.  Default = 5.
+
+    :type fluxerr_scale_factor: float
+
+    :param dpi_val: The DPI value of your device's monitor.  Affects the size of the output plots.  Default = 96. (applicable to most modern monitors).
+    
+    :type dpi_val: float
+
     :param output_size: Size of plot in pixels (plots are square in dimensions).  Defaults to 1024.
 
     :param output_size: int
+
+    :param debug: Should the output plots include debugging information (color-coded data points based on rejection criteria, shaded exclude regions)?  Default = False.
+
+    :type debug: bool
 
     :param full_ylabels: Should the y-labels contain the full values (including the power of 10 in scientific notation)?  Default = False.
 
@@ -251,13 +272,10 @@ def plotspec(cos_spectrum, output_type, output_file, n_consecutive, flux_scale_f
          This function assumes a screen resolution of 96 DPI in order to generate plots of the desired sizes.  This is because matplotlib works in units of inches and DPI rather than pixels.
     """
 
-    """ Specify DPI value (assumes typical value) and make sure the plot size is set. """
-    dpi_val = 96.
+    """ Make sure the plot size is set to an integer value. """
     if output_size is not None:
         if not isinstance(output_size, int):
             output_size = int(round(output_size))
-    else:
-        output_size = 1024
 
     """ Make sure the output path exists, if not, create it. """
     if output_type != 'screen':
@@ -266,7 +284,7 @@ def plotspec(cos_spectrum, output_type, output_file, n_consecutive, flux_scale_f
                 os.mkdir(os.path.dirname(output_file))
             except OSError as this_error:
                 if this_error.errno == 13:
-                    print "*** MAKE_HST_SPEC_PREVIEWS ERROR: Output directory could not be created, "+repr(this_error.strerror)
+                    sys.stderr.write("*** MAKE_HST_SPEC_PREVIEWS ERROR: Output directory could not be created, "+repr(this_error.strerror)+"\n")
                     exit(1)
                 else:
                     raise

@@ -67,6 +67,10 @@ def check_input_options(args):
     """ Make sure the output_type string is trimmed and lowercase. """
     args.output_type = args.output_type.strip().lower()
 
+    """ The DPI value must be greater than zero... """
+    if args.dpi_val < 0.:
+        raise ValueError("DPI value must be > 0.")
+
 #--------------------
 
 def get_instrument_name(input_file):
@@ -128,19 +132,25 @@ def make_hst_spec_previews(args):
     if this_instrument == 'COS':
         """ Get wavelengths, fluxes, flux uncertainties. """
         cos_spectrum = specutils_cos.readspec(args.input_file)
+
         """ Make "large-size" plot. """
-        specutils_cos.plotspec(cos_spectrum, args.output_type, output_file, args.n_consecutive, args.flux_scale_factor, args.fluxerr_scale_factor, output_size=1024, debug=args.debug, full_ylabels=args.full_ylabels)
+        specutils_cos.plotspec(cos_spectrum, args.output_type, output_file, args.n_consecutive, args.flux_scale_factor, args.fluxerr_scale_factor, dpi_val=args.dpi_val, output_size=1024, debug=args.debug, full_ylabels=args.full_ylabels)
+
         """ Make "thumbnail-size" plot, if requested. """
         if not args.debug:
-            specutils_cos.plotspec(cos_spectrum, args.output_type, output_file, args.n_consecutive, args.flux_scale_factor, args.fluxerr_scale_factor, output_size=128)
+            specutils_cos.plotspec(cos_spectrum, args.output_type, output_file, args.n_consecutive, args.flux_scale_factor, args.fluxerr_scale_factor, dpi_val=args.dpi_val, output_size=128)
+
     elif this_instrument == 'STIS':
         """ Get wavelengths, fluxes, flux uncertainties. """
         stis_spectrum = specutils_stis.readspec(args.input_file)
+
         """ Make "large-size" plot. """
-        specutils_stis.plotspec(stis_spectrum, args.output_type, output_file, args.n_consecutive, args.flux_scale_factor, args.fluxerr_scale_factor, output_size=1024, debug=args.debug, full_ylabels=args.full_ylabels)
+        specutils_stis.plotspec(stis_spectrum, args.output_type, output_file, args.n_consecutive, args.flux_scale_factor, args.fluxerr_scale_factor, dpi_val=args.dpi_val, output_size=1024, debug=args.debug, full_ylabels=args.full_ylabels)
+
         """ Make "thumbnail-size" plot, if requested. """
         if not args.debug:
-            specutils_stis.plotspec(stis_spectrum, args.output_type, output_file, args.n_consecutive, args.flux_scale_factor, args.fluxerr_scale_factor, output_size=128)
+            specutils_stis.plotspec(stis_spectrum, args.output_type, output_file, args.n_consecutive, args.flux_scale_factor, args.fluxerr_scale_factor, dpi_val=args.dpi_val, output_size=128)
+
     else:
         raise HSTSpecPrevError('"INSTRUME" keyword not understood: ' + this_instrument)
 
@@ -157,6 +167,8 @@ def setup_args():
     parser.add_argument("-f", action="store", type=str, dest="input_file", default=None, help="[Required] Full path to input file (HST spectrum) for which to generate preview plots.  Include the file name in the path.", metavar='input file')
 
     parser.add_argument("-d", action="store_true", dest="debug", default=False, help='[Optional] Turn on debug mode, which will plot to the screen and color-code fluxes based on different rejection criteria.')
+
+    parser.add_argument("--dpival", action="store", type=float, dest="dpi_val", default=96., help="[Optional] Specify the DPI value of your device's monitor, which will affect the size of the output plots.  Default = 96., which is applicable to most modern monitors.")
 
     parser.add_argument("-e", action="store", type=float, dest="fluxerr_scale_factor", default=5., help="[Optional] Specify the ratio between the flux uncertainty and the median flux uncertainty that defines the pass/fail criterion within the edge trim test.  Default = 5.")
 
