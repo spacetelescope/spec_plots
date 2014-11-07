@@ -12,12 +12,13 @@ import argparse
 from astropy.io import fits
 from os import path
 """ These are local modules that are imported. """
+import specutils
 import specutils_cos
 import specutils_stis
 
 #--------------------
 
-class HSTSpecPrevError(Exception):
+class HSTSpecPrevError(Exception, object):
     """
     This class defines a generic Exception to use for errors raised in MAKE_HST_SPEC_PREVIEWS.  It simply prints the given string when raising the exception. e.g.,
 
@@ -128,17 +129,29 @@ def make_hst_spec_previews(args):
     if args.verbose:
         print "Instrument: " + this_instrument
 
-    """ Read in the FITS file to extract wavelengths, fluxes, and flux uncertainties, using the local package appropriate for the instrument used in the input file. """
+    """ Read in the FITS files and create plots using the local package appropriate for the instrument used in the input file. """
     if this_instrument == 'COS':
         """ Get wavelengths, fluxes, flux uncertainties. """
         cos_spectrum = specutils_cos.readspec(args.input_file)
 
-        """ Make "large-size" plot. """
-        specutils_cos.plotspec(cos_spectrum, args.output_type, output_file, args.n_consecutive, args.flux_scale_factor, args.fluxerr_scale_factor, dpi_val=args.dpi_val, output_size=1024, debug=args.debug, full_ylabels=args.full_ylabels)
+        """ Get a list of segment names sorted such that the bluest segment is first. """
+        cos_segment_names = specutils_cos.get_segment_names(cos_spectrum)
 
-        """ Make "thumbnail-size" plot, if requested. """
+        """ Create a stitched spectrum for use when making thumb-size plots. """
+        stitched_spectrum = specutils.stitch_components(cos_spectrum, args.n_consecutive, args.flux_scale_factor, args.fluxerr_scale_factor, segment_names=cos_segment_names)
+
+        """ Calculate plot metrics for the each segment. """
+        segment_plot_metrics = [specutils.calc_plot_metrics("cos", cos_spectrum.segments[x].wavelengths, cos_spectrum.segments[x].fluxes, cos_spectrum.segments[x].fluxerrs, cos_spectrum.segments[x].dqs, args.n_consecutive, args.flux_scale_factor, args.fluxerr_scale_factor) for x in cos_segment_names]
+
+        """ Make "large-size" plot. """
+        specutils_cos.plotspec(cos_spectrum, args.output_type, output_file, args.n_consecutive, args.flux_scale_factor, args.fluxerr_scale_factor, segment_plot_metrics, dpi_val=args.dpi_val, output_size=1024, debug=args.debug, full_ylabels=args.full_ylabels)
+
         if not args.debug:
-            specutils_cos.plotspec(cos_spectrum, args.output_type, output_file, args.n_consecutive, args.flux_scale_factor, args.fluxerr_scale_factor, dpi_val=args.dpi_val, output_size=128)
+            """ Calculate plot metrics for the stitched spectrum. """
+            stitched_plot_metrics = [specutils.calc_plot_metrics("cos", stitched_spectrum["wls"], stitched_spectrum["fls"], stitched_spectrum["flerrs"], stitched_spectrum["dqs"], args.n_consecutive, args.flux_scale_factor, args.fluxerr_scale_factor)]
+
+            """ Make "thumbnail-size" plot, if requested. """
+            specutils_cos.plotspec(cos_spectrum, args.output_type, output_file, args.n_consecutive, args.flux_scale_factor, args.fluxerr_scale_factor, stitched_plot_metrics, dpi_val=args.dpi_val, output_size=128, stitched_spectrum=stitched_spectrum)
 
     elif this_instrument == 'STIS':
         """ Get wavelengths, fluxes, flux uncertainties. """

@@ -15,7 +15,7 @@ import specutils_stis
 
 #--------------------
 
-class SpecUtilsError(Exception):
+class SpecUtilsError(Exception, object):
     """
     This class defines a generic Exception to use for errors raised in the SPECUTILS modules (specutils, specutils_cos, specutils_stis, etc.).  It simply prints the given value when raising the exception, e.g., 
     
@@ -43,7 +43,7 @@ class SpecUtilsError(Exception):
 
 #--------------------
 
-class AvoidRegion:
+class AvoidRegion(object):
     """
     Defines an avoid region, which is a section of wavelength space that should not be included when determining the optimal y-axis plot range.  The object consists of a starting wavelength, ending wavelength, and string description of what that region is.
 
@@ -64,6 +64,31 @@ class AvoidRegion:
         self.minwl = minwl
         self.maxwl = maxwl
         self.description = description
+
+#--------------------
+
+def calc_plot_metrics(instrument, wls, fls, flerrs, dqs, n_consecutive, flux_scale_factor, fluxerr_scale_factor):
+    """
+    
+    """
+
+    """ Calculate statistics on the fluxes. """
+    median_flux, median_fluxerr, fluxerr_95th = get_flux_stats(fls, flerrs)
+
+    """ Determine optimal x-axis.  This is not the x-axis plot range used, but rather the area of the plot that is considered when scaling the y-axis. """
+    optimal_xaxis_range = set_plot_xrange(instrument, wls, fls, flerrs, dqs, n_consecutive, flux_scale_factor, fluxerr_scale_factor, median_flux, median_fluxerr, fluxerr_95th)
+
+    """ Create COS avoid regions. """
+    avoid_regions = generate_avoid_regions(instrument)
+
+    """ Determine the optimal y-axis. """
+    if all(numpy.isfinite(optimal_xaxis_range)):
+        y_axis_range = set_plot_yrange(wls, fls, avoid_regions=avoid_regions, wl_range=optimal_xaxis_range)
+    else:
+        y_axis_range = [numpy.nan, numpy.nan]
+
+    """ Return the plot_metrics dict. """
+    return {"median_flux":median_flux, "median_fluxerr":median_fluxerr, "fluxerr_95th":fluxerr_95th, "optimal_xaxis_range":optimal_xaxis_range, "avoid_regions":avoid_regions, "y_axis_range":y_axis_range}
 
 #--------------------
 
@@ -301,6 +326,29 @@ def edge_trim(instrument, fluxes, fluxerrs, dqs, n_consecutive, median_flux, flu
             end_index -= 1
 
     return start_index_nodq, end_index_nodq, start_index_withdq, end_index_withdq
+
+#--------------------
+
+def generate_avoid_regions(instrument):
+    """
+    Creates a list of AvoidRegion objects for use in the plotting routine, specifically designed for the given instrument.
+
+    :param instrument: The instrument to generate the Avoid Region for.
+
+    :type instrument: str
+
+    """
+
+    if instrument == "cos":
+        lya1215_ar = AvoidRegion(1214.,1217., "Lyman alpha emission line.")
+        return [lya1215_ar]
+
+    elif instrument == "stis":
+        lya1215_ar = AvoidRegion(1214.,1217., "Lyman alpha emission line.")
+        return [lya1215_ar]
+
+    else:
+        return []
 
 #--------------------
 
@@ -587,7 +635,7 @@ def stitch_components(input_exposure, n_consecutive, flux_scale_factor, fluxerr_
 
     :type segment_names: list
 
-    :returns: numpy array, numpy array, numpy array, str -- The stitched wavelengths, fluxes, flux errors, and an informational plot title in the event that all the fluxes had the DQ flag set.
+    :returns: dict{numpy array, numpy array, numpy array, str} -- The stitched wavelengths, fluxes, flux errors, and an informational plot title in the event that all the fluxes had the DQ flag set.  These are packaged in a dict.
 
     :raises: ValueError
     """
@@ -691,6 +739,6 @@ def stitch_components(input_exposure, n_consecutive, flux_scale_factor, fluxerr_
     all_flerrs = all_flerrs[sorted_indexes]
     all_dqs = all_dqs[sorted_indexes]
 
-    return all_wls, all_fls, all_flerrs, all_dqs, return_title
+    return {"wls":all_wls, "fls":all_fls, "flerrs":all_flerrs, "dqs":all_dqs, "title":return_title}
 
 #--------------------

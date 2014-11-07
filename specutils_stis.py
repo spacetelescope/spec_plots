@@ -9,7 +9,6 @@ __version__ = '1.2'
 """
 
 from astropy.io import fits
-import math
 from matplotlib import rc
 import matplotlib.pyplot as pyplot
 from matplotlib.ticker import FormatStrFormatter
@@ -20,7 +19,7 @@ import sys
 
 #--------------------
 
-class STIS1DSpectrum:
+class STIS1DSpectrum(object):
     """
     Defines a STIS 1D spectrum (either "x1d" extracted or "sx1" summed extracted), including wavelegnth, flux, and flux errors.  A STIS 1D spectrum object consists of N associations.  If the file is an association, then N > 1, otherwise N = 1.  Each of these N associations can contain M orders.  If the association is an Echelle spectrum, then 24 < M < 70, depending on instrument configuration, otherwise M = 1.  Each of these M orders contain typical spectral data (wavelengths, fluxes, etc.), stored as STISOrderSpectrum objects.  The final data structure is then <STIS1DSpectrum>.associations[n].order[m].wavelengths (or .fluxes, .fluxerrs, etc.).
     
@@ -45,7 +44,7 @@ class STIS1DSpectrum:
 
 #--------------------
 
-class STISExposureSpectrum:
+class STISExposureSpectrum(object):
     """
     Defines a STIS exposure spectrum, which consists of "M" STISOrderSpectrum objects.
     """
@@ -66,7 +65,7 @@ class STISExposureSpectrum:
 
 #--------------------
 
-class STISOrderSpectrum:
+class STISOrderSpectrum(object):
     """
     Defines a STIS order spectrum, including wavelength, flux, flux errors, and data quality flags, which are stored as numpy arrays.  A scalar int property provides the number of elements in this segment.
     """
@@ -362,15 +361,12 @@ def readspec(input_file):
     :returns: STIS1DSpectrum -- The spectroscopic data (wavelength, flux, flux error, etc):
     """
     with fits.open(input_file) as hdulist:
-        """ Read in the number of extensions from the primary header.  This will determine whether this is an association (N > 1) or not (N = 1). """
-        n_associations = hdulist[0].header["NEXTEND"]
-
         """ Create an initially empty list that will contain each extension's (association's) spectrum object. """
         all_association_spectra = []
 
         """ Loop over each association and create the COS spectrum objects. """
-        for exten in xrange(n_associations):
-            exten_data_table = hdulist[exten+1].data
+        for exten in hdulist[1:]:
+            exten_data_table = exten.data
 
             """ How many orders (table rows) in this extension? """
             n_orders = len(exten_data_table["sporder"])

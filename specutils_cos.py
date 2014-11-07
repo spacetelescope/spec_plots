@@ -10,7 +10,6 @@ __version__ = '1.2'
 """
 
 from astropy.io import fits
-import math
 from matplotlib import rc
 import matplotlib.pyplot as pyplot
 from matplotlib.ticker import FormatStrFormatter
@@ -21,7 +20,7 @@ import sys
 
 #--------------------
 
-class COSSpectrum:
+class COSSpectrum(object):
     """
     Defines a COS spectrum, including wavelegnth, flux, and flux errors.  A COS spectrum consists of N segments (N = {2,3}) stored as a dict object.  Each of these dicts contain a COSSegment object that contains the wavelengths, fluxes, flux errors, etc.
 
@@ -100,7 +99,7 @@ class COSSpectrum:
 
 #--------------------
 
-class COSSegment:
+class COSSegment(object):
     """
     Defines a spectrum from a COS segment.  The data (wavelength, flux, flux errors) are stored as numpy ndarrays.  A scalar int property provides the number of elements in this segment.
     """
@@ -210,24 +209,33 @@ def check_segments(segments_list, input_file):
 
 #--------------------
 
-def generate_cos_avoid_regions():
+def get_segment_names(cos_spectrum):
     """
-    Creates a list of AvoidRegion objects for use in the plotting routine, specifically designed for COS spectra.
-    """
-
-    lya1215_ar = specutils.AvoidRegion(1214.,1217., "Lyman alpha emission line.")
-
-    return [lya1215_ar]
-
-#--------------------
-
-def plotspec(cos_spectrum, output_type, output_file, n_consecutive, flux_scale_factor, fluxerr_scale_factor, dpi_val=96., output_size=1024, debug=False, full_ylabels=False):
-    """
-    Accepts a COSSpectrum object from the READSPEC function and produces preview plots.
+    Returns a list of segment names sorted such that the bluest segments come first.
 
     :param cos_spectrum: COS spectrum as returned by READSPEC.
 
     :type cos_spectrum: COSSpectrum
+    """
+
+    """ Get an initial list of segment names. """
+    segment_names = cos_spectrum.segments.keys()
+
+    """ Reverse the list of segment names *FOR FUV DATA*, becaue the bluest segment is the latter in the alphabet, but only for the FUV spectra.  If NUV, then just make sure the segments are sorted alphabetically. """
+    if cos_spectrum.band == 'FUV':
+        segment_names.sort(reverse=True)
+    else:
+        segment_names.sort(reverse=False)
+
+    return segment_names
+
+#--------------------
+
+def plotspec(cos_spectrum, output_type, output_file, n_consecutive, flux_scale_factor, fluxerr_scale_factor, plot_metrics, dpi_val=96., output_size=1024, debug=False, full_ylabels=False, stitched_spectrum=None):
+    """
+    Accepts a COSSpectrum object from the READSPEC function and produces preview plots.
+
+    :param cos_spectrum: COS spectrum as returned by READSPEC.
 
     :param output_type: What kind of output to make?
 
@@ -249,6 +257,10 @@ def plotspec(cos_spectrum, output_type, output_file, n_consecutive, flux_scale_f
 
     :type fluxerr_scale_factor: float
 
+    :param plot_metrics: Collection of plot metrics (flux statistics, axis ranges, etc.) to use when making the plots.  These are computed using `specutils.calc_plot_metrics`.
+    
+    :type plot_metrics: list
+
     :param dpi_val: The DPI value of your device's monitor.  Affects the size of the output plots.  Default = 96. (applicable to most modern monitors).
     
     :type dpi_val: float
@@ -265,11 +277,11 @@ def plotspec(cos_spectrum, output_type, output_file, n_consecutive, flux_scale_f
 
     :type full_ylabels: bool
 
+    :param stitched_spectrum: The stitched version of the COS spectrum, where each segment has been stitched using specutils.stitch_components.  This is required is making a small (thumb-sized) plot, but not used if making a large-sized plot.
+    
+    :type stitched_spectrum: dict
+
     :raises: OSError
-
-    .. note::
-
-         This function assumes a screen resolution of 96 DPI in order to generate plots of the desired sizes.  This is because matplotlib works in units of inches and DPI rather than pixels.
     """
 
     """ Make sure the plot size is set to an integer value. """
@@ -290,21 +302,12 @@ def plotspec(cos_spectrum, output_type, output_file, n_consecutive, flux_scale_f
                     raise
 
     """ Get list of segment names. """
-    segment_names = cos_spectrum.segments.keys()
-
-    """ Reverse the list of segment names *FOR FUV DATA*, becaue the bluest segment is the latter in the alphabet, but only for the FUV spectra.  If NUV, then just make sure the segments are sorted alphabetically. """
-    if cos_spectrum.band == 'FUV':
-        segment_names.sort(reverse=True)
-    else:
-        segment_names.sort(reverse=False)
-
-    """ How many total segments are there? """
-    n_segments = len(segment_names)
+    segment_names = get_segment_names(cos_spectrum)
 
     """ Determine the number of subplots to make depending on output size.  Get a list of subplot segment names to iterate over when plotting the figure. """
     if output_size > 128:
         is_bigplot = True
-        n_subplots = n_segments
+        n_subplots = len(segment_names)
         subplot_segment_names = segment_names
     else:
         is_bigplot = False
@@ -315,7 +318,7 @@ def plotspec(cos_spectrum, output_type, output_file, n_consecutive, flux_scale_f
     """ Start the plot figure. """
     this_figure, these_plotareas = pyplot.subplots(nrows=n_subplots, ncols=1, figsize=(output_size/dpi_val, output_size/dpi_val), dpi=dpi_val)
 
-    """ Make sure the subplots are in a numpy array (I think by default it is not if there is only one). """
+    """ Make sure the subplots are in a numpy array (I think it's not if there is only one). """
     if not isinstance(these_plotareas, numpy.ndarray):
         these_plotareas = numpy.asarray([these_plotareas])
 
@@ -338,27 +341,28 @@ def plotspec(cos_spectrum, output_type, output_file, n_consecutive, flux_scale_f
             all_dqs = cos_spectrum.segments[s].dqs
             title_addendum = ""
         else:
-            all_wls, all_fls, all_flerrs, all_dqs, title_addendum = specutils.stitch_components(cos_spectrum, n_consecutive, flux_scale_factor, fluxerr_scale_factor, segment_names=segment_names)
 
-        """ Calculate statistics on the fluxes for this subplot. """
-        median_flux, median_fluxerr, fluxerr_95th = specutils.get_flux_stats(all_fls, all_flerrs)
+            if stitched_spectrum is not None:
+                try:
+                    all_wls = stitched_spectrum["wls"]
+                    all_fls = stitched_spectrum["fls"]
+                    all_flerrs = stitched_spectrum["flerrs"]
+                    all_dqs = stitched_spectrum["dqs"]
+                except KeyError as the_error:
+                    raise specutils.SpecUtilsError("The provided stitched spectrum does not have the expected format, missing key "+str(the_error)+".")
+
+            else:
+                raise specutils.SpecUtilsError("You must provide a stitched spectrum through the `stitched_spectrum` input argument if creating a small (thumbnail-sized) plot.")
 
         """ Only plot information in the plot title if the plot is large (and therefore sufficient space exists on the plot). """
         if is_bigplot:
             this_plotarea.set_title(title_addendum, loc="right", size="small", color="red")
 
-        """ Determine optimal x-axis.  This is not the x-axis plot range used, but rather the area of the plot that is considered when scaling the y-axis. """
-        optimal_xaxis_range = specutils.set_plot_xrange("cos",all_wls, all_fls, all_flerrs, all_dqs, n_consecutive, flux_scale_factor, fluxerr_scale_factor, median_flux, median_fluxerr, fluxerr_95th)
+        """ Extract the optimal x-axis plot range from the plot_metrics dict, since we use it a lot. """
+        optimal_xaxis_range = plot_metrics[i]["optimal_xaxis_range"]
 
         """ Plot the spectrum, but only if valid wavelength ranges for x-axis are returned, otherwise plot a special "Fluxes Are All Zero" plot. """
         if all(numpy.isfinite(optimal_xaxis_range)):
-
-            """ Create COS avoid regions. """
-            avoid_regions = generate_cos_avoid_regions()
-
-            """ Determine optimal y-axis, but only provide it with fluxes from the part of the spectrum that will be plotted based on the x-axis trimming. """
-            y_axis_range = specutils.set_plot_yrange(all_wls, all_fls, avoid_regions=avoid_regions, wl_range=optimal_xaxis_range)
-
             """ Plot the spectrum, turn on plot grid lines. """
             this_plotarea.plot(all_wls, all_fls, 'b')
             this_plotarea.grid(True)
@@ -369,14 +373,14 @@ def plotspec(cos_spectrum, output_type, output_file, n_consecutive, flux_scale_f
 
             if debug:
                 """ Overplot points color-coded based on rejection criteria. """
-                specutils.debug_oplot(this_plotarea, all_wls, all_fls, all_flerrs, all_dqs, median_flux, median_fluxerr, flux_scale_factor, fluxerr_scale_factor, fluxerr_95th)
+                specutils.debug_oplot(this_plotarea, all_wls, all_fls, all_flerrs, all_dqs, plot_metrics[i]["median_flux"], plot_metrics[i]["median_fluxerr"], flux_scale_factor, fluxerr_scale_factor, plot_metrics[i]["fluxerr_95th"])
 
                 """ Overplot regions excluded by the optimal x-axis range as a shaded area. """
                 this_plotarea.axvspan(numpy.nanmin(all_wls), optimal_xaxis_range[0],facecolor="lightgrey",alpha=0.5)
                 this_plotarea.axvspan(optimal_xaxis_range[1], numpy.nanmax(all_wls),facecolor="lightgrey",alpha=0.5)
 
                 """ Overplot the Avoid Regions as a shaded area. """
-                for ar in avoid_regions:
+                for ar in plot_metrics[i]["avoid_regions"]:
                     this_plotarea.axvspan(ar.minwl,ar.maxwl,facecolor="lightgrey",alpha=0.5)
 
             """ This is where we ensure the x-axis range is set to the pyplot-determined x-axis range, rather than using the optimum x-axis range.  This is done so that all the plots for a similar instrument setting will have the same starting and ending plot values. """
@@ -401,7 +405,7 @@ def plotspec(cos_spectrum, output_type, output_file, n_consecutive, flux_scale_f
 
             """ Update y-axis range, but only adjust the ranges if this isn't an all-zero flux case (and not in debug mode, in which case I want to see the entire y-axis range). """
             if not debug:
-                this_plotarea.set_ylim(y_axis_range)
+                this_plotarea.set_ylim(plot_metrics[i]["y_axis_range"])
 
         else:
             """ Otherwise this is a spectrum that has all zero fluxes, or some other problem, and we make a default plot.  Define the optimal x-axis range to span the original spectrum. """
