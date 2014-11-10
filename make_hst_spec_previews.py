@@ -10,6 +10,7 @@ __version__ = '1.2'
 
 import argparse
 from astropy.io import fits
+import numpy
 from os import path
 """ These are local modules that are imported. """
 import specutils
@@ -157,12 +158,21 @@ def make_hst_spec_previews(args):
         """ Get wavelengths, fluxes, flux uncertainties. """
         stis_spectrum = specutils_stis.readspec(args.input_file)
 
-        """ Make "large-size" plot. """
-        specutils_stis.plotspec(stis_spectrum, args.output_type, output_file, args.n_consecutive, args.flux_scale_factor, args.fluxerr_scale_factor, dpi_val=args.dpi_val, output_size=1024, debug=args.debug, full_ylabels=args.full_ylabels)
+        """ Get the indices to plot.  If the number of associations is <=3 then we will plot all of them, but if >3 then only the first, middle, and last association will be plotted, so it's not necessary to stitch or calculate plot metrics for any of the others. """
+        indices_to_plot = specutils_stis.get_association_indices(stis_spectrum.associations)
 
-        """ Make "thumbnail-size" plot, if requested. """
+        """ Create a stitched spectrum for each association, used when making thumb-size plots.  The stitched spectrum joins the orders together (if there is more than one).  The length of the returned list is equal to the number of associations that will be plotted. """
+        stitched_spectra = [specutils.stitch_components(x, args.n_consecutive, args.flux_scale_factor, args.fluxerr_scale_factor) for x in numpy.asarray(stis_spectrum.associations)[indices_to_plot]]
+
+        """ Calculate plot metrics for the each association that will be plotted.  The length of the returned list is equal to the number of associations that will be plotted. """
+        association_plot_metrics = [specutils.calc_plot_metrics("stis", x["wls"], x["fls"], x["flerrs"], x["dqs"], args.n_consecutive, args.flux_scale_factor, args.fluxerr_scale_factor) for x in stitched_spectra]
+
+        """ Make "large-size" plot. """
+        specutils_stis.plotspec(stis_spectrum, indices_to_plot, stitched_spectra, args.output_type, output_file, args.n_consecutive, args.flux_scale_factor, args.fluxerr_scale_factor, association_plot_metrics, dpi_val=args.dpi_val, output_size=1024, debug=args.debug, full_ylabels=args.full_ylabels)
+
+        """ Make "thumbnail-size" plot, if requested.  Notice that in this case we always plot just the first association, by passing only `stitched_spectra[0]`. """
         if not args.debug:
-            specutils_stis.plotspec(stis_spectrum, args.output_type, output_file, args.n_consecutive, args.flux_scale_factor, args.fluxerr_scale_factor, dpi_val=args.dpi_val, output_size=128)
+            specutils_stis.plotspec(stis_spectrum, indices_to_plot, stitched_spectra[0], args.output_type, output_file, args.n_consecutive, args.flux_scale_factor, args.fluxerr_scale_factor, association_plot_metrics, dpi_val=args.dpi_val, output_size=128)
 
     else:
         raise HSTSpecPrevError('"INSTRUME" keyword not understood: ' + this_instrument)
