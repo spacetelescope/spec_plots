@@ -172,7 +172,7 @@ def make_hst_spec_previews(args):
 
         """ Make "thumbnail-size" plot, if requested.  Notice that in this case we always plot just the first association, by passing only `stitched_spectra[0]`. """
         if not args.debug:
-            specutils_stis.plotspec(stis_spectrum, indices_to_plot, stitched_spectra[0], args.output_type, output_file, args.n_consecutive, args.flux_scale_factor, args.fluxerr_scale_factor, association_plot_metrics, dpi_val=args.dpi_val, output_size=128)
+            specutils_stis.plotspec(stis_spectrum, indices_to_plot, [stitched_spectra[0]], args.output_type, output_file, args.n_consecutive, args.flux_scale_factor, args.fluxerr_scale_factor, association_plot_metrics, dpi_val=args.dpi_val, output_size=128)
 
     else:
         raise HSTSpecPrevError('"INSTRUME" keyword not understood: ' + this_instrument)
