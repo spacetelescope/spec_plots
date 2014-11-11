@@ -1,4 +1,4 @@
-__version__ = '1.2'
+__version__ = '1.25'
 
 """
 .. module:: make_hst_spec_previews

@@ -8,6 +8,6 @@ setup(name="spec-plots",
       author="Scott W. Fleming",
       author_email="fleming@stsci.edu",
       license="MIT",
-      packages=["spec-plots"],
+      packages=["spec_plots"],
       install_requires=["astropy", "matplotlib", "numpy"],
       zip_safe=False)

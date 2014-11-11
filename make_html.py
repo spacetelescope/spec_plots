@@ -1,4 +1,4 @@
-__version__ = '1.2'
+__version__ = '1.25'
 
 """
 .. module:: make_html
@@ -16,7 +16,36 @@ import sys
 
 #--------------------
 
-def make_html(idir=None, ofile="plot_previews.html"):
+def find_orig_preview(ufr, orig_files):
+    """
+    Given aunique file root (`ufr`, which includes the IPPPSSOOT ID), this function matches that to the list of original preview files from CADC to determine if an original preview exists for this ufr.
+
+    :param ufr: Unique file root to test (this is equivalent to the IPPPSSOOT ID from MAST).
+
+    :type ufr: str
+
+    :param orig_files: Array of original preview file names in which to find a match.
+
+    :type orig_files: numpy.ndarray
+
+    :returns: int -- The index in `orig_files` that matches the specified `ufr`, if there is no match then returns None.
+    """
+
+    """ Find all indices where the ufr is a substring of the original CADC preview plot file name.  Note that the ufr is input as <ufr>_<size>, so plit on underscore and just look for the first part. """
+    where_match = [i for i,x in enumerate(orig_files) if ufr.split('_')[0] in x]
+
+    """ Return the index if found. """
+    if len(where_match) == 1:
+        return where_match[0]
+    elif len(where_match) > 1:
+        print "*** WARNING in MAKE_HTML: Found more than one CADC match, using the first one for file " + ufr
+        return where_match[0]
+    else:
+        return None
+
+#--------------------
+
+def make_html(idir, ofile="html/plot_previews.html", orig_dir=None, plot_display_width=512):
     """
     Creates diagnostic HTML page showing the generated preview plots (thumb and large) as well as the original MAST version of these plots (the one's from CADC, provided they can be located in the expected location).
 
@@ -24,9 +53,17 @@ def make_html(idir=None, ofile="plot_previews.html"):
 
     :type idir: str
 
-    :param ofile: Output name for your HTML file (include the full path if you don't want the HTML to be made in the current directory).
+    :param ofile: Output name for your HTML file (include the full path if you don't want the HTML to be made in the current directory).  Default = `html/plot_previews.html`
 
     :type ofile: str
+
+    :param orig_dir: [Optional] Directory containing the original preview plots from CADC.  If provided, these will be included in the HTML pages for comparison purposes.
+
+    :type orig_dir: str
+
+    :param plot_display_width: [Optional] The width of the preview plots in the HTML tables (specified through the <img> tag), in pixels.  Default = 512.
+
+    :type plot_display_width: int
 
     :raises: OSError, IOError, ValueError
     """
@@ -61,6 +98,14 @@ def make_html(idir=None, ofile="plot_previews.html"):
 
         else:
             raise IOError("Could not find directory " + idir)
+
+        """ If requested, get a list of all the original preview plots. """
+        if orig_dir is not None:
+            if os.path.isdir(orig_dir):
+                all_orig_files_withpath = numpy.asarray(glob(orig_dir+'/*.jpg'))
+                all_orig_files = numpy.asarray([os.path.basename(x).lower() for x in all_orig_files_withpath])
+            else:
+                raise IOError("Could not find directory containing original preview plots.  Looking for " + orig_dir)
 
         """ Get a list of unique <IPPPSSOOT_filetype> base names from both the all_thumb and all_large arrays of spec-plots file names.  This is because, in principle, there might only be a preview thumbnail or a full-size preview for a given IPPPSSOOT_filetype.  Note that this array should be sorted since the "unique" function returns a sorted array. """
         """ <DEVEL> Concatenating the arrays here can be expensive if trying to make webpage for a very large number of preview plots.  Consider an alternative way of getting the unique set between the two without creating a new array. </DEVEL> """
@@ -105,18 +150,29 @@ def make_html(idir=None, ofile="plot_previews.html"):
                     """ Write the cell containing the thumbnail preview, (or just fill it grey if missing). """
                     of.write('    <td style="border:1px solid black;width:135px;vertical-align:top"><div style="width:128px;text-align:center"><span style="font-weight:bold">'+ufr+'</span></div>')
                     if has_thumb:
-                        of.write('<img src="'+os.path.relpath(all_thumb_png_files[cur_thumb_index],ofile_dir)+'" width="128px">')
+                        of.write('    <img src="'+os.path.relpath(all_thumb_png_files[cur_thumb_index], ofile_dir)+'" width="128px">')
                     else:
-                        of.write('<div style="background-color:#86867D;width:128px;height:128px"></div>')
-                    of.write('</td>\n')
+                        of.write('    <div style="background-color:#86867D;width:128px;height:128px"></div>')
+                    of.write('    </td>\n')
 
                     """ Write the cell containing the large preview, (or just fill it grey if missing). """
                     of.write('    <td style="border:1px solid black;width:1030px">')
                     if has_large:
-                        of.write('<img src="'+os.path.relpath(all_large_png_files[cur_large_index],ofile_dir)+'" width="1024px">')
+                        of.write('    <img src="'+os.path.relpath(all_large_png_files[cur_large_index], ofile_dir)+'" width="'+str(plot_display_width)+'px">')
                     else:
-                        of.write('<div style="background-color:#86867D;width:1024px;height:1024px"></div>')
-                    of.write('</td>\n')
+                        of.write('    <div style="background-color:#86867D;width:'+str(plot_display_width)+'px;height:'+str(plot_display_width)+'px"></div>')
+                    of.write('    </td>\n')
+
+                    """ If requested, write the cell containing the original preview plot.  If requested but missing, just fill it with grey. """
+                    if orig_dir is not None:
+                        """ Check if this file root has a match in the original directory. """
+                        orig_preview_index = find_orig_preview(ufr, all_orig_files)
+                        of.write('    <td style="border:1px solid black;width:1030px">')
+                        if orig_preview_index is not None:
+                            of.write('    <img src="'+os.path.relpath(all_orig_files_withpath[orig_preview_index], ofile_dir)+'" width="'+str(plot_display_width)+'px">')
+                        else:
+                            of.write('    <div style="background-color:#86867D;width:'+str(plot_display_width)+'px;height:'+str(plot_display_width)+'px"></div>')
+                        of.write('    </td>\n')
 
                     of.write('  </tr>\n')
 
@@ -138,15 +194,20 @@ def make_html(idir=None, ofile="plot_previews.html"):
 #--------------------
 
 if __name__ == "__main__":
+
     """ Create argument parser. """
-    parser = argparse.ArgumentParser(description="Create HTML page of preview plots, given an output directory.")
-    parser.add_argument("-d", action="store", type=str, dest="input_dir", default=None, help="[Required] Full path to directory containing preview plots.",metavar='location of plots')
+    parser = argparse.ArgumentParser(description="Create HTML page of preview plots, given a directory containing the plots.")
+
+    parser.add_argument("input_dir", action="store", type=str, help="[Required] Full path to directory containing preview plots.")
+
     parser.add_argument("-o", action="store", type=str, dest="output_file", default="html/plot_previews.html", help='[Optional] Full path and file name of the output HTML file.  If the file already exists, it will be overwritten.  Defualt = "html/plot_previews.html".')
+
+    parser.add_argument("-p", action="store", type=str, dest="orig_dir", help="[Optional] Full path to a directory containing the original versions of the plot previews from CADC.  If provided, these will be included in the HTML table for comparision purposes.")
 
     """ Parse arguments. """
     args = parser.parse_args()
 
     """ Call main method. """
-    make_html(args.input_dir, args.output_file)
+    make_html(args.input_dir, args.output_file, args.orig_dir)
 
 #--------------------
