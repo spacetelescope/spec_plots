@@ -187,7 +187,7 @@ def setup_args():
     """
     parser = argparse.ArgumentParser(description="Create spectroscopic preview plots given an HST spectrum FITS file.")
 
-    parser.add_argument("-f", action="store", type=str, dest="input_file", default=None, help="[Required] Full path to input file (HST spectrum) for which to generate preview plots.  Include the file name in the path.", metavar='input file')
+    parser.add_argument("input_file", action="store", type=str, help="[Required] Full path to input file (HST spectrum) for which to generate preview plots.  Include the file name in the path.")
 
     parser.add_argument("-d", action="store_true", dest="debug", default=False, help='[Optional] Turn on debug mode, which will plot to the screen and color-code fluxes based on different rejection criteria.')
 
