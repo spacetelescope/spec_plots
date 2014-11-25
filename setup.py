@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name="spec-plots",
-      version="1.25",
+      version="1.30",
       description="Create preview plots of HST spectra.",
       classifiers=["Programming Language :: Python :: 2.7"],
       url="https://github.com/openSAIL/spec-plots",
