@@ -325,7 +325,7 @@ def plotspec(cos_spectrum, output_type, output_file, n_consecutive, flux_scale_f
     """ Adjust the plot geometry (margins, etc.) based on plot size. """
     if is_bigplot:
         this_figure.subplots_adjust(hspace=0.3,top=0.915)
-        this_figure.suptitle(os.path.basename(cos_spectrum.orig_file))
+        this_figure.suptitle(os.path.basename(cos_spectrum.orig_file), fontsize=18, color=r'r')
     else:
         this_figure.subplots_adjust(top=0.85,bottom=0.3,left=0.25,right=0.8)
 
@@ -396,8 +396,9 @@ def plotspec(cos_spectrum, output_type, output_file, n_consecutive, flux_scale_f
             else:
                 """ Make sure the font properties go back to normal. """
                 pyplot.rcdefaults()
-                this_plotarea.set_xlabel(r"Wavelength $(\AA)$")
-                this_plotarea.set_ylabel(r"Flux $\mathrm{(erg/s/cm^2\!/\AA)}$")
+                this_plotarea.tick_params(axis='x', labelsize=14)
+                this_plotarea.set_xlabel(r"Wavelength $(\AA)$", fontsize=16, color='k')
+                this_plotarea.set_ylabel(r"Flux $\mathrm{(erg/s/cm^2\!/\AA)}$", fontsize=16, color='k')
 
                 """ If requested, include the powers of 10 part of the y-axis tickmarks. """
                 if full_ylabels:
@@ -428,8 +429,9 @@ def plotspec(cos_spectrum, output_type, output_file, n_consecutive, flux_scale_f
             else:
                 """ Make sure the font properties go back to normal. """
                 pyplot.rcdefaults()
-                this_plotarea.set_xlabel(r"Wavelength $(\AA)$")
-                this_plotarea.set_ylabel(r"Flux $\mathrm{(erg/s/cm^2\!/\AA)}$")
+                this_plotarea.tick_params(axis='x', labelsize=14)
+                this_plotarea.set_xlabel(r"Wavelength $(\AA)$", fontsize=16, color='k')
+                this_plotarea.set_ylabel(r"Flux $\mathrm{(erg/s/cm^2\!/\AA)}$", fontsize=16, color='k')
 
                 """ If requested, include the powers of 10 part of the y-axis tickmarks. """
                 if full_ylabels:
