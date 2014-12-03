@@ -1,0 +1,11 @@
+Metadata-Version: 1.1
+Name: spec-plots
+Version: 1.30
+Summary: Create preview plots of HST spectra.
+Home-page: https://github.com/openSAIL/spec-plots
+Author: Scott W. Fleming
+Author-email: fleming@stsci.edu
+License: MIT
+Description: UNKNOWN
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 2.7
