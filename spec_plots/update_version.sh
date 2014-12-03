@@ -3,7 +3,7 @@
 ## This script updates the version string inside python programs.  Note that it does NOT update the version inside the main README file or other documentation files, it only updates python source files.
 
 ## Define the lists of files that need to be updated with the new version.  This includes the setup.py file, and, separately, the python source files (since the version information is recorded in setup.py differently).
-set setupfile = "setup.py"
+set setupfile = "../setup.py"
 set files = ("make_hst_spec_previews.py" "make_html.py" "specutils.py" "specutils_cos.py" "specutils_stis.py")
 
 ## Print out the help statement if incorrect number of arguments are present.
