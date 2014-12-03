@@ -1,4 +1,6 @@
-__version__ = '1.25'
+#!/usr/bin/env python
+
+__version__ = '1.30'
 
 """
 .. module:: make_hst_spec_previews
@@ -189,23 +191,23 @@ def setup_args():
 
     parser.add_argument("input_file", action="store", type=str, help="[Required] Full path to input file (HST spectrum) for which to generate preview plots.  Include the file name in the path.")
 
-    parser.add_argument("-d", action="store_true", dest="debug", default=False, help='[Optional] Turn on debug mode, which will plot to the screen and color-code fluxes based on different rejection criteria.')
+    parser.add_argument("-d", action="store_true", dest="debug", default=False, help='[Optional] Turn on debug mode, which will plot to the screen and color-code fluxes based on different rejection criteria.  Default = %(default)s.')
 
-    parser.add_argument("--dpival", action="store", type=float, dest="dpi_val", default=96., help="[Optional] Specify the DPI value of your device's monitor, which will affect the size of the output plots.  Default = 96., which is applicable to most modern monitors.")
+    parser.add_argument("--dpival", action="store", type=float, dest="dpi_val", default=96., help="[Optional] Specify the DPI value of your device's monitor, which will affect the size of the output plots.  Default = %(default)s.")
 
-    parser.add_argument("-e", action="store", type=float, dest="fluxerr_scale_factor", default=5., help="[Optional] Specify the ratio between the flux uncertainty and the median flux uncertainty that defines the pass/fail criterion within the edge trim test.  Default = 5.")
+    parser.add_argument("-e", action="store", type=float, dest="fluxerr_scale_factor", default=5., help="[Optional] Specify the ratio between the flux uncertainty and the median flux uncertainty that defines the pass/fail criterion within the edge trim test.  Default = %(default)s.")
 
-    parser.add_argument("-n", action="store", type=int, dest="n_consecutive", default=20, help="[Optional] Specify the number of consecutive data points that must pass the edge trim test to define the start and end of the spectrum for plotting purposes.  Default = 20.")
+    parser.add_argument("-n", action="store", type=int, dest="n_consecutive", default=20, help="[Optional] Specify the number of consecutive data points that must pass the edge trim test to define the start and end of the spectrum for plotting purposes.  Default = %(default)s.")
 
-    parser.add_argument("-o", action="store", type=str, dest="output_path", default="", help="[Optional] Full path to output plot files.  Do not inclue file name in path.  Default is the same directory as the input file.", metavar='output path')
+    parser.add_argument("-o", action="store", type=str, dest="output_path", default="", help="[Optional] Full path to output plot files.  Do not include file name in path.    Default = %(default)s, the same directory as the input file.", metavar='output path')
 
-    parser.add_argument("-s", action="store", type=float, dest="flux_scale_factor", default=10., help="[Optional] Specify the ratio between the flux and the median flux that defines the pass/fail criterion within the edge trim test.  Default = 10.")
+    parser.add_argument("-s", action="store", type=float, dest="flux_scale_factor", default=10., help="[Optional] Specify the ratio between the flux and the median flux that defines the pass/fail criterion within the edge trim test.  Default = %(default)s.")
 
-    parser.add_argument("-t", action="store", type=str, dest="output_type", default="png", help='[Optional] Specify where plots should be output.  Default = "png".', choices=['png','PNG','eps', 'EPS', 'screen','SCREEN'], metavar='{png,ps,screen}')
+    parser.add_argument("-t", action="store", type=str, dest="output_type", default="png", help='[Optional] Specify where plots should be output.  Default = %(default)s.', choices=['png','PNG','eps', 'EPS', 'screen','SCREEN'], metavar='{png,ps,screen}')
 
-    parser.add_argument("-v", action="store_true", dest="verbose", default=False, help='[Optional] Turn on verbose messages/logging.  Default = "False".')
+    parser.add_argument("-v", action="store_true", dest="verbose", default=False, help='[Optional] Turn on verbose messages/logging.  Default = %(default)s.')
 
-    parser.add_argument("-y", action="store_true", dest="full_ylabels", default=False, help='[Optional] Label y-axis with full values, including powers of ten in scientific notation.  Default=False.')
+    parser.add_argument("-y", action="store_true", dest="full_ylabels", default=False, help='[Optional] Label y-axis with full values, including powers of ten in scientific notation.  Default = %(default)s.')
 
     return parser
 

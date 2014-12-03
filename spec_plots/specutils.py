@@ -1,4 +1,4 @@
-__version__ = '1.25'
+__version__ = '1.30'
 
 """
 .. module:: specutils
@@ -586,7 +586,7 @@ def set_plot_yrange(wavelengths, fluxes, avoid_regions=None, wl_range=None):
     max_flux = numpy.percentile(keep_fluxes,99.)
 
     """ Determine a y-buffer based on the difference between the max. and min. fluxes. """
-    ybuffer = 0.1 * (max_flux-min_flux)
+    ybuffer = 0.3 * (max_flux-min_flux)
 
     """ Make sure the min. and max. fluxes aren't identical (both 0., or both the same exact value.  If so, just return the min. and max.  value nudged by 1.0. """
     if min_flux != max_flux:

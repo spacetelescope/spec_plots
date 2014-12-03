@@ -1,4 +1,4 @@
-__version__ = '1.25'
+__version__ = '1.30'
 
 """
 
@@ -325,9 +325,9 @@ def plotspec(cos_spectrum, output_type, output_file, n_consecutive, flux_scale_f
     """ Adjust the plot geometry (margins, etc.) based on plot size. """
     if is_bigplot:
         this_figure.subplots_adjust(hspace=0.3,top=0.915)
-        this_figure.suptitle(os.path.basename(cos_spectrum.orig_file))
+        this_figure.suptitle(os.path.basename(cos_spectrum.orig_file), fontsize=18, color=r'r')
     else:
-        this_figure.subplots_adjust(top=0.85,bottom=0.3,left=0.25,right=0.9)
+        this_figure.subplots_adjust(top=0.85,bottom=0.3,left=0.25,right=0.8)
 
     """ Loop over each segment. """
     for i,s in enumerate(subplot_segment_names):
@@ -386,18 +386,19 @@ def plotspec(cos_spectrum, output_type, output_file, n_consecutive, flux_scale_f
             """ This is where we ensure the x-axis range is set to the pyplot-determined x-axis range, rather than using the optimum x-axis range.  This is done so that all the plots for a similar instrument setting will have the same starting and ending plot values. """
             this_plotarea.set_xlim(pyplot_xrange)
 
-            """ Change x-axis units to microns if a small plot, because there isn't enough space. """
-            """ <DEVEL> Note this assumes the wavelengths are always in Angstroms.  If a file format ever reports the wavelengths as something else, this would be an incorrect conversion. </DEVEL> """
+            """ Only use two tick labels (min and max wavelengths) for thumbnails, because there isn't enough space otherwise. """
             if not is_bigplot:
                 rc('font', size=10)
-                this_plotarea.set_xticklabels(this_plotarea.get_xticks()/10000.,rotation=45.)
-                this_plotarea.locator_params(axis="both", nbins=4, steps=[1,2,4,6,8,10])
-                this_figure.suptitle(r'$\lambda (\mu$m)', position=(0.83,0.99))
+                minwl = numpy.nanmin(all_wls) ; maxwl = numpy.nanmax(all_wls)
+                this_plotarea.set_xticks([minwl, maxwl])
+                this_plotarea.set_xticklabels(this_plotarea.get_xticks(),rotation=25.)
+                this_plotarea.xaxis.set_major_formatter(FormatStrFormatter("%6.1f"))
             else:
                 """ Make sure the font properties go back to normal. """
                 pyplot.rcdefaults()
-                this_plotarea.set_xlabel(r"Wavelength $(\AA)$")
-                this_plotarea.set_ylabel(r"Flux $\mathrm{(erg/s/cm^2\!/\AA)}$")
+                this_plotarea.tick_params(axis='x', labelsize=14)
+                this_plotarea.set_xlabel(r"Wavelength $(\AA)$", fontsize=16, color='k')
+                this_plotarea.set_ylabel(r"Flux $\mathrm{(erg/s/cm^2\!/\AA)}$", fontsize=16, color='k')
 
                 """ If requested, include the powers of 10 part of the y-axis tickmarks. """
                 if full_ylabels:
@@ -419,16 +420,18 @@ def plotspec(cos_spectrum, output_type, output_file, n_consecutive, flux_scale_f
             """ Configure the plot units, text size, and other markings based on whether this is a large or thumbnail-sized plot. """
             if not is_bigplot:
                 rc('font', size=10)
-                this_plotarea.set_xticklabels(this_plotarea.get_xticks()/10000.,rotation=45.)
-                this_plotarea.locator_params(axis="both", nbins=4, steps=[1,2,4,6,8,10])
-                this_figure.suptitle(r'$\lambda (\mu$m)', position=(0.83,0.99))
+                minwl = numpy.nanmin(all_wls) ; maxwl = numpy.nanmax(all_wls)
+                this_plotarea.set_xticks([minwl, maxwl])
+                this_plotarea.set_xticklabels(this_plotarea.get_xticks(),rotation=25.)
+                this_plotarea.xaxis.set_major_formatter(FormatStrFormatter("%6.1f"))
                 textsize = "small"
                 plottext = "Fluxes are \n all 0."
             else:
                 """ Make sure the font properties go back to normal. """
                 pyplot.rcdefaults()
-                this_plotarea.set_xlabel(r"Wavelength $(\AA)$")
-                this_plotarea.set_ylabel(r"Flux $\mathrm{(erg/s/cm^2\!/\AA)}$")
+                this_plotarea.tick_params(axis='x', labelsize=14)
+                this_plotarea.set_xlabel(r"Wavelength $(\AA)$", fontsize=16, color='k')
+                this_plotarea.set_ylabel(r"Flux $\mathrm{(erg/s/cm^2\!/\AA)}$", fontsize=16, color='k')
 
                 """ If requested, include the powers of 10 part of the y-axis tickmarks. """
                 if full_ylabels:
