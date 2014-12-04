@@ -1,4 +1,4 @@
-__version__ = '1.30'
+__version__ = '1.31'
 
 """
 
@@ -22,7 +22,7 @@ import sys
 
 class COSSpectrum(object):
     """
-    Defines a COS spectrum, including wavelegnth, flux, and flux errors.  A COS spectrum consists of N segments (N = {2,3}) stored as a dict object.  Each of these dicts contain a COSSegment object that contains the wavelengths, fluxes, flux errors, etc.
+    Defines a COS spectrum, including wavelegnth, flux, flux errors, and DQ_WGT values.  A COS spectrum consists of N segments (N = {2,3}) stored as a dict object.  Each of these dicts contain a COSSegment object that contains the wavelengths, fluxes, flux errors, etc.
 
     :raises: ValueError
     """
@@ -333,7 +333,7 @@ def plotspec(cos_spectrum, output_type, output_file, n_consecutive, flux_scale_f
     for i,s in enumerate(subplot_segment_names):
         this_plotarea = these_plotareas[i]
 
-        """ If this is a large plot, then get the spectrum for this segment.  Otherwise, stitch all the segments together (there is only one subplot in this case). """
+        """ If this is a large plot, then get the spectrum for this segment.  Otherwise, stitch all the segments together (there is only one subplot in this case).  Note that the DQ values are the bits from DQ_WGT in the header."""
         if is_bigplot:
             all_wls = cos_spectrum.segments[s].wavelengths
             all_fls = cos_spectrum.segments[s].fluxes
@@ -373,7 +373,7 @@ def plotspec(cos_spectrum, output_type, output_file, n_consecutive, flux_scale_f
 
             if debug:
                 """ Overplot points color-coded based on rejection criteria. """
-                specutils.debug_oplot(this_plotarea, all_wls, all_fls, all_flerrs, all_dqs, plot_metrics[i]["median_flux"], plot_metrics[i]["median_fluxerr"], flux_scale_factor, fluxerr_scale_factor, plot_metrics[i]["fluxerr_95th"])
+                specutils.debug_oplot(this_plotarea, "cos", all_wls, all_fls, all_flerrs, all_dqs, plot_metrics[i]["median_flux"], plot_metrics[i]["median_fluxerr"], flux_scale_factor, fluxerr_scale_factor, plot_metrics[i]["fluxerr_95th"])
 
                 """ Overplot regions excluded by the optimal x-axis range as a shaded area. """
                 this_plotarea.axvspan(numpy.nanmin(all_wls), optimal_xaxis_range[0],facecolor="lightgrey",alpha=0.5)
@@ -460,7 +460,7 @@ def plotspec(cos_spectrum, output_type, output_file, n_consecutive, flux_scale_f
 
 def readspec(input_file):
     """
-    Reads in a COS spectrum FITS file (x1d, x1dsum, or x1dsum{1,2,3,4}) and returns the wavelengths, fluxes, and flux uncertainties for the two (FUV segments) or three (NUV stripes).
+    Reads in a COS spectrum FITS file (x1d, x1dsum, or x1dsum{1,2,3,4}) and returns the wavelengths, fluxes, flux uncertainties, and DQ_WGT values for the two (FUV segments) or three (NUV stripes).
 
     :param input_file: Name of input FITS file.
 
@@ -512,9 +512,9 @@ def readspec(input_file):
             exit(1)
 
         try:
-            dq_table = cos_tabledata.field("DQ")
+            dq_table = cos_tabledata.field("DQ_WGT")
         except KeyError:
-            print "*** MAKE_HST_SPEC_PREVIEWS ERROR: DQ column not found in first extension's binary table."
+            print "*** MAKE_HST_SPEC_PREVIEWS ERROR: DQ_WGT column not found in first extension's binary table."
             exit(1)
 
         """ Create COSSegment objects to populate the COSSpectrum object with. """

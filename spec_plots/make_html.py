@@ -1,4 +1,4 @@
-__version__ = '1.30'
+__version__ = '1.31'
 
 """
 .. module:: make_html
@@ -109,7 +109,15 @@ def make_html(idir, ofile="html/plot_previews.html", orig_dir=None, plot_display
 
         """ Get a list of unique <IPPPSSOOT_filetype> base names from both the all_thumb and all_large arrays of spec-plots file names.  This is because, in principle, there might only be a preview thumbnail or a full-size preview for a given IPPPSSOOT_filetype.  Note that this array should be sorted since the "unique" function returns a sorted array. """
         """ <DEVEL> Concatenating the arrays here can be expensive if trying to make webpage for a very large number of preview plots.  Consider an alternative way of getting the unique set between the two without creating a new array. </DEVEL> """
-        uniq_fileroots = numpy.sort(numpy.unique(numpy.concatenate([all_thumb_png_files_froots,all_large_png_files_froots])))
+        if n_thumb_png_files > 0 and n_large_png_files > 0:
+            uniq_fileroots = numpy.sort(numpy.unique(numpy.concatenate([all_thumb_png_files_froots,all_large_png_files_froots])))
+        elif n_thumb_png_files > 0:
+            uniq_fileroots = numpy.sort(numpy.unique(all_thumb_png_files_froots))
+        elif n_large_png_files > 0:
+            uniq_fileroots = numpy.sort(numpy.unique(all_large_png_files_froots))
+        else:
+            raise IOError("No thumb-size or large-size files found.  Looking in " + orig_dir)
+
 
         """ Create the output directory if needed. """
         if ofile_dir != '' and not os.path.isdir(ofile_dir):

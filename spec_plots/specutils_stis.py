@@ -1,4 +1,4 @@
-__version__ = '1.30'
+__version__ = '1.31'
 
 """
 .. module:: specutils_stis
@@ -279,7 +279,7 @@ def plotspec(stis_spectrum, association_indices, stitched_spectra, output_type, 
 
             if debug:
                 """ Overplot points color-coded based on rejection criteria. """
-                specutils.debug_oplot(this_plotarea, all_wls, all_fls, all_flerrs, all_dqs, plot_metrics[i]["median_flux"], plot_metrics[i]["median_fluxerr"], flux_scale_factor, fluxerr_scale_factor, plot_metrics[i]["fluxerr_95th"])
+                specutils.debug_oplot(this_plotarea, "stis", all_wls, all_fls, all_flerrs, all_dqs, plot_metrics[i]["median_flux"], plot_metrics[i]["median_fluxerr"], flux_scale_factor, fluxerr_scale_factor, plot_metrics[i]["fluxerr_95th"])
 
                 """ Overplot the x-axis edges that are trimmed to define the y-axis plot range as a shaded area. """
                 this_plotarea.axvspan(numpy.nanmin(all_wls), optimal_xaxis_range[0],facecolor="lightgrey",alpha=0.5)

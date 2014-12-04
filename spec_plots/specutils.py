@@ -1,4 +1,4 @@
-__version__ = '1.30'
+__version__ = '1.31'
 
 """
 .. module:: specutils
@@ -69,7 +69,37 @@ class AvoidRegion(object):
 
 def calc_plot_metrics(instrument, wls, fls, flerrs, dqs, n_consecutive, flux_scale_factor, fluxerr_scale_factor):
     """
-    
+    :param instrument: The instrument that is being tested.
+
+    :type instrument: str
+
+    :param wls: The wavelengths to be plotted.
+
+    :type wls: numpy.ndarray
+
+    :param fls: The fluxes to be plotted.
+
+    :type fls: numpy.ndarray
+
+    :param flerrs: The uncertainties of the fluxes to be plotted.
+
+    :type flerrs: numpy.ndarray
+
+    :param dqs: The DQ flags of the spectrum to be plotted.  For COS, these are the DQ_WGT bits from the header.
+
+    :type dqs: numpy.ndarray
+
+    :param n_consecutive: How many consecutive points must pass the test for the index to count as the valid start/end of the spectrum?
+
+    :type n_consecutive: int
+
+    :param flux_scale_factor: Max. allowed ratio between the flux and a median flux value, used in edge trimming.
+
+    :type flux_scale_factor: float
+
+    :param fluxerr_scale_factor: Max. allowed ratio between the flux uncertainty and a median flux uncertainty value, used in edge trimming.
+
+    :type fluxerr_scale_factor: float
     """
 
     """ Calculate statistics on the fluxes. """
@@ -92,13 +122,17 @@ def calc_plot_metrics(instrument, wls, fls, flerrs, dqs, n_consecutive, flux_sca
 
 #--------------------
 
-def debug_oplot(this_plotarea, all_wls, all_fls, all_flerrs, all_dqs, median_flux, median_fluxerr, flux_scale_factor, fluxerr_scale_factor, fluxerr_95th, oplot_percentiles=False):
+def debug_oplot(this_plotarea, instrument, all_wls, all_fls, all_flerrs, all_dqs, median_flux, median_fluxerr, flux_scale_factor, fluxerr_scale_factor, fluxerr_95th, oplot_percentiles=False):
     """
     Creates plots of the spectra with color-coding and special annotation to identify which points were rejected by which tests.  Useful for debugging and understanding why a given plot had its plot axes defined the way it did.
 
     :param this_plotarea: The AxesSubplot object to plot on.
 
     :type this_plotarea: matplotlib.axes._subplots.AxesSubplot
+
+    :param instrument: The instrument that is being tested.
+
+    :type instrument: str
 
     :param all_wls: Array of wavelengths.
     
@@ -112,7 +146,7 @@ def debug_oplot(this_plotarea, all_wls, all_fls, all_flerrs, all_dqs, median_flu
     
     :type all_flerrs: numpy.ndarray
 
-    :param all_dqs: Array of data quality flags.
+    :param all_dqs: Array of data quality flags.  For COS, these are the DQ_WGT bits from the header.
     
     :type all_dqs: numpy.ndarray
 
@@ -155,10 +189,10 @@ def debug_oplot(this_plotarea, all_wls, all_fls, all_flerrs, all_dqs, median_flu
     if len(where_allzero[0]) > 0:
         this_plotarea.plot(all_wls[where_allzero], all_fls[where_allzero], 'go', label="Flux=0")
 
-    """ Plot those fluxes that fail because they have a data quality flag > 0 in red. """
-    where_dqnotzero = numpy.where((all_dqs > 0) & (all_dqs != 16))
-    if len(where_dqnotzero[0]) > 0:
-        this_plotarea.plot(all_wls[where_dqnotzero], all_fls[where_dqnotzero], 'ro', label="DQ>0")
+    """ Plot those fluxes that fail because they have a bad DQ value in red. """
+    where_bad_dq = numpy.where( isbaddq(instrument, all_dqs) )[0]
+    if len(where_bad_dq) > 0:
+        this_plotarea.plot(all_wls[where_bad_dq], all_fls[where_bad_dq], 'ro', label="BAD DQ_WGT")
 
     """ Plot those fluxes that fail because their flux uncertainties are much greater than the median flux uncertainty in magenta. """
     if numpy.isfinite(median_fluxerr):
@@ -231,7 +265,7 @@ def edge_trim(instrument, fluxes, fluxerrs, dqs, n_consecutive, median_flux, flu
 
     :type fluxerrs: numpy.ndarray
 
-    :param dqs: The DQ flags of the spectrum.
+    :param dqs: The DQ flags of the spectrum.  For COS, these are the DQ_WGT bits from the header.
 
     :type dqs: numpy.ndarray
 
@@ -243,7 +277,7 @@ def edge_trim(instrument, fluxes, fluxerrs, dqs, n_consecutive, median_flux, flu
 
     :type median_flux: float
 
-    :param flux_scale_factor: Max. allowed ratio between the flux and a median flux value, used in edge trimming.  Default = 10.
+    :param flux_scale_factor: Max. allowed ratio between the flux and a median flux value, used in edge trimming.
 
     :type flux_scale_factor: float
 
@@ -251,7 +285,7 @@ def edge_trim(instrument, fluxes, fluxerrs, dqs, n_consecutive, median_flux, flu
 
     :type median_fluxerr: float
 
-    :param fluxerr_scale_factor: Max. allowed ratio between the flux uncertainty and a median flux uncertainty value, used in edge trimming.  Default = 5.
+    :param fluxerr_scale_factor: Max. allowed ratio between the flux uncertainty and a median flux uncertainty value, used in edge trimming.
 
     :type fluxerr_scale_factor: float
 
@@ -362,6 +396,38 @@ def get_flux_stats(fluxes, fluxerrs):
 
 #--------------------
 
+def isbaddq(instrument, dqs):
+    """
+    Returns True/False whether the DQ values are from a good part of the spectrum.  If the input DQs is a scalar value, the return result is also a scalar value.  If the input DQs are a numpy array, the return result is also a numpy array.
+
+    :param instrument: The instrument the DQs come from.
+
+    :type instrument: str
+
+    :param dqs: Array of DQ (STIS) or DQ_WGT (COS) values.
+
+    :type dqs: numpy.ndarray
+
+    :returns: boolean or numpy.ndarray -- A scalar boolean or array of booleans.
+    """
+
+    if instrument == "cos":
+        if isinstance(dqs,numpy.ndarray):
+            return [x < 1 for x in dqs]
+        else:
+            return dqs < 1
+
+    elif instrument == "stis":
+        if isinstance(dqs,numpy.ndarray):
+            return [x != 0 and x != 16 for x in dqs]
+        else:
+            return dqs != 0 and dqs != 16
+
+    else:
+        return []
+
+#--------------------
+
 def rms(values, offset=0.):
     """
     Calculates the RMS about some offset (default offset is 0.)
@@ -400,7 +466,7 @@ def _set_plot_xrange_test(instrument, flux_values, flux_err_values, median_flux,
 
     :type median_flux: float
 
-    :param flux_scale_factor: Max. allowed ratio between the flux and a median flux value, used in edge trimming.  Default = 10.
+    :param flux_scale_factor: Max. allowed ratio between the flux and a median flux value, used in edge trimming.
 
     :type flux_scale_factor: float
 
@@ -408,7 +474,7 @@ def _set_plot_xrange_test(instrument, flux_values, flux_err_values, median_flux,
 
     :type median_fluxerr: float
 
-    :param fluxerr_scale_factor: Max. allowed ratio between the flux uncertainty and a median flux uncertainty value, used in edge trimming.  Default = 5.
+    :param fluxerr_scale_factor: Max. allowed ratio between the flux uncertainty and a median flux uncertainty value, used in edge trimming.
 
     :type fluxerr_scale_factor: float
 
@@ -416,7 +482,7 @@ def _set_plot_xrange_test(instrument, flux_values, flux_err_values, median_flux,
 
     :type fluxerr_95th: float
 
-    :param dqs: The array of DQ flags to use in the test.
+    :param dqs: The array of DQ flags to use in the test.  For COS, these are the DQ_WGT bits from the header.
 
     :type dqs: numpy.ndarray
 
@@ -455,7 +521,7 @@ def _set_plot_xrange_test(instrument, flux_values, flux_err_values, median_flux,
                              and ( (abs(x/median_flux) < flux_scale_factor and checkFluxRatios) or (not checkFluxRatios) ) \
                              and ( (y/median_fluxerr < fluxerr_scale_factor and checkFluxErrRatios) or (not checkFluxErrRatios) ) \
                              and ( (y <= fluxerr_95th and checkFluxErrPercentile) or (not checkFluxErrPercentile) ) \
-                             and ( (instrument == "stis" and z == 0 or z == 16 and checkDQs) or (instrument == "cos" and z == 0 and checkDQs) or (not checkDQs) ) \
+                             and ( (instrument == "stis" and not isbaddq(instrument, z) and checkDQs) or (instrument == "cos" and not isbaddq(instrument, z) and checkDQs) or (not checkDQs) ) \
                              for x,y,z in zip(flux_values, flux_err_values, dqs) ]
     else:
         bool_results = [False] * len(flux_values)
@@ -468,11 +534,11 @@ def set_plot_xrange(instrument, wavelengths, fluxes, fluxerrs, dqs, n_consecutiv
     """
     Given an array of wavelengths and fluxes, returns a list of [xmin,xmax] to define an optimal x-axis plot range.
 
-    :param wavelengths: The wavelengths to be plotted.
-
     :param instrument: The instrument that is being tested.
 
     :type instrument: str
+
+    :param wavelengths: The wavelengths to be plotted.
 
     :type wavelengths: numpy.ndarray
 
@@ -484,19 +550,19 @@ def set_plot_xrange(instrument, wavelengths, fluxes, fluxerrs, dqs, n_consecutiv
 
     :type fluxerrs: numpy.ndarray
 
-    :param dqs: The DQ flags of the spectrum to be plotted.
+    :param dqs: The DQ flags of the spectrum to be plotted.  For COS, these are the DQ_WGT bits from the header.
 
     :type dqs: numpy.ndarray
 
-    :param n_consecutive: How many consecutive points must pass the test for the index to count as the valid start/end of the spectrum?  Default = 20.
+    :param n_consecutive: How many consecutive points must pass the test for the index to count as the valid start/end of the spectrum?
 
     :type n_consecutive: int
 
-    :param flux_scale_factor: Max. allowed ratio between the flux and a median flux value, used in edge trimming.  Default = 10.
+    :param flux_scale_factor: Max. allowed ratio between the flux and a median flux value, used in edge trimming.
 
     :type flux_scale_factor: float
 
-    :param fluxerr_scale_factor: Max. allowed ratio between the flux uncertainty and a median flux uncertainty value, used in edge trimming.  Default = 5.
+    :param fluxerr_scale_factor: Max. allowed ratio between the flux uncertainty and a median flux uncertainty value, used in edge trimming.
 
     :type fluxerr_scale_factor: float
 
@@ -604,15 +670,15 @@ def stitch_components(input_exposure, n_consecutive, flux_scale_factor, fluxerr_
 
     :type input_exposure: COSSpectrum or STISExposureSpectrum
 
-    :param n_consecutive: How many consecutive points must pass the test for the index to count as the valid start/end of the spectrum?  Default = 20.
+    :param n_consecutive: How many consecutive points must pass the test for the index to count as the valid start/end of the spectrum?
 
     :type n_consecutive: int
 
-    :param flux_scale_factor: Max. allowed ratio between the flux and a median flux value, used in edge trimming.  Default = 10.
+    :param flux_scale_factor: Max. allowed ratio between the flux and a median flux value, used in edge trimming.
 
     :type flux_scale_factor: float
 
-    :param fluxerr_scale_factor: Max. allowed ratio between the flux uncertainty and a median flux uncertainty value, used in edge trimming.  Default = 5.
+    :param fluxerr_scale_factor: Max. allowed ratio between the flux uncertainty and a median flux uncertainty value, used in edge trimming.
 
     :type fluxerr_scale_factor: float
 
@@ -645,7 +711,7 @@ def stitch_components(input_exposure, n_consecutive, flux_scale_factor, fluxerr_
     else:
         raise ValueError("Input must be either a COSSpectrum or STISExposureSpectrum object.")
     
-    """ Create an array that will keep track whether each component to stitch is filled with bad DQ flags.  The return title will be set to a non-empty string if every component to stitch is filled with bad DQ flags. """
+    """ Create an array that will keep track whether each component to stitch is filled with bad DQ flags.  The return title will be set to a non-empty string if every component to stitch is filled with bad DQ flags.  Note that for COS the DQ flags are the DQ_WGT bits from the header."""
     all_dq_flags = numpy.zeros(n_components)
     return_title = ""
 
@@ -656,13 +722,13 @@ def stitch_components(input_exposure, n_consecutive, flux_scale_factor, fluxerr_
             these_fls = input_exposure.orders[j].fluxes
             these_flerrs = input_exposure.orders[j].fluxerrs
             these_dqs = input_exposure.orders[j].dqs
-            where_bad_dq = numpy.where( (these_dqs > 0) & (these_dqs != 16))[0]
+            where_bad_dq = numpy.where( isbaddq(inst_type, these_dqs) )[0]
         elif inst_type == "cos":
             these_wls = input_exposure.segments[j].wavelengths
             these_fls = input_exposure.segments[j].fluxes
             these_flerrs = input_exposure.segments[j].fluxerrs
             these_dqs = input_exposure.segments[j].dqs
-            where_bad_dq = numpy.where(these_dqs > 0)[0]
+            where_bad_dq = numpy.where( isbaddq(inst_type, these_dqs) )[0]
         n_elems = len(these_wls)
 
         """ Calculate some statistics for this component. """
@@ -705,9 +771,9 @@ def stitch_components(input_exposure, n_consecutive, flux_scale_factor, fluxerr_
     """ If every single order had all DQ flags, then we want to print a warning on the plot. """
     if sum(all_dq_flags) == n_components:
         if inst_type == 'stis':
-            return_title = "Warning: All fluxes have DQ > 0 and != 16."
+            return_title = "Warning: All fluxes have bad DQ."
         elif inst_type == 'cos':
-            return_title = "Warning: All fluxes have DQ > 0."
+            return_title = "Warning: All fluxes have bad DQ_WGT."
 
     """ Convert these to numpy arrays. """
     """ <DEVEL> Should these just be numpy arrays to begin with? </DEVEL> """
