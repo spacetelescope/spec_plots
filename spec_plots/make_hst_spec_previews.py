@@ -140,6 +140,10 @@ def make_hst_spec_previews(args):
         """ Get a list of segment names sorted such that the bluest segment is first. """
         cos_segment_names = specutils_cos.get_segment_names(cos_spectrum)
 
+        """ Trim the wavelengths < 900 Angstroms for FUVB segment if optical element used is G140L. """
+        if "FUVB" in cos_spectrum.segments and cos_spectrum.optical_element == "G140L":
+            specutils_cos.extract_subspec(cos_spectrum, "FUVB", min_wl=900.)
+
         """ Create a stitched spectrum for use when making thumb-size plots. """
         stitched_spectrum = specutils.stitch_components(cos_spectrum, args.n_consecutive, args.flux_scale_factor, args.fluxerr_scale_factor, segment_names=cos_segment_names)
 

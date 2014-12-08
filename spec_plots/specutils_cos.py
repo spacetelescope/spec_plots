@@ -17,6 +17,7 @@ import numpy
 import os
 import specutils
 import sys
+import warnings
 
 #--------------------
 
@@ -26,9 +27,13 @@ class COSSpectrum(object):
 
     :raises: ValueError
     """
-    def __init__(self, band=None, cos_segments=None, orig_file=None):
+    def __init__(self, optical_element, band=None, cos_segments=None, orig_file=None):
         """
         Create a COSSpectrum object given a band choice (must be "FUV" or "NUV").
+
+        :param optical_element: The string representation of the optical element used for this observation, e.g., "G140L".
+
+        :type optical_element: str
 
         :param band: Which band is this spectrum for ("FUV" or "NUV")?
 
@@ -44,6 +49,9 @@ class COSSpectrum(object):
 
         :raises: ValueError
         """
+
+        """ Record the optical element. """
+        self.optical_element = optical_element
 
         """ Record the original file name. """
         self.orig_file = orig_file
@@ -206,6 +214,49 @@ def check_segments(segments_list, input_file):
         raise specutils.SpecUtilsError("The array of SEGMENT strings should contain 1, 2, or 3 values, found " + str(n_segments) + " in file " + input_file)
 
     return this_band
+
+#--------------------
+
+def extract_subspec(cos_spectrum, segment, min_wl=None, max_wl=None):
+    """
+    Extracts a sub-spectrum of a COS segment's spectrum.  If both min. and max. wavelengths are specified, then it keeps the part of the spectrum within those bounds.  If only a min. or max. is specified, then those are treated as lower or upper bounds, and the part of the spectrum redder/bluer than the bound is retained.
+
+    :param cos_spectrum: COS spectrum as returned by READSPEC.
+
+    :type cos_spectrum: COSSpectrum
+
+    :param segment: The segment to do the extraction on.
+
+    :type segment: str
+
+    :param min_wl: The minimum wavlength value to keep.  If None, then there will be no lower bound.
+
+    :type min_wl: float
+
+    :param max_wl: The maximum wavelength value to keep.  If None, then there will be no upper bound.
+
+    :type max_wl: float
+    """
+    if segment in cos_spectrum.segments:
+        if min_wl is not None and max_wl is not None:
+            where_within = numpy.where( (cos_spectrum.segments[segment].wavelengths >= min_wl) & (cos_spectrum.segments[segment].wavelengths <= max_wl) )[0]
+        elif min_wl is not None and max_wl is None:
+            where_within = numpy.where( (cos_spectrum.segments[segment].wavelengths >= min_wl) )[0]
+        elif min_wl is None and max_wl is not None:
+            where_within = numpy.where( (cos_spectrum.segments[segment].wavelengths <= max_wl) )[0]
+        
+        n_within = len(where_within)
+        if n_within > 0:
+            """ Then we extract the subspectrum for this object by modifying the cos_spectrum object. """
+            cos_spectrum.segments[segment].nelem = n_within
+            cos_spectrum.segments[segment].wavelengths = cos_spectrum.segments[segment].wavelengths[where_within]
+            cos_spectrum.segments[segment].fluxes = cos_spectrum.segments[segment].fluxes[where_within]
+            cos_spectrum.segments[segment].fluxerrs = cos_spectrum.segments[segment].fluxerrs[where_within]
+            cos_spectrum.segments[segment].dqs = cos_spectrum.segments[segment].dqs[where_within]
+        else:
+            print "*** WARNING in SPECUTILS_COS: Requested subspectrum does not overlap with this segment's spectrum.  No extraction will be done."
+    else:
+        raise specutils.SpecUtilsError("The segment where you want to perform the subspectrum extraction is not present.  Specified \"" + segment + "\", available segments for this spectrum are: " + ', '.join(cos_spectrum.segments)+".")
 
 #--------------------
 
@@ -475,7 +526,7 @@ def readspec(input_file):
         """ Read the data from the first extension.  For COS, the spectra are always stored as tables in the first FITS extension. """
         cos_tabledata = hdulist[1].data
 
-        """ Extract the SEGMENTS.  This is either a 2-element array of ["FUVA", "FUVB"], or a 3-element array of ["NUVA", "NUVB", "NUVC"]. """
+        """ Extract the SEGMENTS.  This is either an (up-to) 2-element array of ["FUVA", "FUVB"], or an (up-to) 3-element array of ["NUVA", "NUVB", "NUVC"]. """
         try:
             segment_arr = cos_tabledata.field("SEGMENT")
         except KeyError:
@@ -485,14 +536,21 @@ def readspec(input_file):
         """ Determine which band this is (NUV, FUV). """
         band = check_segments(segment_arr, input_file)
 
-        """ Extract the number of elements (n_wavelengths, n_fluxes, etc.) for each segment.  This will also be either a 2-element array (FUV) or 3-element array (NUV). """
+        """ Extract the optical element from the primary header. """
+        try:
+            optical_element = hdulist[0].header["OPT_ELEM"]
+        except KeyError:
+            print "*** MAKE_HST_SPEC_PREVIEWS ERROR: OPT_ELEM keyword not found in the primary header."
+            exit(1)
+
+        """ Extract the number of elements (n_wavelengths, n_fluxes, etc.) for each segment.  The dimension will match the array of segment names. """
         try:
             nelems_arr = cos_tabledata.field("NELEM")
         except KeyError:
             print "*** MAKE_HST_SPEC_PREVIEWS ERROR: NELEM column not found in first extension's binary table."
             exit(1)
 
-        """ Extract wavelength, fluxes, flux uncertainties, and DQ flags for each segment.  These will be either 2xn (FUV) or 3xn (NUV) tables. """
+        """ Extract wavelength, fluxes, flux uncertainties, and DQ flags for each segment.  These will be mxn tables, where m is the number of segment names, and n is the number of elements from the nelems array. """
         try:
             wavelength_table = cos_tabledata.field("WAVELENGTH")
         except KeyError:
@@ -569,33 +627,33 @@ def readspec(input_file):
         if band == 'FUV':
             """ Handle case where both are supplied. """
             if fuva_index is not None and fuvb_index is not None:
-                return_spec = COSSpectrum(band=band, cos_segments={'FUVA':fuva_cossegment,'FUVB':fuvb_cossegment}, orig_file=input_file)
+                return_spec = COSSpectrum(optical_element, band=band, cos_segments={'FUVA':fuva_cossegment,'FUVB':fuvb_cossegment}, orig_file=input_file)
             elif fuva_index is not None:
                 """ Handle cases where only one is supplied. """
-                return_spec = COSSpectrum(band=band, cos_segments={'FUVA':fuva_cossegment}, orig_file=input_file)
+                return_spec = COSSpectrum(optical_element, band=band, cos_segments={'FUVA':fuva_cossegment}, orig_file=input_file)
             elif fuvb_index is not None:
-                return_spec = COSSpectrum(band=band, cos_segments={'FUVB':fuvb_cossegment}, orig_file=input_file)
+                return_spec = COSSpectrum(optical_element, band=band, cos_segments={'FUVB':fuvb_cossegment}, orig_file=input_file)
             else:
                 raise ValueError("Neither FUVA or FUVB segments were found, unable to create COS spectrum object.")
 
         elif band == 'NUV':
             """ Handle case where all three are supplied. """
             if nuva_index is not None and nuvb_index is not None and nuvc_index is not None:
-                return_spec = COSSpectrum(band=band, cos_segments={'NUVA':nuva_cossegment,'NUVB':nuvb_cossegment,'NUVC':nuvc_cossegment}, orig_file=input_file)
+                return_spec = COSSpectrum(optical_element, band=band, cos_segments={'NUVA':nuva_cossegment,'NUVB':nuvb_cossegment,'NUVC':nuvc_cossegment}, orig_file=input_file)
             elif nuva_index is not None and nuvb_index is not None:
                 """ Handle cases where only two are supplied. """
-                return_spec = COSSpectrum(band=band, cos_segments={'NUVA':nuva_cossegment,'NUVB':nuvb_cossegment}, orig_file=input_file)
+                return_spec = COSSpectrum(optical_element, band=band, cos_segments={'NUVA':nuva_cossegment,'NUVB':nuvb_cossegment}, orig_file=input_file)
             elif nuva_index is not None and nuvc_index is not None:
-                return_spec = COSSpectrum(band=band, cos_segments={'NUVA':nuva_cossegment,'NUVC':nuvc_cossegment}, orig_file=input_file)
+                return_spec = COSSpectrum(optical_element, band=band, cos_segments={'NUVA':nuva_cossegment,'NUVC':nuvc_cossegment}, orig_file=input_file)
             elif nuvb_index is not None and nuvc_index is not None:
-                return_spec = COSSpectrum(band=band, cos_segments={'NUVB':nuvb_cossegment,'NUVC':nuvc_cossegment}, orig_file=input_file)
+                return_spec = COSSpectrum(optical_element, band=band, cos_segments={'NUVB':nuvb_cossegment,'NUVC':nuvc_cossegment}, orig_file=input_file)
             elif nuva_index is not None:
                 """ Handle cases where only one is supplied. """
-                return_spec = COSSpectrum(band=band, cos_segments={'NUVA':nuva_cossegment}, orig_file=input_file)
+                return_spec = COSSpectrum(optical_element, band=band, cos_segments={'NUVA':nuva_cossegment}, orig_file=input_file)
             elif nuvb_index is not None:
-                return_spec = COSSpectrum(band=band, cos_segments={'NUVB':nuvb_cossegment}, orig_file=input_file)
+                return_spec = COSSpectrum(optical_element, band=band, cos_segments={'NUVB':nuvb_cossegment}, orig_file=input_file)
             elif nuvc_index is not None:
-                return_spec = COSSpectrum(band=band, cos_segments={'NUVC':nuvc_cossegment}, orig_file=input_file)
+                return_spec = COSSpectrum(optical_element, band=band, cos_segments={'NUVC':nuvc_cossegment}, orig_file=input_file)
             else:
                 raise ValueError("None of the NUVA, NUVB, or NUVC segments were found, unable to create COS spectrum object.")
 
