@@ -14,8 +14,8 @@ import matplotlib.pyplot as pyplot
 from matplotlib.ticker import FormatStrFormatter
 import numpy
 import os
-import specutils
 import sys
+import utils.specutils
 
 #--------------------
 
@@ -155,7 +155,7 @@ def plotspec(stis_spectrum, association_indices, stitched_spectra, output_type, 
 
     :type association_indices: list
 
-    :param stitched_spectra: List of order-stitched spectra for each association, as created in `specutils.stitch_components`.
+    :param stitched_spectra: List of order-stitched spectra for each association, as created in `utils.specutils.stitch_components()`.
 
     :type stitched_spectra: list
 
@@ -179,7 +179,7 @@ def plotspec(stis_spectrum, association_indices, stitched_spectra, output_type, 
 
     :type fluxerr_scale_factor: float
 
-    :param plot_metrics: Collection of plot metrics (flux statistics, axis ranges, etc.) to use when making the plots.  These are computed using `specutils.calc_plot_metrics`.
+    :param plot_metrics: Collection of plot metrics (flux statistics, axis ranges, etc.) to use when making the plots.  These are computed using `utils.specutils.calc_plot_metrics()`.
     
     :type plot_metrics: list
 
@@ -199,7 +199,7 @@ def plotspec(stis_spectrum, association_indices, stitched_spectra, output_type, 
 
     :type full_ylabels: bool
 
-    :raises: OSError
+    :raises: OSError, utils.specutils.SpecUtilsError
 
     .. note::
 
@@ -257,7 +257,7 @@ def plotspec(stis_spectrum, association_indices, stitched_spectra, output_type, 
             all_dqs = stitched_spectra[i]["dqs"]
             title_addendum = stitched_spectra[i]["title"]
         except KeyError as the_error:
-            raise specutils.SpecUtilsError("The provided stitched spectrum does not have the expected format, missing key "+str(the_error)+".")
+            raise utils.specutils.SpecUtilsError("The provided stitched spectrum does not have the expected format, missing key "+str(the_error)+".")
 
         if is_bigplot:
             this_plotarea.set_title(title_addendum, loc="right", size="small", color="red")
@@ -279,7 +279,7 @@ def plotspec(stis_spectrum, association_indices, stitched_spectra, output_type, 
 
             if debug:
                 """ Overplot points color-coded based on rejection criteria. """
-                specutils.debug_oplot(this_plotarea, "stis", all_wls, all_fls, all_flerrs, all_dqs, plot_metrics[i]["median_flux"], plot_metrics[i]["median_fluxerr"], flux_scale_factor, fluxerr_scale_factor, plot_metrics[i]["fluxerr_95th"])
+                utils.specutils.debug_oplot(this_plotarea, "stis", all_wls, all_fls, all_flerrs, all_dqs, plot_metrics[i]["median_flux"], plot_metrics[i]["median_fluxerr"], flux_scale_factor, fluxerr_scale_factor, plot_metrics[i]["fluxerr_95th"])
 
                 """ Overplot the x-axis edges that are trimmed to define the y-axis plot range as a shaded area. """
                 this_plotarea.axvspan(numpy.nanmin(all_wls), optimal_xaxis_range[0],facecolor="lightgrey",alpha=0.5)

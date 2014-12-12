@@ -1,7 +1,6 @@
 __version__ = '1.31'
 
 """
-
 .. module:: specutils_cos
 
    :synopsis: Contains functions for reading and plotting HST COS spectra.
@@ -15,9 +14,8 @@ import matplotlib.pyplot as pyplot
 from matplotlib.ticker import FormatStrFormatter
 import numpy
 import os
-import specutils
 import sys
-import warnings
+import utils.specutils
 
 #--------------------
 
@@ -178,7 +176,7 @@ def check_segments(segments_list, input_file):
 
     :returns: str -- A string representation of the band, either "FUV" or "NUV".
 
-    :raises: specutils.SpecUtilsError
+    :raises: utils.specutils.SpecUtilsError
 
     .. note::
 
@@ -194,24 +192,24 @@ def check_segments(segments_list, input_file):
         if numpy.array_equal(segments_list, ["FUVA"]) or numpy.array_equal(segments_list, ["FUVB"]):
             this_band = "FUV"
         else:
-            raise specutils.SpecUtilsError("The array of SEGMENT strings contains 1 value, but is not equal to [\"FUVA\"] or [\"FUVB\"] in file " + input_file)
+            raise utils.specutils.SpecUtilsError("The array of SEGMENT strings contains 1 value, but is not equal to [\"FUVA\"] or [\"FUVB\"] in file " + input_file)
 
     elif n_segments == 2:
         """ Must be ["FUVA", "FUVB"]. """
         if numpy.array_equal(segments_list, ["FUVA", "FUVB"]):
             this_band = "FUV"
         else:
-            raise specutils.SpecUtilsError("The array of SEGMENT strings contains 2 values, but is not equal to [\"FUVA\", \"FUVB\"] in file " + input_file)
+            raise utils.specutils.SpecUtilsError("The array of SEGMENT strings contains 2 values, but is not equal to [\"FUVA\", \"FUVB\"] in file " + input_file)
 
     elif n_segments == 3:
         """ Must be ["NUVA", "NUVB", "NUVC"]. """
         if numpy.array_equal(segments_list, ["NUVA", "NUVB", "NUVC"]):
             this_band = "NUV"
         else:
-            raise specutils.SpecUtilsError("The array of SEGMENT strings contains 3 values, but is not equal to [\"NUVA\", \"NUVB\", \"NUVC\"] in file " + input_file)
+            raise utils.specutils.SpecUtilsError("The array of SEGMENT strings contains 3 values, but is not equal to [\"NUVA\", \"NUVB\", \"NUVC\"] in file " + input_file)
 
     else:
-        raise specutils.SpecUtilsError("The array of SEGMENT strings should contain 1, 2, or 3 values, found " + str(n_segments) + " in file " + input_file)
+        raise utils.specutils.SpecUtilsError("The array of SEGMENT strings should contain 1, 2, or 3 values, found " + str(n_segments) + " in file " + input_file)
 
     return this_band
 
@@ -256,7 +254,7 @@ def extract_subspec(cos_spectrum, segment, min_wl=None, max_wl=None):
         else:
             print "*** WARNING in SPECUTILS_COS: Requested subspectrum does not overlap with this segment's spectrum.  No extraction will be done."
     else:
-        raise specutils.SpecUtilsError("The segment where you want to perform the subspectrum extraction is not present.  Specified \"" + segment + "\", available segments for this spectrum are: " + ', '.join(cos_spectrum.segments)+".")
+        raise utils.specutils.SpecUtilsError("The segment where you want to perform the subspectrum extraction is not present.  Specified \"" + segment + "\", available segments for this spectrum are: " + ', '.join(cos_spectrum.segments)+".")
 
 #--------------------
 
@@ -308,7 +306,7 @@ def plotspec(cos_spectrum, output_type, output_file, n_consecutive, flux_scale_f
 
     :type fluxerr_scale_factor: float
 
-    :param plot_metrics: Collection of plot metrics (flux statistics, axis ranges, etc.) to use when making the plots.  These are computed using `specutils.calc_plot_metrics`.
+    :param plot_metrics: Collection of plot metrics (flux statistics, axis ranges, etc.) to use when making the plots.  These are computed using `utils.specutils.calc_plot_metrics()`.
     
     :type plot_metrics: list
 
@@ -328,7 +326,7 @@ def plotspec(cos_spectrum, output_type, output_file, n_consecutive, flux_scale_f
 
     :type full_ylabels: bool
 
-    :param stitched_spectrum: The stitched version of the COS spectrum, where each segment has been stitched using specutils.stitch_components.  This is required is making a small (thumb-sized) plot, but not used if making a large-sized plot.
+    :param stitched_spectrum: The stitched version of the COS spectrum, where each segment has been stitched using `utils.specutils.stitch_components()`.  This is required is making a small (thumb-sized) plot, but not used if making a large-sized plot.
     
     :type stitched_spectrum: dict
 
@@ -400,10 +398,10 @@ def plotspec(cos_spectrum, output_type, output_file, n_consecutive, flux_scale_f
                     all_flerrs = stitched_spectrum["flerrs"]
                     all_dqs = stitched_spectrum["dqs"]
                 except KeyError as the_error:
-                    raise specutils.SpecUtilsError("The provided stitched spectrum does not have the expected format, missing key "+str(the_error)+".")
+                    raise utils.specutils.SpecUtilsError("The provided stitched spectrum does not have the expected format, missing key "+str(the_error)+".")
 
             else:
-                raise specutils.SpecUtilsError("You must provide a stitched spectrum through the `stitched_spectrum` input argument if creating a small (thumbnail-sized) plot.")
+                raise utils.specutils.SpecUtilsError("You must provide a stitched spectrum through the `stitched_spectrum` input argument if creating a small (thumbnail-sized) plot.")
 
         """ Only plot information in the plot title if the plot is large (and therefore sufficient space exists on the plot). """
         if is_bigplot:
@@ -424,7 +422,7 @@ def plotspec(cos_spectrum, output_type, output_file, n_consecutive, flux_scale_f
 
             if debug:
                 """ Overplot points color-coded based on rejection criteria. """
-                specutils.debug_oplot(this_plotarea, "cos", all_wls, all_fls, all_flerrs, all_dqs, plot_metrics[i]["median_flux"], plot_metrics[i]["median_fluxerr"], flux_scale_factor, fluxerr_scale_factor, plot_metrics[i]["fluxerr_95th"])
+                utils.specutils.debug_oplot(this_plotarea, "cos", all_wls, all_fls, all_flerrs, all_dqs, plot_metrics[i]["median_flux"], plot_metrics[i]["median_fluxerr"], flux_scale_factor, fluxerr_scale_factor, plot_metrics[i]["fluxerr_95th"])
 
                 """ Overplot regions excluded by the optimal x-axis range as a shaded area. """
                 this_plotarea.axvspan(numpy.nanmin(all_wls), optimal_xaxis_range[0],facecolor="lightgrey",alpha=0.5)

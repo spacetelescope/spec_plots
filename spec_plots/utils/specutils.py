@@ -10,36 +10,8 @@ __version__ = '1.31'
 
 import math
 import numpy
-import specutils_cos
-import specutils_stis
-
-#--------------------
-
-class SpecUtilsError(Exception, object):
-    """
-    This class defines a generic Exception to use for errors raised in the SPECUTILS modules (specutils, specutils_cos, specutils_stis, etc.).  It simply prints the given value when raising the exception, e.g., 
-    
-    .. code-block:: python
-    
-         raise SpecUtilsError("Print this string") 
-         SpecUtilsError: *** SPECUTILS ERROR: 'Print this string'
-    """
-
-    def __init__(self, value):
-        """
-        Initiate the Exception.
-
-        :param value: The string to print on error.
-
-        :type value: str
-        """
-        self.value = value
-
-    def __str__(self):
-        """
-        Overrides the str function for this class.
-        """
-        return "*** SPECUTILS ERROR: "+repr(self.value)
+import utils.specutils_cos
+import utils.specutils_stis
 
 #--------------------
 
@@ -695,7 +667,7 @@ def stitch_components(input_exposure, n_consecutive, flux_scale_factor, fluxerr_
     all_wls = [] ; all_fls = [] ; all_flerrs = [] ; all_dqs = []
     
     """ Determine how many pieces there are to stitch, and how to loop through them (different depending on instrument type. """
-    if isinstance(input_exposure, specutils_cos.COSSpectrum):
+    if isinstance(input_exposure, utils.specutils_cos.COSSpectrum):
         if segment_names is not None:
             n_components = len(segment_names)
             loop_iterable = segment_names
@@ -703,7 +675,7 @@ def stitch_components(input_exposure, n_consecutive, flux_scale_factor, fluxerr_
         else:
             raise ValueError("Must provide a list of segment names for COS spectra.")
 
-    elif isinstance(input_exposure, specutils_stis.STISExposureSpectrum):
+    elif isinstance(input_exposure, utils.specutils_stis.STISExposureSpectrum):
         n_components = len(input_exposure.orders)
         loop_iterable = xrange(n_components)
         inst_type = "stis"

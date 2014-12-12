@@ -15,9 +15,7 @@ from astropy.io import fits
 import numpy
 from os import path
 """ These are local modules that are imported. """
-import specutils
-import specutils_cos
-import specutils_stis
+from utils import specutils, specutils_cos, specutils_stis
 
 flux_scale_factor_default = 10.
 fluxerr_scale_factor_default = 5.
@@ -114,9 +112,45 @@ def make_hst_spec_previews(input_file, flux_scale_factor=flux_scale_factor_defau
     """
     Main function in the module.
 
-    :param args:
+    :param input_file: The full path and name of the FITS file to create a preview for.
+    
+    :type input_file: str
 
-    :type args: argparse.Namespace object.
+    :param flux_scale_factor: The ratio between the flux and the median flux that defines the pass/fail criterion within the edge trim test.
+
+    :type flux_scale_factor: float
+
+    :param fluxerr_scale_factor: The ratio between the flux uncertainty and the median flux uncertainty that defines the pass/fail criterion within the edge trim test.
+
+    :type fluxerr_scale_factor: float
+
+    :param n_consecutive: The number of consecutive data points that must pass the edge trim test to define the start and end of the spectrum for plotting purposes.
+
+    :type n_consecutive: int
+
+    :param output_path: Full path to output plot files.  Do not include the output file name in this path.  If not supplied, plots will be created in the same directory as the input file.
+
+    :type output_path: str
+
+    :param output_type: The file type of the plots to make.
+
+    :type output_type: str
+
+    :param dpi_val: The DPI value of your device's monitor, which will affect the size of the output plots.
+
+    :type dpi_val: float
+
+    :param debug: If True, turns on debug mode, which will plot to the screen and color-code fluxes based on different rejection criteria.
+
+    :type debug: bool
+
+    :param full_ylabels: If True, label the y-axis with full values, including powers of ten in scientific notation.
+
+    :type full_ylabels: bool
+
+    :param verbose: Turn on verbose messages/logging?
+
+    :type verbose: bool
 
     :raises: HSTSpecPrevError
     """
@@ -217,11 +251,11 @@ def setup_args():
 
     parser.add_argument("-s", action="store", type=float, dest="flux_scale_factor", default=flux_scale_factor_default, help="[Optional] Specify the ratio between the flux and the median flux that defines the pass/fail criterion within the edge trim test.  Default = %(default)s.")
 
-    parser.add_argument("-t", action="store", type=str, dest="output_type", default=output_type_default, help='[Optional] Specify where plots should be output.  Default = %(default)s.', choices=['png','PNG','eps', 'EPS', 'screen','SCREEN'], metavar='{png,ps,screen}')
+    parser.add_argument("-t", action="store", type=str, dest="output_type", default=output_type_default, help='[Optional] Specify the file type of the plots to make.  Default = %(default)s.', choices=['png','PNG','eps', 'EPS', 'screen','SCREEN'], metavar='{png,ps,screen}')
 
-    parser.add_argument("-v", action="store_true", dest="verbose", default=verbose_default, help='[Optional] Turn on verbose messages/logging.  Default = %(default)s.')
+    parser.add_argument("-v", action="store_true", dest="verbose", default=verbose_default, help='[Optional] Turn on verbose messages/logging?  Default = %(default)s.')
 
-    parser.add_argument("-y", action="store_true", dest="full_ylabels", default=full_ylabels_default, help='[Optional] Label y-axis with full values, including powers of ten in scientific notation.  Default = %(default)s.')
+    parser.add_argument("-y", action="store_true", dest="full_ylabels", default=full_ylabels_default, help='[Optional] Label the y-axis with full values, including powers of ten in scientific notation?  Default = %(default)s.')
 
     return parser
 
