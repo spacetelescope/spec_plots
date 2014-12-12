@@ -1,8 +1,8 @@
 Metadata-Version: 1.1
 Name: spec-plots
-Version: 1.30
+Version: 1.31
 Summary: Create preview plots of HST spectra.
-Home-page: https://github.com/openSAIL/spec-plots
+Home-page: https://github.com/openSAIL/spec_plots
 Author: Scott W. Fleming
 Author-email: fleming@stsci.edu
 License: MIT

@@ -1,0 +1,696 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>The work horses: specutils*.py. &mdash; spec_plots 1.2 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="spec_plots 1.2 documentation" href="index.html" />
+    <link rel="next" title="After The Fact: Diagnostic Modules." href="diagnostics.html" />
+    <link rel="prev" title="Getting Started: Main Program" href="make_hst_spec_previews.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="diagnostics.html" title="After The Fact: Diagnostic Modules."
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="make_hst_spec_previews.html" title="Getting Started: Main Program"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">spec_plots 1.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="the-work-horses-specutils-py">
+<h1>The work horses: specutils*.py.<a class="headerlink" href="#the-work-horses-specutils-py" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-specutils">
+<span id="specutils-utility-functions-used-in-plotting-hst-spectra-in-general"></span><h2><tt class="docutils literal"><span class="pre">specutils</span></tt> &#8211; Utility functions used in plotting HST spectra in general.<a class="headerlink" href="#module-specutils" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="specutils.AvoidRegion">
+<em class="property">class </em><tt class="descclassname">specutils.</tt><tt class="descname">AvoidRegion</tt><big>(</big><em>minwl=None</em>, <em>maxwl=None</em>, <em>description=''</em><big>)</big><a class="headerlink" href="#specutils.AvoidRegion" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines an avoid region, which is a section of wavelength space that should not be included when determining the optimal y-axis plot range.  The object consists of a starting wavelength, ending wavelength, and string description of what that region is.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body">ValueError</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="exception">
+<dt id="specutils.SpecUtilsError">
+<em class="property">exception </em><tt class="descclassname">specutils.</tt><tt class="descname">SpecUtilsError</tt><big>(</big><em>value</em><big>)</big><a class="headerlink" href="#specutils.SpecUtilsError" title="Permalink to this definition">¶</a></dt>
+<dd><p>This class defines a generic Exception to use for errors raised in the SPECUTILS modules (specutils, specutils_cos, specutils_stis, etc.).  It simply prints the given value when raising the exception, e.g.,</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">raise</span> <span class="n">SpecUtilsError</span><span class="p">(</span><span class="s">&quot;Print this string&quot;</span><span class="p">)</span> 
+<span class="n">SpecUtilsError</span><span class="p">:</span> <span class="o">***</span> <span class="n">SPECUTILS</span> <span class="n">ERROR</span><span class="p">:</span> <span class="s">&#39;Print this string&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="specutils._set_plot_xrange_test">
+<tt class="descclassname">specutils.</tt><tt class="descname">_set_plot_xrange_test</tt><big>(</big><em>instrument</em>, <em>flux_values</em>, <em>flux_err_values</em>, <em>median_flux</em>, <em>flux_scale_factor</em>, <em>median_fluxerr</em>, <em>fluxerr_scale_factor</em>, <em>fluxerr_95th</em>, <em>dqs</em>, <em>checkFluxes=False</em>, <em>checkFluxRatios=False</em>, <em>checkFluxErrRatios=False</em>, <em>checkFluxErrPercentile=False</em>, <em>checkDQs=False</em><big>)</big><a class="headerlink" href="#specutils._set_plot_xrange_test" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines the test for an invalid part of the spectrum when trimming from the edges along the wavelength (x) axis.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>instrument</strong> (<em>str</em>) &#8211; The instrument that is being tested.</li>
+<li><strong>flux_values</strong> (<em>numpy.ndarray</em>) &#8211; An array of fluxes to test.</li>
+<li><strong>flux_err_values</strong> (<em>numpy.ndarray</em>) &#8211; An array of associated flux uncertainties.</li>
+<li><strong>median_flux</strong> (<em>float</em>) &#8211; A median flux value, used in the test.</li>
+<li><strong>flux_scale_factor</strong> (<em>float</em>) &#8211; Max. allowed ratio between the flux and a median flux value, used in edge trimming.</li>
+<li><strong>median_fluxerr</strong> (<em>float</em>) &#8211; A median flux uncertainty value, used in the test.</li>
+<li><strong>fluxerr_scale_factor</strong> (<em>float</em>) &#8211; Max. allowed ratio between the flux uncertainty and a median flux uncertainty value, used in edge trimming.</li>
+<li><strong>fluxerr_95th</strong> (<em>float</em>) &#8211; The flux uncertainty corresponding to the 95th percentile.</li>
+<li><strong>dqs</strong> (<em>numpy.ndarray</em>) &#8211; The array of DQ flags to use in the test.  For COS, these are the DQ_WGT bits from the header.</li>
+<li><strong>checkFluxes</strong> (<em>bool</em>) &#8211; Should the value of the fluxes be used to test edge trimming?</li>
+<li><strong>checkFluxRatios</strong> (<em>bool</em>) &#8211; Should the ratio of the fluxes to the median flux value be used to test edge trimming?</li>
+<li><strong>checkFluxErrRatios</strong> (<em>bool</em>) &#8211; Should the ratio of the flux uncertainties to the median flux uncertainty be used to test edge trimming?</li>
+<li><strong>checkFluxErrPercentile</strong> (<em>bool</em>) &#8211; Should the highest percentile flux uncertainties be used to test edge trimming?</li>
+<li><strong>checkDQs</strong> (<em>bool</em>) &#8211; Should the highest percentile flux uncertainties be used to test edge trimming?</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">list &#8211; A list of True/False values depening on whether the input flux values pass the test.  Note that if a return value is True, then the flux value is considered PART OF THE SPECTRUM TO KEEP.  If median_flux is input as NaN, then this function returns False for all flux_values (i.e., skip all of them since median_flux is not defined).</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last">ValueError</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="specutils.calc_plot_metrics">
+<tt class="descclassname">specutils.</tt><tt class="descname">calc_plot_metrics</tt><big>(</big><em>instrument</em>, <em>wls</em>, <em>fls</em>, <em>flerrs</em>, <em>dqs</em>, <em>n_consecutive</em>, <em>flux_scale_factor</em>, <em>fluxerr_scale_factor</em><big>)</big><a class="headerlink" href="#specutils.calc_plot_metrics" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>instrument</strong> (<em>str</em>) &#8211; The instrument that is being tested.</li>
+<li><strong>wls</strong> (<em>numpy.ndarray</em>) &#8211; The wavelengths to be plotted.</li>
+<li><strong>fls</strong> (<em>numpy.ndarray</em>) &#8211; The fluxes to be plotted.</li>
+<li><strong>flerrs</strong> (<em>numpy.ndarray</em>) &#8211; The uncertainties of the fluxes to be plotted.</li>
+<li><strong>dqs</strong> (<em>numpy.ndarray</em>) &#8211; The DQ flags of the spectrum to be plotted.  For COS, these are the DQ_WGT bits from the header.</li>
+<li><strong>n_consecutive</strong> (<em>int</em>) &#8211; How many consecutive points must pass the test for the index to count as the valid start/end of the spectrum?</li>
+<li><strong>flux_scale_factor</strong> (<em>float</em>) &#8211; Max. allowed ratio between the flux and a median flux value, used in edge trimming.</li>
+<li><strong>fluxerr_scale_factor</strong> (<em>float</em>) &#8211; Max. allowed ratio between the flux uncertainty and a median flux uncertainty value, used in edge trimming.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="specutils.debug_oplot">
+<tt class="descclassname">specutils.</tt><tt class="descname">debug_oplot</tt><big>(</big><em>this_plotarea</em>, <em>instrument</em>, <em>all_wls</em>, <em>all_fls</em>, <em>all_flerrs</em>, <em>all_dqs</em>, <em>median_flux</em>, <em>median_fluxerr</em>, <em>flux_scale_factor</em>, <em>fluxerr_scale_factor</em>, <em>fluxerr_95th</em>, <em>oplot_percentiles=False</em><big>)</big><a class="headerlink" href="#specutils.debug_oplot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates plots of the spectra with color-coding and special annotation to identify which points were rejected by which tests.  Useful for debugging and understanding why a given plot had its plot axes defined the way it did.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>this_plotarea</strong> (<em>matplotlib.axes._subplots.AxesSubplot</em>) &#8211; The AxesSubplot object to plot on.</li>
+<li><strong>instrument</strong> (<em>str</em>) &#8211; The instrument that is being tested.</li>
+<li><strong>all_wls</strong> (<em>numpy.ndarray</em>) &#8211; Array of wavelengths.</li>
+<li><strong>all_fls</strong> (<em>numpy.ndarray</em>) &#8211; Array of fluxes.</li>
+<li><strong>all_flerrs</strong> (<em>numpy.ndarray</em>) &#8211; Array of flux uncertainties.</li>
+<li><strong>all_dqs</strong> (<em>numpy.ndarray</em>) &#8211; Array of data quality flags.  For COS, these are the DQ_WGT bits from the header.</li>
+<li><strong>median_flux</strong> (<em>float</em>) &#8211; The median flux used in determining where the best part of the spectrum is.</li>
+<li><strong>median_fluxerr</strong> (<em>float</em>) &#8211; The median flux uncertainty used in determining where the best part of the spectrum is.</li>
+<li><strong>flux_scale_factor</strong> (<em>float</em>) &#8211; Max. allowed ratio between the flux and a median flux value used in edge trimming.</li>
+<li><strong>fluxerr_scale_factor</strong> (<em>float</em>) &#8211; Max. allowed ratio between the flux uncertainty and a median flux uncertainty value used in edge trimming.</li>
+<li><strong>fluxerr_95th</strong> (<em>float</em>) &#8211; The flux uncertainty corresponding to the 95th percentile.</li>
+<li><strong>oplot_percentiles</strong> (<em>bool</em>) &#8211; Set this to True to overplot points where the flux uncertainties are greater than the 95th percentile.  Default = False.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="specutils.dq_has_flag">
+<tt class="descclassname">specutils.</tt><tt class="descname">dq_has_flag</tt><big>(</big><em>dq</em>, <em>flag_to_check</em><big>)</big><a class="headerlink" href="#specutils.dq_has_flag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns true/false if the given DQ value has a specific flag value set after unpacked into a 16-bit string.  For example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">print</span> <span class="n">dq_has_flag</span><span class="p">(</span><span class="mi">48</span><span class="p">,</span><span class="mi">16</span><span class="p">)</span>
+<span class="bp">True</span>
+<span class="k">print</span> <span class="n">dq_has_flag</span><span class="p">(</span><span class="mi">40</span><span class="p">,</span> <span class="mi">16</span><span class="p">)</span>
+<span class="bp">False</span>
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>dq</strong> (<em>int</em>) &#8211; The DQ value.</li>
+<li><strong>flag_to_check</strong> (<em>int</em>) &#8211; The flag value to check if it&#8217;s set to True.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">bool &#8211; Returns True if <cite>flag_to_check</cite> is set to True inside <cite>dq</cite>.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last">ValueError</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="specutils.edge_trim">
+<tt class="descclassname">specutils.</tt><tt class="descname">edge_trim</tt><big>(</big><em>instrument</em>, <em>fluxes</em>, <em>fluxerrs</em>, <em>dqs</em>, <em>n_consecutive</em>, <em>median_flux</em>, <em>flux_scale_factor</em>, <em>median_fluxerr</em>, <em>fluxerr_scale_factor</em>, <em>fluxerr_95th</em><big>)</big><a class="headerlink" href="#specutils.edge_trim" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns start and end indexes (end indexes are negatively indexed) of the best part of the spectrum to use when defining the plot&#8217;s wavelength ranges.  Returns two sets of start and end indexes: one set without taking into account DQ flags, and one set that does take into account DQ flags (since some spectra have all DQ flags set &gt; 0).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>instrument</strong> (<em>str</em>) &#8211; The instrument that is being tested.</li>
+<li><strong>fluxes</strong> (<em>numpy.ndarray</em>) &#8211; The fluxes to be plotted.</li>
+<li><strong>fluxerrs</strong> (<em>numpy.ndarray</em>) &#8211; The uncertainties of the fluxes to be plotted.</li>
+<li><strong>dqs</strong> (<em>numpy.ndarray</em>) &#8211; The DQ flags of the spectrum.  For COS, these are the DQ_WGT bits from the header.</li>
+<li><strong>n_consecutive</strong> (<em>int</em>) &#8211; The consecutive number of fluxes that must belong to the &#8220;best&#8221; part of the spectrum for the start/end index to count.</li>
+<li><strong>median_flux</strong> (<em>float</em>) &#8211; The median flux, used in determining where the best part of the spectrum is.</li>
+<li><strong>flux_scale_factor</strong> (<em>float</em>) &#8211; Max. allowed ratio between the flux and a median flux value, used in edge trimming.</li>
+<li><strong>median_fluxerr</strong> (<em>float</em>) &#8211; The median flux uncertainty, used in determining where the best part of the spectrum is.</li>
+<li><strong>fluxerr_scale_factor</strong> (<em>float</em>) &#8211; Max. allowed ratio between the flux uncertainty and a median flux uncertainty value, used in edge trimming.</li>
+<li><strong>fluxerr_95th</strong> (<em>float</em>) &#8211; The flux uncertainty corresponding to the 95th percentile.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">int tuple &#8211; Indexes that define the best part of the spectrum, in the order of (start_index_nodq, end_index_nodq, start_index_withdq, end_index_withdq).</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="specutils.generate_avoid_regions">
+<tt class="descclassname">specutils.</tt><tt class="descname">generate_avoid_regions</tt><big>(</big><em>instrument</em><big>)</big><a class="headerlink" href="#specutils.generate_avoid_regions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a list of AvoidRegion objects for use in the plotting routine, specifically designed for the given instrument.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>instrument</strong> (<em>str</em>) &#8211; The instrument to generate the Avoid Region for.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="specutils.get_flux_stats">
+<tt class="descclassname">specutils.</tt><tt class="descname">get_flux_stats</tt><big>(</big><em>fluxes</em>, <em>fluxerrs</em><big>)</big><a class="headerlink" href="#specutils.get_flux_stats" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates median values of the fluxes and flux uncertainties, and the 95th percentile flux uncertainty.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>fluxes</strong> (<em>numpy.ndarray</em>) &#8211; The fluxes to be plotted.</li>
+<li><strong>fluxerrs</strong> (<em>numpy.ndarray</em>) &#8211; The uncertainties of the fluxes to be plotted.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="specutils.isbaddq">
+<tt class="descclassname">specutils.</tt><tt class="descname">isbaddq</tt><big>(</big><em>instrument</em>, <em>dqs</em><big>)</big><a class="headerlink" href="#specutils.isbaddq" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns True/False whether the DQ values are from a good part of the spectrum.  If the input DQs is a scalar value, the return result is also a scalar value.  If the input DQs are a numpy array, the return result is also a numpy array.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>instrument</strong> (<em>str</em>) &#8211; The instrument the DQs come from.</li>
+<li><strong>dqs</strong> (<em>numpy.ndarray</em>) &#8211; Array of DQ (STIS) or DQ_WGT (COS) values.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">boolean or numpy.ndarray &#8211; A scalar boolean or array of booleans.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="specutils.rms">
+<tt class="descclassname">specutils.</tt><tt class="descname">rms</tt><big>(</big><em>values</em>, <em>offset=0.0</em><big>)</big><a class="headerlink" href="#specutils.rms" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the RMS about some offset (default offset is 0.)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>values</strong> (<em>numpy.ndarray</em>) &#8211; Array of values to compute the rms of.</li>
+<li><strong>offset</strong> (<em>float</em>) &#8211; Optional offset to compute the rms about.  Defaults to 0.0.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">float &#8211; A scalar float containing the rms about the offset.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="specutils.set_plot_xrange">
+<tt class="descclassname">specutils.</tt><tt class="descname">set_plot_xrange</tt><big>(</big><em>instrument</em>, <em>wavelengths</em>, <em>fluxes</em>, <em>fluxerrs</em>, <em>dqs</em>, <em>n_consecutive</em>, <em>flux_scale_factor</em>, <em>fluxerr_scale_factor</em>, <em>median_flux</em>, <em>median_fluxerr</em>, <em>fluxerr_95th</em><big>)</big><a class="headerlink" href="#specutils.set_plot_xrange" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given an array of wavelengths and fluxes, returns a list of [xmin,xmax] to define an optimal x-axis plot range.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>instrument</strong> (<em>str</em>) &#8211; The instrument that is being tested.</li>
+<li><strong>wavelengths</strong> (<em>numpy.ndarray</em>) &#8211; The wavelengths to be plotted.</li>
+<li><strong>fluxes</strong> (<em>numpy.ndarray</em>) &#8211; The fluxes to be plotted.</li>
+<li><strong>fluxerrs</strong> (<em>numpy.ndarray</em>) &#8211; The uncertainties of the fluxes to be plotted.</li>
+<li><strong>dqs</strong> (<em>numpy.ndarray</em>) &#8211; The DQ flags of the spectrum to be plotted.  For COS, these are the DQ_WGT bits from the header.</li>
+<li><strong>n_consecutive</strong> (<em>int</em>) &#8211; How many consecutive points must pass the test for the index to count as the valid start/end of the spectrum?</li>
+<li><strong>flux_scale_factor</strong> (<em>float</em>) &#8211; Max. allowed ratio between the flux and a median flux value, used in edge trimming.</li>
+<li><strong>fluxerr_scale_factor</strong> (<em>float</em>) &#8211; Max. allowed ratio between the flux uncertainty and a median flux uncertainty value, used in edge trimming.</li>
+<li><strong>median_flux</strong> (<em>float</em>) &#8211; A median flux value, used in the test.</li>
+<li><strong>median_fluxerr</strong> (<em>float</em>) &#8211; A median flux uncertainty value, used in the test.</li>
+<li><strong>fluxerr_95th</strong> (<em>float</em>) &#8211; The flux uncertainty corresponding to the 95th percentile.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list &#8211; Two-element list containing the optimal [xmin,xmax] values to define the x-axis plot range.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="specutils.set_plot_yrange">
+<tt class="descclassname">specutils.</tt><tt class="descname">set_plot_yrange</tt><big>(</big><em>wavelengths</em>, <em>fluxes</em>, <em>avoid_regions=None</em>, <em>wl_range=None</em><big>)</big><a class="headerlink" href="#specutils.set_plot_yrange" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given an array of wavelengths, fluxes, and avoid regions, returns a list of [ymin,ymax] to define an optimal y-axis plot range.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>wavelengths</strong> (<em>numpy.ndarray</em>) &#8211; The wavelengths to be plotted.</li>
+<li><strong>fluxes</strong> (<em>numpy.ndarray</em>) &#8211; The fluxes to be plotted.</li>
+<li><strong>avoid_regions</strong> (<em>list of STISAvoidRegion objects.</em>) &#8211; A list of wavelength ranges to avoid when calculating optimal y-axis plot range.</li>
+<li><strong>wl_range</strong> (<em>list</em>) &#8211; The min. and max. wavelength that defines the x-axis plot range.  The default is None, in which case the min. and max. if the input wavelength array will be used.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list &#8211; Two-element list containing the optimal [ymin,ymax] values to define the y-axis plot range.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This function makes use of an internal look-up table of wavelength regions where known contaminating emission lines or other strong UV artifacts can affect the zoom level of the plot.</p>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="specutils.stitch_components">
+<tt class="descclassname">specutils.</tt><tt class="descname">stitch_components</tt><big>(</big><em>input_exposure</em>, <em>n_consecutive</em>, <em>flux_scale_factor</em>, <em>fluxerr_scale_factor</em>, <em>segment_names=None</em><big>)</big><a class="headerlink" href="#specutils.stitch_components" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a COSSpectrum or STISExposureSpectrum object, stitches each segment/order, respectively, into a contiguous array.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>input_exposure</strong> (<em>COSSpectrum or STISExposureSpectrum</em>) &#8211; The COS segment or STIS exposure spectrum to stitch.</li>
+<li><strong>n_consecutive</strong> (<em>int</em>) &#8211; How many consecutive points must pass the test for the index to count as the valid start/end of the spectrum?</li>
+<li><strong>flux_scale_factor</strong> (<em>float</em>) &#8211; Max. allowed ratio between the flux and a median flux value, used in edge trimming.</li>
+<li><strong>fluxerr_scale_factor</strong> (<em>float</em>) &#8211; Max. allowed ratio between the flux uncertainty and a median flux uncertainty value, used in edge trimming.</li>
+<li><strong>segment_names</strong> (<em>list</em>) &#8211; List of segment names if input_exposure is a COSSpectrum object.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">dict{numpy array, numpy array, numpy array, str} &#8211; The stitched wavelengths, fluxes, flux errors, and an informational plot title in the event that all the fluxes had the DQ flag set.  These are packaged in a dict.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last">ValueError</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-specutils_cos">
+<span id="specutils-cos-functions-specific-to-cos-spectra"></span><h2><tt class="docutils literal"><span class="pre">specutils_cos</span></tt> &#8211; Functions specific to COS spectra.<a class="headerlink" href="#module-specutils_cos" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="specutils_cos.COSSegment">
+<em class="property">class </em><tt class="descclassname">specutils_cos.</tt><tt class="descname">COSSegment</tt><big>(</big><em>nelem=None</em>, <em>wavelengths=None</em>, <em>fluxes=None</em>, <em>fluxerrs=None</em>, <em>dqs=None</em><big>)</big><a class="headerlink" href="#specutils_cos.COSSegment" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines a spectrum from a COS segment.  The data (wavelength, flux, flux errors) are stored as numpy ndarrays.  A scalar int property provides the number of elements in this segment.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="specutils_cos.COSSpectrum">
+<em class="property">class </em><tt class="descclassname">specutils_cos.</tt><tt class="descname">COSSpectrum</tt><big>(</big><em>optical_element</em>, <em>band=None</em>, <em>cos_segments=None</em>, <em>orig_file=None</em><big>)</big><a class="headerlink" href="#specutils_cos.COSSpectrum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines a COS spectrum, including wavelegnth, flux, flux errors, and DQ_WGT values.  A COS spectrum consists of N segments (N = {2,3}) stored as a dict object.  Each of these dicts contain a COSSegment object that contains the wavelengths, fluxes, flux errors, etc.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body">ValueError</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="specutils_cos.COSSpectrum.optical_element">
+<tt class="descname">optical_element</tt><em class="property"> = None</em><a class="headerlink" href="#specutils_cos.COSSpectrum.optical_element" title="Permalink to this definition">¶</a></dt>
+<dd><p>Record the original file name.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="specutils_cos.check_segments">
+<tt class="descclassname">specutils_cos.</tt><tt class="descname">check_segments</tt><big>(</big><em>segments_list</em>, <em>input_file</em><big>)</big><a class="headerlink" href="#specutils_cos.check_segments" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks that the array of &#8220;segments&#8221; in the COS spectrum header are expected values.  It returns a scalar string representing the band (either &#8220;FUV&#8221; or &#8220;NUV&#8221;).  If the array is not what&#8217;s expected, an Exception is raised.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>segments_list</strong> (<em>list</em>) &#8211; List of segment labels.</li>
+<li><strong>input_file</strong> (<em>str</em>) &#8211; Name of input FITS file.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">str &#8211; A string representation of the band, either &#8220;FUV&#8221; or &#8220;NUV&#8221;.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last">specutils.SpecUtilsError</p>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This function does not attempt to access the input file, it only requires the name of the file for error reporting purposes.</p>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="specutils_cos.extract_subspec">
+<tt class="descclassname">specutils_cos.</tt><tt class="descname">extract_subspec</tt><big>(</big><em>cos_spectrum</em>, <em>segment</em>, <em>min_wl=None</em>, <em>max_wl=None</em><big>)</big><a class="headerlink" href="#specutils_cos.extract_subspec" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extracts a sub-spectrum of a COS segment&#8217;s spectrum.  If both min. and max. wavelengths are specified, then it keeps the part of the spectrum within those bounds.  If only a min. or max. is specified, then those are treated as lower or upper bounds, and the part of the spectrum redder/bluer than the bound is retained.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>cos_spectrum</strong> (<em>COSSpectrum</em>) &#8211; COS spectrum as returned by READSPEC.</li>
+<li><strong>segment</strong> (<em>str</em>) &#8211; The segment to do the extraction on.</li>
+<li><strong>min_wl</strong> (<em>float</em>) &#8211; The minimum wavlength value to keep.  If None, then there will be no lower bound.</li>
+<li><strong>max_wl</strong> (<em>float</em>) &#8211; The maximum wavelength value to keep.  If None, then there will be no upper bound.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="specutils_cos.get_segment_names">
+<tt class="descclassname">specutils_cos.</tt><tt class="descname">get_segment_names</tt><big>(</big><em>cos_spectrum</em><big>)</big><a class="headerlink" href="#specutils_cos.get_segment_names" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a list of segment names sorted such that the bluest segments come first.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>cos_spectrum</strong> (<em>COSSpectrum</em>) &#8211; COS spectrum as returned by READSPEC.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="specutils_cos.plotspec">
+<tt class="descclassname">specutils_cos.</tt><tt class="descname">plotspec</tt><big>(</big><em>cos_spectrum</em>, <em>output_type</em>, <em>output_file</em>, <em>n_consecutive</em>, <em>flux_scale_factor</em>, <em>fluxerr_scale_factor</em>, <em>plot_metrics</em>, <em>dpi_val=96.0</em>, <em>output_size=1024</em>, <em>debug=False</em>, <em>full_ylabels=False</em>, <em>stitched_spectrum=None</em><big>)</big><a class="headerlink" href="#specutils_cos.plotspec" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accepts a COSSpectrum object from the READSPEC function and produces preview plots.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>cos_spectrum</strong> &#8211; COS spectrum as returned by READSPEC.</li>
+<li><strong>output_type</strong> (<em>str</em>) &#8211; What kind of output to make?</li>
+<li><strong>output_file</strong> (<em>str</em>) &#8211; Name of output file (including full path).</li>
+<li><strong>n_consecutive</strong> (<em>int</em>) &#8211; How many consecutive points must pass the test for the index to count as the valid start/end of the spectrum?  Default = 20.</li>
+<li><strong>flux_scale_factor</strong> (<em>float</em>) &#8211; Max. allowed ratio between the flux and a median flux value, used in edge trimming.  Default = 10.</li>
+<li><strong>fluxerr_scale_factor</strong> (<em>float</em>) &#8211; Max. allowed ratio between the flux uncertainty and a median flux uncertainty value, used in edge trimming.  Default = 5.</li>
+<li><strong>plot_metrics</strong> (<em>list</em>) &#8211; Collection of plot metrics (flux statistics, axis ranges, etc.) to use when making the plots.  These are computed using <cite>specutils.calc_plot_metrics</cite>.</li>
+<li><strong>dpi_val</strong> (<em>float</em>) &#8211; The DPI value of your device&#8217;s monitor.  Affects the size of the output plots.  Default = 96. (applicable to most modern monitors).</li>
+<li><strong>output_size</strong> &#8211; Size of plot in pixels (plots are square in dimensions).  Defaults to 1024.</li>
+<li><strong>output_size</strong> &#8211; int</li>
+<li><strong>debug</strong> (<em>bool</em>) &#8211; Should the output plots include debugging information (color-coded data points based on rejection criteria, shaded exclude regions)?  Default = False.</li>
+<li><strong>full_ylabels</strong> (<em>bool</em>) &#8211; Should the y-labels contain the full values (including the power of 10 in scientific notation)?  Default = False.</li>
+<li><strong>stitched_spectrum</strong> (<em>dict</em>) &#8211; The stitched version of the COS spectrum, where each segment has been stitched using specutils.stitch_components.  This is required is making a small (thumb-sized) plot, but not used if making a large-sized plot.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last">OSError</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="specutils_cos.readspec">
+<tt class="descclassname">specutils_cos.</tt><tt class="descname">readspec</tt><big>(</big><em>input_file</em><big>)</big><a class="headerlink" href="#specutils_cos.readspec" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads in a COS spectrum FITS file (x1d, x1dsum, or x1dsum{1,2,3,4}) and returns the wavelengths, fluxes, flux uncertainties, and DQ_WGT values for the two (FUV segments) or three (NUV stripes).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>input_file</strong> (<em>str</em>) &#8211; Name of input FITS file.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">COSSpectrum &#8211; The spectroscopic data (wavelength, flux, flux error, etc):</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body">KeyError</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-specutils_stis">
+<span id="specutils-stis-functions-specific-to-stis-spectra"></span><h2><tt class="docutils literal"><span class="pre">specutils_stis</span></tt> &#8211; Functions specific to STIS spectra.<a class="headerlink" href="#module-specutils_stis" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="specutils_stis.STIS1DSpectrum">
+<em class="property">class </em><tt class="descclassname">specutils_stis.</tt><tt class="descname">STIS1DSpectrum</tt><big>(</big><em>association_spectra</em>, <em>orig_file=None</em><big>)</big><a class="headerlink" href="#specutils_stis.STIS1DSpectrum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines a STIS 1D spectrum (either &#8220;x1d&#8221; extracted or &#8220;sx1&#8221; summed extracted), including wavelegnth, flux, and flux errors.  A STIS 1D spectrum object consists of N associations.  If the file is an association, then N &gt; 1, otherwise N = 1.  Each of these N associations can contain M orders.  If the association is an Echelle spectrum, then 24 &lt; M &lt; 70, depending on instrument configuration, otherwise M = 1.  Each of these M orders contain typical spectral data (wavelengths, fluxes, etc.), stored as STISOrderSpectrum objects.  The final data structure is then &lt;STIS1DSpectrum&gt;.associations[n].order[m].wavelengths (or .fluxes, .fluxerrs, etc.).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body">ValueError</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="specutils_stis.STISExposureSpectrum">
+<em class="property">class </em><tt class="descclassname">specutils_stis.</tt><tt class="descname">STISExposureSpectrum</tt><big>(</big><em>order_spectra</em><big>)</big><a class="headerlink" href="#specutils_stis.STISExposureSpectrum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines a STIS exposure spectrum, which consists of &#8220;M&#8221; STISOrderSpectrum objects.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="specutils_stis.STISOrderSpectrum">
+<em class="property">class </em><tt class="descclassname">specutils_stis.</tt><tt class="descname">STISOrderSpectrum</tt><big>(</big><em>nelem=None</em>, <em>wavelengths=None</em>, <em>fluxes=None</em>, <em>fluxerrs=None</em>, <em>dqs=None</em><big>)</big><a class="headerlink" href="#specutils_stis.STISOrderSpectrum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines a STIS order spectrum, including wavelength, flux, flux errors, and data quality flags, which are stored as numpy arrays.  A scalar int property provides the number of elements in this segment.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="specutils_stis.get_association_indices">
+<tt class="descclassname">specutils_stis.</tt><tt class="descname">get_association_indices</tt><big>(</big><em>associations</em><big>)</big><a class="headerlink" href="#specutils_stis.get_association_indices" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a list of associations, determines the indices that will be plotted.  If n_associations &gt; 3, this is the first, middle, and last associations, otherwise it&#8217;s all of them.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>associations</strong> (<em>list</em>) &#8211; All of the associations for this STIS spectrum.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">list &#8211; The indices of the list that will be plotted.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="specutils_stis.plotspec">
+<tt class="descclassname">specutils_stis.</tt><tt class="descname">plotspec</tt><big>(</big><em>stis_spectrum</em>, <em>association_indices</em>, <em>stitched_spectra</em>, <em>output_type</em>, <em>output_file</em>, <em>n_consecutive</em>, <em>flux_scale_factor</em>, <em>fluxerr_scale_factor</em>, <em>plot_metrics</em>, <em>dpi_val=96.0</em>, <em>output_size=1024</em>, <em>debug=False</em>, <em>full_ylabels=False</em><big>)</big><a class="headerlink" href="#specutils_stis.plotspec" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accepts a STIS1DSpectrum object from the READSPEC function and produces preview plots.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>stis_spectrum</strong> (<em>STIS1DSpectrum</em>) &#8211; STIS spectrum as returned by READSPEC.</li>
+<li><strong>association_indices</strong> (<em>list</em>) &#8211; The indices of the original list of associations for this spectrum that will be plotted.  Used in the informational plot title, e.g., <cite>Association &lt;x&gt; of &lt;y&gt;.</cite>, where &lt;x&gt; is the association index and &lt;y&gt; is the total number of associations in this spectrum.</li>
+<li><strong>stitched_spectra</strong> (<em>list</em>) &#8211; List of order-stitched spectra for each association, as created in <cite>specutils.stitch_components</cite>.</li>
+<li><strong>output_type</strong> (<em>str</em>) &#8211; What kind of output to make?</li>
+<li><strong>output_file</strong> (<em>str</em>) &#8211; Name of output file (including full path).</li>
+<li><strong>n_consecutive</strong> (<em>int</em>) &#8211; How many consecutive points must pass the test for the index to count as the valid start/end of the spectrum?  Default = 20.</li>
+<li><strong>flux_scale_factor</strong> (<em>float</em>) &#8211; Max. allowed ratio between the flux and a median flux value, used in edge trimming.  Default = 10.</li>
+<li><strong>fluxerr_scale_factor</strong> (<em>float</em>) &#8211; Max. allowed ratio between the flux uncertainty and a median flux uncertainty value, used in edge trimming.  Default = 5.</li>
+<li><strong>plot_metrics</strong> (<em>list</em>) &#8211; Collection of plot metrics (flux statistics, axis ranges, etc.) to use when making the plots.  These are computed using <cite>specutils.calc_plot_metrics</cite>.</li>
+<li><strong>dpi_val</strong> (<em>float</em>) &#8211; The DPI value of your device&#8217;s monitor.  Affects the size of the output plots.  Default = 96. (applicable to most modern monitors).</li>
+<li><strong>output_size</strong> &#8211; Size of plot in pixels (plots are square in dimensions).  Defaults to 1024.</li>
+<li><strong>output_size</strong> &#8211; int</li>
+<li><strong>debug</strong> (<em>bool</em>) &#8211; Should the output plots include debugging information (color-coded data points based on rejection criteria, shaded exclude regions)?  Default = False.</li>
+<li><strong>full_ylabels</strong> (<em>bool</em>) &#8211; Should the y-labels contain the full values (including the power of 10 in scientific notation)?  Default = False.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last">OSError</p>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This function assumes a screen resolution of 96 DPI in order to generate plots of the desired sizes.  This is because matplotlib works in units of inches and DPI rather than pixels.</p>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="specutils_stis.readspec">
+<tt class="descclassname">specutils_stis.</tt><tt class="descname">readspec</tt><big>(</big><em>input_file</em><big>)</big><a class="headerlink" href="#specutils_stis.readspec" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads in a STIS spectrum FITS file (x1d, sx1) and returns the wavelengths, fluxes, and flux uncertainties for the two (FUV segments) or three (NUV stripes).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>input_file</strong> (<em>str</em>) &#8211; Name of input FITS file.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">STIS1DSpectrum &#8211; The spectroscopic data (wavelength, flux, flux error, etc):</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">The work horses: specutils*.py.</a><ul>
+<li><a class="reference internal" href="#module-specutils"><tt class="docutils literal"><span class="pre">specutils</span></tt> &#8211; Utility functions used in plotting HST spectra in general.</a></li>
+<li><a class="reference internal" href="#module-specutils_cos"><tt class="docutils literal"><span class="pre">specutils_cos</span></tt> &#8211; Functions specific to COS spectra.</a></li>
+<li><a class="reference internal" href="#module-specutils_stis"><tt class="docutils literal"><span class="pre">specutils_stis</span></tt> &#8211; Functions specific to STIS spectra.</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="make_hst_spec_previews.html"
+                        title="previous chapter">Getting Started: Main Program</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="diagnostics.html"
+                        title="next chapter">After The Fact: Diagnostic Modules.</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/specutils.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="diagnostics.html" title="After The Fact: Diagnostic Modules."
+             >next</a> |</li>
+        <li class="right" >
+          <a href="make_hst_spec_previews.html" title="Getting Started: Main Program"
+             >previous</a> |</li>
+        <li><a href="index.html">spec_plots 1.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Scott W. Fleming.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>
