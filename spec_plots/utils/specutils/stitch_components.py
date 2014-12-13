@@ -9,7 +9,13 @@ __version__ = '1.31'
 """
 
 import numpy
-import ipdb; ipdb.set_trace()
+from is_bad_dq import is_bad_dq
+from get_flux_stats import get_flux_stats
+from edge_trim import edge_trim
+
+import os
+import sys
+sys.path.append(os.path.abspath(os.pardir+os.sep))
 import utils.specutils_cos
 import utils.specutils_stis
 

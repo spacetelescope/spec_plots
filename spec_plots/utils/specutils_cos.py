@@ -15,7 +15,7 @@ from matplotlib.ticker import FormatStrFormatter
 import numpy
 import os
 import sys
-import utils.specutils
+import specutils
 
 #--------------------
 
@@ -422,7 +422,7 @@ def plotspec(cos_spectrum, output_type, output_file, n_consecutive, flux_scale_f
 
             if debug:
                 """ Overplot points color-coded based on rejection criteria. """
-                utils.specutils.debug_oplot(this_plotarea, "cos", all_wls, all_fls, all_flerrs, all_dqs, plot_metrics[i]["median_flux"], plot_metrics[i]["median_fluxerr"], flux_scale_factor, fluxerr_scale_factor, plot_metrics[i]["fluxerr_95th"])
+                specutils.debug_oplot(this_plotarea, "cos", all_wls, all_fls, all_flerrs, all_dqs, plot_metrics[i]["median_flux"], plot_metrics[i]["median_fluxerr"], flux_scale_factor, fluxerr_scale_factor, plot_metrics[i]["fluxerr_95th"])
 
                 """ Overplot regions excluded by the optimal x-axis range as a shaded area. """
                 this_plotarea.axvspan(numpy.nanmin(all_wls), optimal_xaxis_range[0],facecolor="lightgrey",alpha=0.5)

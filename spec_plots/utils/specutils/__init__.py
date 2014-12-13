@@ -5,7 +5,7 @@ from .stitch_components import stitch_components
 from .calc_plot_metrics import calc_plot_metrics
 from .debug_oplot import debug_oplot
 from .dq_has_flag import dq_has_flag
-from .edge_trim import edge_trim
+from .edge_trim import edge_trim, _set_plot_xrange_test
 from .get_flux_stats import get_flux_stats
-from .set_plot_xrange import set_plot_xrange, _set_plot_xrange_test
+from .set_plot_xrange import set_plot_xrange
 from .set_plot_yrange import set_plot_yrange

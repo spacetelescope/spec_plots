@@ -9,6 +9,7 @@ __version__ = '1.31'
 """
 
 import numpy
+from is_bad_dq import is_bad_dq
 
 #--------------------
 def debug_oplot(this_plotarea, instrument, all_wls, all_fls, all_flerrs, all_dqs, median_flux, median_fluxerr, flux_scale_factor, fluxerr_scale_factor, fluxerr_95th, oplot_percentiles=False):

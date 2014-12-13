@@ -9,6 +9,10 @@ __version__ = '1.31'
 """
 
 import numpy
+from get_flux_stats import get_flux_stats
+from set_plot_xrange import set_plot_xrange
+from avoidregion import generate_avoid_regions
+from set_plot_yrange import set_plot_yrange
 
 #--------------------
 def calc_plot_metrics(instrument, wls, fls, flerrs, dqs, n_consecutive, flux_scale_factor, fluxerr_scale_factor):
