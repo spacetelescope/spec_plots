@@ -28,16 +28,16 @@ def is_bad_dq(instrument, dqs):
 
     if instrument == "cos":
         if isinstance(dqs,numpy.ndarray):
-            return [x < 1 for x in dqs]
+            return numpy.asarray([x < 1 for x in dqs])
         else:
             return dqs < 1
 
     elif instrument == "stis":
         if isinstance(dqs,numpy.ndarray):
-            return [x != 0 and x != 16 for x in dqs]
+            return numpy.asarray([x != 0 and x != 16 for x in dqs])
         else:
             return dqs != 0 and dqs != 16
 
     else:
-        return []
+        return numpy.asarray([])
 #--------------------

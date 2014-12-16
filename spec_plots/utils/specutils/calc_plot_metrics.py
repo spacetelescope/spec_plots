@@ -3,20 +3,22 @@ __version__ = '1.31'
 """
 .. module:: calc_plot_metrics
 
-   :synopsis: Calculates optimal x- and y-axis ranges for plots.
+   :synopsis: Calculates metrics related to a plot, including flux statistics, avoid regions, and optimal x- and y-axis ranges for plots.
 
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
 """
 
 import numpy
 from get_flux_stats import get_flux_stats
-from set_plot_xrange import set_plot_xrange
 from avoidregion import generate_avoid_regions
+from set_plot_xrange import set_plot_xrange
 from set_plot_yrange import set_plot_yrange
 
 #--------------------
 def calc_plot_metrics(instrument, wls, fls, flerrs, dqs, n_consecutive, flux_scale_factor, fluxerr_scale_factor):
     """
+    Calculates a variety of plot metrics, including flux statistics, avoid regions, and optimal x- and y-axis ranges.
+
     :param instrument: The instrument that is being tested.
 
     :type instrument: str
@@ -48,6 +50,8 @@ def calc_plot_metrics(instrument, wls, fls, flerrs, dqs, n_consecutive, flux_sca
     :param fluxerr_scale_factor: Max. allowed ratio between the flux uncertainty and a median flux uncertainty value, used in edge trimming.
 
     :type fluxerr_scale_factor: float
+
+    :returns: dict -- A container for the plot metrics.
     """
 
     """ Calculate statistics on the fluxes. """

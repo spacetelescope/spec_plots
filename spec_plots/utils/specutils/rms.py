@@ -8,6 +8,8 @@ __version__ = '1.31'
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
 """
 
+import math
+
 #--------------------
 def rms(values, offset=0.):
     """

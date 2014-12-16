@@ -13,13 +13,23 @@ from is_bad_dq import is_bad_dq
 from get_flux_stats import get_flux_stats
 from edge_trim import edge_trim
 
-import os
-import sys
-sys.path.append(os.path.abspath(os.pardir+os.sep))
-import utils.specutils_cos
-import utils.specutils_stis
+""" <DEVEL> Note that this hack to make it so that the user can import `stitch_components` directly as a module or run it from the command line as __main__ has the side effect of importing this module twice, despite my best efforts to work around it.  I don't think it will be a major issue, but worth thinking about in the future. </DEVEL> """
+if __package__ is None:
+    import sys, os
+    specutils_dir = os.path.dirname(os.path.abspath(__file__))
+    utils_dir = os.path.dirname(specutils_dir)
+    parent_dir = os.path.dirname(utils_dir)
+    sys.path.insert(1, parent_dir)
+    import utils
+    __package__ = str("utils.specutils")
+    __name__ = str(__package__+"."+__name__)
+    del sys, os
+    
+from ..specutils_cos import COSSpectrum
+from ..specutils_stis import STISExposureSpectrum
 
 #--------------------
+
 def stitch_components(input_exposure, n_consecutive, flux_scale_factor, fluxerr_scale_factor, segment_names=None):
     """
     Given a COSSpectrum or STISExposureSpectrum object, stitches each segment/order, respectively, into a contiguous array.
@@ -53,7 +63,7 @@ def stitch_components(input_exposure, n_consecutive, flux_scale_factor, fluxerr_
     all_wls = [] ; all_fls = [] ; all_flerrs = [] ; all_dqs = []
     
     """ Determine how many pieces there are to stitch, and how to loop through them (different depending on instrument type. """
-    if isinstance(input_exposure, utils.specutils_cos.COSSpectrum):
+    if isinstance(input_exposure, COSSpectrum):
         if segment_names is not None:
             n_components = len(segment_names)
             loop_iterable = segment_names
@@ -61,7 +71,7 @@ def stitch_components(input_exposure, n_consecutive, flux_scale_factor, fluxerr_
         else:
             raise ValueError("Must provide a list of segment names for COS spectra.")
 
-    elif isinstance(input_exposure, utils.specutils_stis.STISExposureSpectrum):
+    elif isinstance(input_exposure, STISExposureSpectrum):
         n_components = len(input_exposure.orders)
         loop_iterable = xrange(n_components)
         inst_type = "stis"
