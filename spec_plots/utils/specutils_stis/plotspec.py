@@ -160,10 +160,6 @@ def plotspec(stis_spectrum, association_indices, stitched_spectra, output_type, 
             this_plotarea.plot(all_wls, all_fls, 'b')
             this_plotarea.grid(True)
 
-            """ Get the values of the x- and y-axes plot limits that *would* have been used by pyplot automatically.  We still use these x-axis plot ranges so that plots from the same instrument configuration have the same x-axis range. """
-            pyplot_xrange = this_plotarea.get_xlim()
-            pyplot_yrange = this_plotarea.get_ylim()
-
             if debug:
                 """ Overplot points color-coded based on rejection criteria. """
                 debug_oplot(this_plotarea, "stis", all_wls, all_fls, all_flerrs, all_dqs, plot_metrics[i]["median_flux"], plot_metrics[i]["median_fluxerr"], flux_scale_factor, fluxerr_scale_factor, plot_metrics[i]["fluxerr_95th"])
@@ -176,8 +172,11 @@ def plotspec(stis_spectrum, association_indices, stitched_spectra, output_type, 
                 for ar in plot_metrics[i]["avoid_regions"]:
                     this_plotarea.axvspan(ar.minwl,ar.maxwl,facecolor="lightgrey",alpha=0.5)
 
-            """ This is where we ensure the x-axis range is set to the pyplot-determined x-axis range, rather than using the optimum x-axis range.  This is done so that all the plots for a similar instrument setting will have the same starting and ending plot values. """
-            this_plotarea.set_xlim(pyplot_xrange)
+            """ This is where we ensure the x-axis range is based on the full x-axis range, rather than using the optimum x-axis range.  This is done so that all the plots for a similar instrument setting will have the same starting and ending plot values. """
+            min_wl = numpy.nanmin(all_wls)
+            max_wl = numpy.nanmax(all_wls)
+            xplot_buffer = (max_wl - min_wl) * 0.05
+            this_plotarea.set_xlim([min_wl-xplot_buffer, max_wl+xplot_buffer])
 
             """ Only use two tick labels (min and max wavelengths) for thumbnails, because there isn't enough space otherwise. """
             if not is_bigplot:
