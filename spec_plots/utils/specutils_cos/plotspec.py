@@ -148,6 +148,7 @@ def plotspec(cos_spectrum, output_type, output_file, n_consecutive, flux_scale_f
                     all_fls = stitched_spectrum["fls"]
                     all_flerrs = stitched_spectrum["flerrs"]
                     all_dqs = stitched_spectrum["dqs"]
+                    title_addendum = stitched_spectrum["title"]
                 except KeyError as the_error:
                     raise SpecUtilsError("The provided stitched spectrum does not have the expected format, missing key "+str(the_error)+".")
 
@@ -164,7 +165,11 @@ def plotspec(cos_spectrum, output_type, output_file, n_consecutive, flux_scale_f
         """ Plot the spectrum, but only if valid wavelength ranges for x-axis are returned, otherwise plot a special "Fluxes Are All Zero" plot. """
         if all(numpy.isfinite(optimal_xaxis_range)):
             """ Plot the spectrum, turn on plot grid lines. """
-            this_plotarea.plot(all_wls, all_fls, 'b')
+            if is_bigplot:
+                plot_metrics[i]["line_collection"].set_alpha(plot_metrics[i]["plot_transparency"])
+            else:
+                plot_metrics[i]["line_collection"].set_alpha(0.01)
+            this_plotarea.add_collection(plot_metrics[i]["line_collection"])
             this_plotarea.grid(True)
 
             if debug:

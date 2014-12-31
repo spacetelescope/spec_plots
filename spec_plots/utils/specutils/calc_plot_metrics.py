@@ -9,10 +9,12 @@ __version__ = '1.31'
 """
 
 import numpy
+import matplotlib.collections
 from get_flux_stats import get_flux_stats
 from avoidregion import generate_avoid_regions
 from set_plot_xrange import set_plot_xrange
 from set_plot_yrange import set_plot_yrange
+from calc_plot_transparency import calc_plot_transparency
 
 #--------------------
 def calc_plot_metrics(instrument, wls, fls, flerrs, dqs, n_consecutive, flux_scale_factor, fluxerr_scale_factor):
@@ -63,12 +65,23 @@ def calc_plot_metrics(instrument, wls, fls, flerrs, dqs, n_consecutive, flux_sca
     """ Create COS avoid regions. """
     avoid_regions = generate_avoid_regions(instrument)
 
+    """ Compute the square total path length of this spectrum. """
+    path_length_squared = sum( ( (wls[i-1]-wls[i])**2. + (fls[i-1]-fls[i])**2. for i in xrange(1,len(wls)) ) )
+
+    """ Calculate the transparency (alpha) value to use in the plot. """
+    plot_alpha = calc_plot_transparency(path_length_squared)
+
     """ Determine the optimal y-axis. """
     if all(numpy.isfinite(optimal_xaxis_range)):
         y_axis_range = set_plot_yrange(wls, fls, avoid_regions=avoid_regions, wl_range=optimal_xaxis_range)
     else:
         y_axis_range = [numpy.nan, numpy.nan]
 
+    """ Construct the LineCollection of segments for this curve. """
+    points = numpy.array([wls, fls]).T.reshape(-1, 1, 2)
+    segments = numpy.concatenate([points[:-1], points[1:]], axis=1)
+    linecoll = matplotlib.collections.LineCollection(segments)
+
     """ Return the plot_metrics dict. """
-    return {"median_flux":median_flux, "median_fluxerr":median_fluxerr, "fluxerr_95th":fluxerr_95th, "optimal_xaxis_range":optimal_xaxis_range, "avoid_regions":avoid_regions, "y_axis_range":y_axis_range}
+    return {"median_flux":median_flux, "median_fluxerr":median_fluxerr, "fluxerr_95th":fluxerr_95th, "optimal_xaxis_range":optimal_xaxis_range, "avoid_regions":avoid_regions, "y_axis_range":y_axis_range, "plot_transparency":plot_alpha, "line_collection":linecoll, "path_length_sq":path_length_squared}
 #--------------------

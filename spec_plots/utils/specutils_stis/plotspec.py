@@ -8,6 +8,7 @@ __version__ = '1.31'
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
 """
 
+import copy
 from matplotlib.ticker import FormatStrFormatter
 import matplotlib.pyplot as pyplot
 from matplotlib import rc
@@ -157,7 +158,13 @@ def plotspec(stis_spectrum, association_indices, stitched_spectra, output_type, 
         """ Plot the spectrum, but only if valid wavelength ranges for x-axis are returned, otherwise plot a special "Fluxes Are All Zero" plot. """
         if all(numpy.isfinite(optimal_xaxis_range)):
             """ Plot the spectrum, turn on plot grid lines. """
-            this_plotarea.plot(all_wls, all_fls, 'b')
+            if is_bigplot:
+                plot_metrics[i]["line_collection"].set_alpha(plot_metrics[i]["plot_transparency"])
+            """ Note: because we are re-using a LineCollection object in the array of plot_metrics in the case of a thumbnail-sized plot, we have to use a copy of the LineCollection object, otherwise it will have Axes, Figure, etc. all defined and resetting them to None does not work. """
+            if i == 0:
+                this_plotarea.add_collection(copy.copy(plot_metrics[i]["line_collection"]))
+            else:
+                this_plotarea.add_collection(plot_metrics[i]["line_collection"])
             this_plotarea.grid(True)
 
             if debug:

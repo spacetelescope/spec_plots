@@ -67,6 +67,10 @@ def set_plot_xrange(instrument, wavelengths, fluxes, fluxerrs, dqs, n_consecutiv
     if numpy.isnan(numpy.sum(wavelengths)):
         print "***WARNING in SPECUTILS_STIS: Wavelength array contains NaN values.  Behavior has not been fully tested in this case."
 
+    """ Is the array of fluxes all zero values?  If so, then immediately return NaN values for the edges. """
+    if len(numpy.unique(fluxes)) == 1 and fluxes[0] == 0.:
+        return [numpy.nan, numpy.nan]
+
     """ Find the first element in the array that is NOT considered an "edge effect", and the last element in the array that is NOT considered an "edge effect".  If the input array is all zeroes, then it will find the last and first element, respectively.  Note that the trim does not just stop at the first index that satisfies this requirement, since there can be spikes at the edges that can fool the algorithm.  Instead, it requires that the next "n_consecutive" data points after each trial location also fail the test for "edge effect".  It returns start and stop indexes taking into account DQ values, as well as start and stop indexes without taking into account DQ values. """
     start_index_nodq, end_index_nodq, start_index_withdq, end_index_withdq = edge_trim(instrument, fluxes, fluxerrs, dqs, n_consecutive, median_flux, flux_scale_factor, median_fluxerr, fluxerr_scale_factor, fluxerr_95th)
 
