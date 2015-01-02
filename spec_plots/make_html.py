@@ -45,7 +45,7 @@ def find_orig_preview(ufr, orig_files):
 
 #--------------------
 
-def make_html(idir, ofile="html/plot_previews.html", orig_dir=None, plot_display_width=512):
+def make_html(idir, odir="html/plot_previews/", ofile="plot_previews", orig_dir=None, plot_display_width=512):
     """
     Creates diagnostic HTML page showing the generated preview plots (thumb and large) as well as the original MAST version of these plots (the one's from CADC, provided they can be located in the expected location).
 
@@ -53,7 +53,11 @@ def make_html(idir, ofile="html/plot_previews.html", orig_dir=None, plot_display
 
     :type idir: str
 
-    :param ofile: Output name for your HTML file (include the full path if you don't want the HTML to be made in the current directory).  Default = `html/plot_previews.html`
+    :param odir: Output path for the HTML files.  Default = `html/plot_previews/`
+
+    :type odir: str
+
+    :param ofile: Base file name of the output HTML files.  Default = `plot_previews`
 
     :type ofile: str
 
@@ -68,8 +72,17 @@ def make_html(idir, ofile="html/plot_previews.html", orig_dir=None, plot_display
     :raises: OSError, IOError, ValueError
     """
 
-    """ Get the path of the desired output file. """
-    ofile_dir = os.path.dirname(ofile)
+    """ Ensure output directory is treated as an absolute path, make sure it exists, if not, create the output directory. """
+    odir = os.path.abspath(odir) + os.path.sep
+    if odir != '' and not os.path.isdir(odir):
+        try:
+            os.mkdir(odir)
+        except OSError as this_error:
+            if this_error.errno == 13: 
+                sys.stderr.write("*** MAKE_HTML ERROR: Output directory could not be created, "+repr(this_error.strerror)+"\n")
+                exit(1)
+            else:
+                raise
 
     """ Get all of the thumb and full-size .png files in this directory. """
     if idir is not None:
@@ -118,55 +131,71 @@ def make_html(idir, ofile="html/plot_previews.html", orig_dir=None, plot_display
         else:
             raise IOError("No thumb-size or large-size files found.  Looking in " + orig_dir)
 
+        """ How many thumbnails per row? """
+        n_thumbs_per_row = 8
 
-        """ Create the output directory if needed. """
-        if ofile_dir != '' and not os.path.isdir(ofile_dir):
-            try:
-                os.mkdir(ofile_dir)
-            except OSError as this_error:
-                if this_error.errno == 13: 
-                    sys.stderr.write("*** MAKE_HTML ERROR: Output directory could not be created, "+repr(this_error.strerror)+"\n")
-                    exit(1)
-                else:
-                    raise
-
-        """ Open HTML for writing and begin printing the HTML table, where each row is one of the unique fileroots. """
-        cur_thumb_index = 0; cur_large_index = 0
-
-        with open(ofile, 'w') as of:
+        """ Make the HTML file for the thumbnail-sized preview plots. """
+        with open(odir+ofile+"_thumbs.html", 'w') as of:
             of.write('<html><head></head><body>\n')
-            of.write('<table style="border:1px solid black;border-collapse:collapse;width:1160px">\n')
+            of.write('<table style="border:1px solid black;border-collapse:collapse;width:100%">\n')
 
-            for ufr in uniq_fileroots:
+            for i,ufr in enumerate(uniq_fileroots):
 
                 """ Check if the thumb version of the preview exists. """
-                if n_thumb_png_files > 0 and all_thumb_png_files_froots[cur_thumb_index] == ufr:
+                if n_thumb_png_files > 0 and ufr in all_thumb_png_files_froots:
                     has_thumb = True
+                    where_this_thumb = numpy.where(all_thumb_png_files_froots == ufr)[0]
+                    if len(where_this_thumb) > 1:
+                        print "Warning: This unique file root appeared more than once in the list of all thumbnails: " + ufr
+                    where_this_thumb = where_this_thumb[0]
                 else:
                     has_thumb = False
-                    
-                """ Check if the large version of the preview exists. """
-                if n_large_png_files > 0 and all_large_png_files_froots[cur_large_index] == ufr:
-                    has_large = True
-                else:
-                    has_large = False
-
-                """ If it has at least one preview image, then print this table row. """
-                if has_thumb or has_large:
-                    of.write('  <tr>\n')
+                
+                if has_thumb:
+                    if i % n_thumbs_per_row == 0:
+                        of.write('  <tr>\n')
 
                     """ Write the cell containing the thumbnail preview, (or just fill it grey if missing). """
-                    of.write('    <td style="border:1px solid black;width:135px;vertical-align:top"><div style="width:128px;text-align:center"><span style="font-weight:bold">'+ufr+'</span></div>')
+                    of.write('    <td style="border:1px solid black;width:135px;vertical-align:top"><div style="width:128px;text-align:center"><span style="font-weight:bold">'+'_<br>'.join(ufr.split('_'))+'</span></div>')
                     if has_thumb:
-                        of.write('    <img src="'+os.path.relpath(all_thumb_png_files[cur_thumb_index], ofile_dir)+'" width="128px">')
+                        of.write('    <img src="'+os.path.relpath(all_thumb_png_files[where_this_thumb], odir)+'" width="128px">')
                     else:
                         of.write('    <div style="background-color:#86867D;width:128px;height:128px"></div>')
                     of.write('    </td>\n')
 
+                    if i % n_thumbs_per_row == n_thumbs_per_row-1:
+                        of.write('  </tr>\n')
+
+                else:
+                    print "Warning: Could not find full-size PNG for IPPPSSOOT_filetype = " + ufr
+            of.write('</table>/n')
+            of.write('</body></html>/n')
+
+        """ Make the HTML file for the large-sized preview plots. """
+        with open(odir+ofile+"_large.html", 'w') as of:
+            of.write('<html><head></head><body>\n')
+            of.write('<table style="border:1px solid black;border-collapse:collapse;width:'+str(int(round(2.*plot_display_width)))+'px">\n')
+
+            for i,ufr in enumerate(uniq_fileroots):
+
+                """ Check if the large version of the preview exists. """
+                if n_large_png_files > 0 and ufr in all_large_png_files_froots:
+                    has_large = True
+                    where_this_large = numpy.where(all_large_png_files_froots == ufr)[0]
+                    if len(where_this_large) > 1:
+                        print "Warning: This unique file root appeared more than once in the list of all large previews: " + ufr
+                    where_this_large = where_this_large[0]
+                else:
+                    has_large = False
+
+                """ If it has at least one preview image, then print this table row. """
+                if has_large:
+                    of.write('  <tr>\n')
+
                     """ Write the cell containing the large preview, (or just fill it grey if missing). """
-                    of.write('    <td style="border:1px solid black;width:1030px">')
+                    of.write('    <td style="border:1px solid black;width:100%">')
                     if has_large:
-                        of.write('    <img src="'+os.path.relpath(all_large_png_files[cur_large_index], ofile_dir)+'" width="'+str(plot_display_width)+'px">')
+                        of.write('    <img src="'+os.path.relpath(all_large_png_files[where_this_large], odir)+'" width="'+str(plot_display_width)+'px">')
                     else:
                         of.write('    <div style="background-color:#86867D;width:'+str(plot_display_width)+'px;height:'+str(plot_display_width)+'px"></div>')
                     of.write('    </td>\n')
@@ -175,9 +204,9 @@ def make_html(idir, ofile="html/plot_previews.html", orig_dir=None, plot_display
                     if orig_dir is not None:
                         """ Check if this file root has a match in the original directory. """
                         orig_preview_index = find_orig_preview(ufr, all_orig_files)
-                        of.write('    <td style="border:1px solid black;width:1030px">')
+                        of.write('    <td style="border:1px solid black;width:100%">')
                         if orig_preview_index is not None:
-                            of.write('    <img src="'+os.path.relpath(all_orig_files_withpath[orig_preview_index], ofile_dir)+'" width="'+str(plot_display_width)+'px">')
+                            of.write('    <img src="'+os.path.relpath(all_orig_files_withpath[orig_preview_index], odir)+'" width="'+str(plot_display_width)+'px">')
                         else:
                             of.write('    <div style="background-color:#86867D;width:'+str(plot_display_width)+'px;height:'+str(plot_display_width)+'px"></div>')
                         of.write('    </td>\n')
@@ -185,13 +214,7 @@ def make_html(idir, ofile="html/plot_previews.html", orig_dir=None, plot_display
                     of.write('  </tr>\n')
 
                 else:
-                    print "Warning: Could not find either thumbnail or full-size PNG for IPPPSSOOT_filetype = " + ufr
-
-                if has_thumb:
-                    cur_thumb_index+=1
-
-                if has_large:
-                    cur_large_index+=1
+                    print "Warning: Could not find full-size PNG for IPPPSSOOT_filetype = " + ufr
 
             of.write('</table>\n')
             of.write('</body></html>\n')
@@ -208,14 +231,24 @@ if __name__ == "__main__":
 
     parser.add_argument("input_dir", action="store", type=str, help="[Required] Full path to directory containing preview plots.")
 
-    parser.add_argument("-o", action="store", type=str, dest="output_file", default="html/plot_previews.html", help='[Optional] Full path and file name of the output HTML file.  If the file already exists, it will be overwritten.  Defualt = "html/plot_previews.html".')
+    parser.add_argument("-f", action="store", type=str, dest="output_file", default="plot_previews", help='[Optional] Base file name of the output HTML files.  If the files already exist, they will be overwritten.  Defualt = "%(default)s".')
+
+    parser.add_argument("-o", action="store", type=str, dest="output_dir", default="html/plot_previews/", help='[Optional] Specify the full path to the output HTML files.  Defualt = "%(default)s".')
 
     parser.add_argument("-p", action="store", type=str, dest="orig_dir", help="[Optional] Full path to a directory containing the original versions of the plot previews from CADC.  If provided, these will be included in the HTML table for comparision purposes.")
+
+    parser.add_argument("-w", action="store", type=float, dest="plot_display_width", default=512., help='[Optional] Specify the display width of the large-sized preview plots, in pixels, for the HTML table.  Default = %(default)s.')
 
     """ Parse arguments. """
     args = parser.parse_args()
 
+    """ Make sure the requested display width for the large-sized plots is at least greater than a minimum value. """
+    min_display_width = 128.
+    if args.plot_display_width < min_display_width:
+        print "Warning: Display width for full-size preview plots is very, very small.  Will use a display width of "+str(min_display_width)+" px instead of "+str(args.plot_display_width)+" px."
+        args.plot_display_width = min_display_width
+
     """ Call main method. """
-    make_html(args.input_dir, args.output_file, args.orig_dir)
+    make_html(args.input_dir, args.output_dir, args.output_file, args.orig_dir, args.plot_display_width)
 
 #--------------------
