@@ -169,6 +169,7 @@ def plotspec(cos_spectrum, output_type, output_file, n_consecutive, flux_scale_f
                 plot_metrics[i]["line_collection"].set_alpha(plot_metrics[i]["plot_transparency"])
             else:
                 plot_metrics[i]["line_collection"].set_alpha(0.01)
+
             this_plotarea.add_collection(plot_metrics[i]["line_collection"])
             this_plotarea.grid(True)
 

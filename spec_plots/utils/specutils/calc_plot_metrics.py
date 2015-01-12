@@ -65,17 +65,14 @@ def calc_plot_metrics(instrument, wls, fls, flerrs, dqs, n_consecutive, flux_sca
     """ Create COS avoid regions. """
     avoid_regions = generate_avoid_regions(instrument)
 
-    """ Compute the square total path length of this spectrum. """
-    path_length_squared = sum( ( (wls[i-1]-wls[i])**2. + (fls[i-1]-fls[i])**2. for i in xrange(1,len(wls)) ) )
-
-    """ Calculate the transparency (alpha) value to use in the plot. """
-    plot_alpha = calc_plot_transparency(path_length_squared)
-
     """ Determine the optimal y-axis. """
     if all(numpy.isfinite(optimal_xaxis_range)):
         y_axis_range = set_plot_yrange(wls, fls, avoid_regions=avoid_regions, wl_range=optimal_xaxis_range)
     else:
         y_axis_range = [numpy.nan, numpy.nan]
+
+    """ Calculate the transparency (alpha) value to use in the plot. """
+    plot_alpha, y_range_ratio = calc_plot_transparency(wls, fls, y_axis_range)
 
     """ Construct the LineCollection of segments for this curve. """
     points = numpy.array([wls, fls]).T.reshape(-1, 1, 2)
@@ -83,5 +80,5 @@ def calc_plot_metrics(instrument, wls, fls, flerrs, dqs, n_consecutive, flux_sca
     linecoll = matplotlib.collections.LineCollection(segments)
 
     """ Return the plot_metrics dict. """
-    return {"median_flux":median_flux, "median_fluxerr":median_fluxerr, "fluxerr_95th":fluxerr_95th, "optimal_xaxis_range":optimal_xaxis_range, "avoid_regions":avoid_regions, "y_axis_range":y_axis_range, "plot_transparency":plot_alpha, "line_collection":linecoll, "path_length_sq":path_length_squared}
+    return {"median_flux":median_flux, "median_fluxerr":median_fluxerr, "fluxerr_95th":fluxerr_95th, "optimal_xaxis_range":optimal_xaxis_range, "avoid_regions":avoid_regions, "y_axis_range":y_axis_range, "plot_transparency":plot_alpha, "line_collection":linecoll, "y_range_ratio":y_range_ratio}
 #--------------------

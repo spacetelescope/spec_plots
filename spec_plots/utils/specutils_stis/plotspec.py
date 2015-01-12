@@ -160,7 +160,10 @@ def plotspec(stis_spectrum, association_indices, stitched_spectra, output_type, 
             """ Plot the spectrum, turn on plot grid lines. """
             if is_bigplot:
                 plot_metrics[i]["line_collection"].set_alpha(plot_metrics[i]["plot_transparency"])
-            """ Note: because we are re-using a LineCollection object in the array of plot_metrics in the case of a thumbnail-sized plot, we have to use a copy of the LineCollection object, otherwise it will have Axes, Figure, etc. all defined and resetting them to None does not work. """
+            else:
+                plot_metrics[i]["line_collection"].set_alpha(0.01)
+
+            """ Note: because we are re-using a LineCollection object in the array of plot_metrics (specifically, when creating the thumbnail-sized plot), we have to use a copy of the LineCollection object, otherwise it will have Axes, Figure, etc. all defined and resetting them to None does not work. """
             if i == 0:
                 this_plotarea.add_collection(copy.copy(plot_metrics[i]["line_collection"]))
             else:

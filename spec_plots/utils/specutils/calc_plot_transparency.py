@@ -8,15 +8,25 @@ __version__ = '1.31'
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
 """
 
+import numpy
+
 #--------------------
 
-def calc_plot_transparency(path_length_sq):
+def calc_plot_transparency(wls, fls, y_axis_range):
     """
-    Calculates the plot transparency (alpha value) to use, based on the total path length of the line segments that make up the spectrum.
+    Calculates the plot transparency (alpha value) to use, based on the y-axis range compared to the average scatter in the spectrum.
 
-    :param path_length_sq: The square of the path length for all line segments in this spectrum.
+    :param wls: The wavelengths to be plotted.
 
-    :type path_length_sq: float
+    :type wls: numpy.ndarray
+
+    :param fls: The fluxes to be plotted.
+
+    :type fls: numpy.ndarray
+
+    :param y_axis_range: The optimal y-axis plot range for this spectrum.
+
+    :type path_length_sq: list
 
     :returns: float -- The transparency (alpha) value to use in the plot.
     """
@@ -24,14 +34,24 @@ def calc_plot_transparency(path_length_sq):
     """ This is the minimum transparency value allowed. """
     min_alpha = 0.1
 
-    """ Calculate the alpha value to return. """
-    if path_length_sq > 50.:
-        return_alpha = 0.25
-    elif path_length_sq <= 50. and path_length_sq > 1.5:
-        return_alpha = 0.25
-    else:
-        return_alpha = 0.25
+    """ Compute the y-range. """
+    yrange = y_axis_range[1]-y_axis_range[0]
 
-    return return_alpha
+    """ What is the median difference between adjacent fluxes? """
+    flux_deltas = abs(numpy.subtract(fls[1:], fls[0:-1]))
+    median_flux_delta = numpy.median(flux_deltas)
+
+    """ Define the y-range ratio as the ratio between the median_flux_delta and the yrange. """
+    y_range_ratio = median_flux_delta / yrange
+    y_range_ratio_alpha = numpy.percentile(flux_deltas, 45.) / yrange
+    y_range_ratio_beta =  numpy.percentile(flux_deltas, 55.) / yrange
+
+    """ Calculate the alpha value to return. """
+    if y_range_ratio_alpha > 0.08 and y_range_ratio_beta > 0.08 and y_range_ratio - y_range_ratio_alpha > 0.01 and y_range_ratio_beta - y_range_ratio > 0.01:
+        return_alpha = min_alpha
+    else:
+        return_alpha = 1.0
+
+    return return_alpha, y_range_ratio
 
 #--------------------
