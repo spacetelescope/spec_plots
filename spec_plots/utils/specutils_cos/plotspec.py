@@ -31,7 +31,7 @@ from ..specutils.debug_oplot import debug_oplot
 
 #--------------------
 
-def plotspec(cos_spectrum, output_type, output_file, n_consecutive, flux_scale_factor, fluxerr_scale_factor, plot_metrics, dpi_val=96., output_size=1024, debug=False, full_ylabels=False, stitched_spectrum=None):
+def plotspec(cos_spectrum, output_type, output_file, n_consecutive, flux_scale_factor, fluxerr_scale_factor, plot_metrics, dpi_val=96., output_size=1024, debug=False, full_ylabels=False, stitched_spectrum=None, title_addendum=""):
     """
     Accepts a COSSpectrum object from the READSPEC function and produces preview plots.
 
@@ -80,6 +80,10 @@ def plotspec(cos_spectrum, output_type, output_file, n_consecutive, flux_scale_f
     :param stitched_spectrum: The stitched version of the COS spectrum, where each segment has been stitched using `utils.specutils.stitch_components()`.  This is required is making a small (thumb-sized) plot, but not used if making a large-sized plot.
     
     :type stitched_spectrum: dict
+
+    :param title_addendum: A plot title addendum that contains possible warnings (e.g., if all DQ or DQ_WGT flags are defined as bad).  This is only used in the case of large-sized COS plots, otherwise this information is included in the stitched spectrum (COS large-sized plots do not use a stitched version of the spectrum).
+
+    :type title_addendum: str
 
     :raises: OSError
     """
@@ -139,7 +143,7 @@ def plotspec(cos_spectrum, output_type, output_file, n_consecutive, flux_scale_f
             all_fls = cos_spectrum.segments[s].fluxes
             all_flerrs = cos_spectrum.segments[s].fluxerrs
             all_dqs = cos_spectrum.segments[s].dqs
-            title_addendum = ""
+            title_addendum = title_addendum
         else:
 
             if stitched_spectrum is not None:

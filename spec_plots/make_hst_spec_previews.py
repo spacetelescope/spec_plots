@@ -195,7 +195,7 @@ def make_hst_spec_previews(input_file, flux_scale_factor=flux_scale_factor_defau
         segment_plot_metrics = [specutils.calc_plot_metrics("cos", cos_spectrum.segments[x].wavelengths, cos_spectrum.segments[x].fluxes, cos_spectrum.segments[x].fluxerrs, cos_spectrum.segments[x].dqs, args.n_consecutive, args.flux_scale_factor, args.fluxerr_scale_factor) for x in cos_segment_names]
 
         """ Make "large-size" plot. """
-        specutils_cos.plotspec(cos_spectrum, args.output_type, output_file, args.n_consecutive, args.flux_scale_factor, args.fluxerr_scale_factor, segment_plot_metrics, dpi_val=args.dpi_val, output_size=1024, debug=args.debug, full_ylabels=args.full_ylabels)
+        specutils_cos.plotspec(cos_spectrum, args.output_type, output_file, args.n_consecutive, args.flux_scale_factor, args.fluxerr_scale_factor, segment_plot_metrics, dpi_val=args.dpi_val, output_size=1024, debug=args.debug, full_ylabels=args.full_ylabels, title_addendum=stitched_spectrum["title"])
 
         if not args.debug:
             """ Calculate plot metrics for the stitched spectrum. """
