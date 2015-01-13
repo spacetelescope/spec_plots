@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-__version__ = '1.30'
+__version__ = '1.31'
 
 """
 .. module:: make_hst_spec_previews
@@ -15,9 +15,17 @@ from astropy.io import fits
 import numpy
 from os import path
 """ These are local modules that are imported. """
-import specutils
-import specutils_cos
-import specutils_stis
+from utils import specutils, specutils_cos, specutils_stis
+
+flux_scale_factor_default = 10.
+fluxerr_scale_factor_default = 5.
+n_consecutive_default = 20
+output_path_default = ""
+output_type_default = "png"
+dpi_val_default = 96.
+debug_default = False
+full_ylabels_default = False
+verbose_default = False
 
 #--------------------
 
@@ -100,13 +108,49 @@ def get_instrument_name(input_file):
 
 #--------------------
 
-def make_hst_spec_previews(args):
+def make_hst_spec_previews(input_file, flux_scale_factor=flux_scale_factor_default, fluxerr_scale_factor=fluxerr_scale_factor_default, n_consecutive=n_consecutive_default, output_path=output_path_default, output_type=output_type_default, dpi_val=dpi_val_default, debug=debug_default, full_ylabels=full_ylabels_default, verbose=verbose_default):
     """
     Main function in the module.
 
-    :param args:
+    :param input_file: The full path and name of the FITS file to create a preview for.
+    
+    :type input_file: str
 
-    :type args: argparse.Namespace object.
+    :param flux_scale_factor: The ratio between the flux and the median flux that defines the pass/fail criterion within the edge trim test.
+
+    :type flux_scale_factor: float
+
+    :param fluxerr_scale_factor: The ratio between the flux uncertainty and the median flux uncertainty that defines the pass/fail criterion within the edge trim test.
+
+    :type fluxerr_scale_factor: float
+
+    :param n_consecutive: The number of consecutive data points that must pass the edge trim test to define the start and end of the spectrum for plotting purposes.
+
+    :type n_consecutive: int
+
+    :param output_path: Full path to output plot files.  Do not include the output file name in this path.  If not supplied, plots will be created in the same directory as the input file.
+
+    :type output_path: str
+
+    :param output_type: The file type of the plots to make.
+
+    :type output_type: str
+
+    :param dpi_val: The DPI value of your device's monitor, which will affect the size of the output plots.
+
+    :type dpi_val: float
+
+    :param debug: If True, turns on debug mode, which will plot to the screen and color-code fluxes based on different rejection criteria.
+
+    :type debug: bool
+
+    :param full_ylabels: If True, label the y-axis with full values, including powers of ten in scientific notation.
+
+    :type full_ylabels: bool
+
+    :param verbose: Turn on verbose messages/logging?
+
+    :type verbose: bool
 
     :raises: HSTSpecPrevError
     """
@@ -140,6 +184,10 @@ def make_hst_spec_previews(args):
         """ Get a list of segment names sorted such that the bluest segment is first. """
         cos_segment_names = specutils_cos.get_segment_names(cos_spectrum)
 
+        """ Trim the wavelengths < 900 Angstroms for FUVB segment if optical element used is G140L. """
+        if "FUVB" in cos_spectrum.segments and cos_spectrum.optical_element == "G140L":
+            specutils_cos.extract_subspec(cos_spectrum, "FUVB", min_wl=900.)
+
         """ Create a stitched spectrum for use when making thumb-size plots. """
         stitched_spectrum = specutils.stitch_components(cos_spectrum, args.n_consecutive, args.flux_scale_factor, args.fluxerr_scale_factor, segment_names=cos_segment_names)
 
@@ -147,7 +195,7 @@ def make_hst_spec_previews(args):
         segment_plot_metrics = [specutils.calc_plot_metrics("cos", cos_spectrum.segments[x].wavelengths, cos_spectrum.segments[x].fluxes, cos_spectrum.segments[x].fluxerrs, cos_spectrum.segments[x].dqs, args.n_consecutive, args.flux_scale_factor, args.fluxerr_scale_factor) for x in cos_segment_names]
 
         """ Make "large-size" plot. """
-        specutils_cos.plotspec(cos_spectrum, args.output_type, output_file, args.n_consecutive, args.flux_scale_factor, args.fluxerr_scale_factor, segment_plot_metrics, dpi_val=args.dpi_val, output_size=1024, debug=args.debug, full_ylabels=args.full_ylabels)
+        specutils_cos.plotspec(cos_spectrum, args.output_type, output_file, args.n_consecutive, args.flux_scale_factor, args.fluxerr_scale_factor, segment_plot_metrics, dpi_val=args.dpi_val, output_size=1024, debug=args.debug, full_ylabels=args.full_ylabels, title_addendum=stitched_spectrum["title"])
 
         if not args.debug:
             """ Calculate plot metrics for the stitched spectrum. """
@@ -191,23 +239,23 @@ def setup_args():
 
     parser.add_argument("input_file", action="store", type=str, help="[Required] Full path to input file (HST spectrum) for which to generate preview plots.  Include the file name in the path.")
 
-    parser.add_argument("-d", action="store_true", dest="debug", default=False, help='[Optional] Turn on debug mode, which will plot to the screen and color-code fluxes based on different rejection criteria.  Default = %(default)s.')
+    parser.add_argument("-d", action="store_true", dest="debug", default=debug_default, help='[Optional] Turn on debug mode, which will plot to the screen and color-code fluxes based on different rejection criteria.  Default = %(default)s.')
 
-    parser.add_argument("--dpival", action="store", type=float, dest="dpi_val", default=96., help="[Optional] Specify the DPI value of your device's monitor, which will affect the size of the output plots.  Default = %(default)s.")
+    parser.add_argument("--dpival", action="store", type=float, dest="dpi_val", default=dpi_val_default, help="[Optional] Specify the DPI value of your device's monitor, which will affect the size of the output plots.  Default = %(default)s.")
 
-    parser.add_argument("-e", action="store", type=float, dest="fluxerr_scale_factor", default=5., help="[Optional] Specify the ratio between the flux uncertainty and the median flux uncertainty that defines the pass/fail criterion within the edge trim test.  Default = %(default)s.")
+    parser.add_argument("-e", action="store", type=float, dest="fluxerr_scale_factor", default=fluxerr_scale_factor_default, help="[Optional] Specify the ratio between the flux uncertainty and the median flux uncertainty that defines the pass/fail criterion within the edge trim test.  Default = %(default)s.")
 
-    parser.add_argument("-n", action="store", type=int, dest="n_consecutive", default=20, help="[Optional] Specify the number of consecutive data points that must pass the edge trim test to define the start and end of the spectrum for plotting purposes.  Default = %(default)s.")
+    parser.add_argument("-n", action="store", type=int, dest="n_consecutive", default=n_consecutive_default, help="[Optional] Specify the number of consecutive data points that must pass the edge trim test to define the start and end of the spectrum for plotting purposes.  Default = %(default)i.")
 
-    parser.add_argument("-o", action="store", type=str, dest="output_path", default="", help="[Optional] Full path to output plot files.  Do not include file name in path.    Default = %(default)s, the same directory as the input file.", metavar='output path')
+    parser.add_argument("-o", action="store", type=str, dest="output_path", default=output_path_default, help="[Optional] Full path to output plot files.  Do not include file name in path.    Default = %(default)s, the same directory as the input file.", metavar='output path')
 
-    parser.add_argument("-s", action="store", type=float, dest="flux_scale_factor", default=10., help="[Optional] Specify the ratio between the flux and the median flux that defines the pass/fail criterion within the edge trim test.  Default = %(default)s.")
+    parser.add_argument("-s", action="store", type=float, dest="flux_scale_factor", default=flux_scale_factor_default, help="[Optional] Specify the ratio between the flux and the median flux that defines the pass/fail criterion within the edge trim test.  Default = %(default)s.")
 
-    parser.add_argument("-t", action="store", type=str, dest="output_type", default="png", help='[Optional] Specify where plots should be output.  Default = %(default)s.', choices=['png','PNG','eps', 'EPS', 'screen','SCREEN'], metavar='{png,ps,screen}')
+    parser.add_argument("-t", action="store", type=str, dest="output_type", default=output_type_default, help='[Optional] Specify the file type of the plots to make.  Default = %(default)s.', choices=['png','PNG','eps', 'EPS', 'screen','SCREEN'], metavar='{png,ps,screen}')
 
-    parser.add_argument("-v", action="store_true", dest="verbose", default=False, help='[Optional] Turn on verbose messages/logging.  Default = %(default)s.')
+    parser.add_argument("-v", action="store_true", dest="verbose", default=verbose_default, help='[Optional] Turn on verbose messages/logging?  Default = %(default)s.')
 
-    parser.add_argument("-y", action="store_true", dest="full_ylabels", default=False, help='[Optional] Label y-axis with full values, including powers of ten in scientific notation.  Default = %(default)s.')
+    parser.add_argument("-y", action="store_true", dest="full_ylabels", default=full_ylabels_default, help='[Optional] Label the y-axis with full values, including powers of ten in scientific notation?  Default = %(default)s.')
 
     return parser
 
@@ -222,6 +270,15 @@ if __name__ == "__main__":
     check_input_options(args)
 
     """ Call main function. """
-    make_hst_spec_previews(args)
+    make_hst_spec_previews(args.input_file, \
+                               flux_scale_factor = args.flux_scale_factor, \
+                               fluxerr_scale_factor = args.fluxerr_scale_factor, \
+                               n_consecutive = args.n_consecutive, \
+                               output_path = args.output_path, \
+                               output_type = args.output_type, \
+                               dpi_val = args.dpi_val, \
+                               debug = args.debug, \
+                               full_ylabels = args.full_ylabels, \
+                               verbose = args.verbose)
 
 #--------------------

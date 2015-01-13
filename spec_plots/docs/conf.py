@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# spec-plots documentation build configuration file, created by
+# spec_plots documentation build configuration file, created by
 # sphinx-quickstart on Mon Oct 27 13:03:08 2014.
 #
 # This file is execfile()d with the current directory set to its
@@ -47,7 +47,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'spec-plots'
+project = u'spec_plots'
 copyright = u'2014, Scott W. Fleming'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -180,7 +180,7 @@ html_static_path = ['_static']
 #html_file_suffix = None
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'spec-plotsdoc'
+htmlhelp_basename = 'spec_plotsdoc'
 
 
 # -- Options for LaTeX output ---------------------------------------------
@@ -200,7 +200,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-  ('index', 'spec-plots.tex', u'spec-plots Documentation',
+  ('index', 'spec_plots.tex', u'spec_plots Documentation',
    u'Scott W. Fleming', 'manual'),
 ]
 
@@ -230,7 +230,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'spec-plots', u'spec-plots Documentation',
+    ('index', 'spec_plots', u'spec_plots Documentation',
      [u'Scott W. Fleming'], 1)
 ]
 
@@ -244,8 +244,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  ('index', 'spec-plots', u'spec-plots Documentation',
-   u'Scott W. Fleming', 'spec-plots', 'One line description of project.',
+  ('index', 'spec_plots', u'spec_plots Documentation',
+   u'Scott W. Fleming', 'spec_plots', 'One line description of project.',
    'Miscellaneous'),
 ]
 
