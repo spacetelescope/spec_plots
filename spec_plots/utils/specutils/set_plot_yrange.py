@@ -67,9 +67,13 @@ def set_plot_yrange(wavelengths, fluxes, avoid_regions=None, wl_range=None):
     """ Determine a y-buffer based on the difference between the max. and min. fluxes. """
     ybuffer = 0.3 * (max_flux-min_flux)
 
-    """ Make sure the min. and max. fluxes aren't identical (both 0., or both the same exact value.  If so, just return the min. and max.  value nudged by 1.0. """
+    """ Make sure the min. and max. fluxes aren't identical (both 0., or both the same exact value.  If so, just return the min. and max. value nudged by 1.0. """
     if min_flux != max_flux:
-        return [min_flux-ybuffer, max_flux+ybuffer]
+        if min_flux - ybuffer > 0.:
+            return [min_flux-ybuffer, max_flux+ybuffer]
+        else:
+            """ We don't want the y-axis range to be TOO far negative, so limit it to be close to the lowest data point. """
+            return [1.1*min_flux, max_flux+ybuffer]
     else:
         return [min_flux-1., max_flux+1.]
 #--------------------
