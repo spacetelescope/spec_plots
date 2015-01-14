@@ -1,4 +1,4 @@
-__version__ = '1.31'
+__version__ = '1.31.1'
 
 """
 .. module:: get_association_indices

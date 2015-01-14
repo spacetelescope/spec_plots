@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-__version__ = '1.31'
+__version__ = '1.31.1'
 
 """
 .. module:: make_hst_spec_previews
