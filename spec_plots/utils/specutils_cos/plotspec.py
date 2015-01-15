@@ -1,4 +1,4 @@
-__version__ = '1.31.1'
+__version__ = '1.31.2'
 
 """
 .. module:: plotspec
@@ -95,7 +95,7 @@ def plotspec(cos_spectrum, output_type, output_file, n_consecutive, flux_scale_f
 
     """ Make sure the output path exists, if not, create it. """
     if output_type != 'screen':
-        if not os.path.isdir(os.path.dirname(output_file)):
+        if os.path.dirname(output_file) != "" and not os.path.isdir(os.path.dirname(output_file)):
             try:
                 os.mkdir(os.path.dirname(output_file))
             except OSError as this_error:
@@ -258,7 +258,10 @@ def plotspec(cos_spectrum, output_type, output_file, n_consecutive, flux_scale_f
         """ Deconstruct output file to include plot size information. """
         output_splits = os.path.split(output_file)
         file_splits = os.path.splitext(output_splits[1])
-        revised_output_file = output_splits[0]+os.path.sep+file_splits[0]+'_{0:04d}'.format(output_size)+file_splits[1]
+        if output_splits[0] != "":
+            revised_output_file = output_splits[0]+os.path.sep+file_splits[0]+'_{0:04d}'.format(output_size)+file_splits[1]
+        else:
+            revised_output_file = file_splits[0]+'_{0:04d}'.format(output_size)+file_splits[1]
 
         """ Save figure. """
         this_figure.savefig(revised_output_file, format=output_type, dpi=dpi_val)

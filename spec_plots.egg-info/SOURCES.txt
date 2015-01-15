@@ -1,10 +1,12 @@
 setup.py
 spec_plots/__init__.py
+spec_plots/__main__.py
 spec_plots/make_hst_spec_previews.py
 spec_plots/make_html.py
 spec_plots.egg-info/PKG-INFO
 spec_plots.egg-info/SOURCES.txt
 spec_plots.egg-info/dependency_links.txt
+spec_plots.egg-info/entry_points.txt
 spec_plots.egg-info/not-zip-safe
 spec_plots.egg-info/requires.txt
 spec_plots.egg-info/top_level.txt

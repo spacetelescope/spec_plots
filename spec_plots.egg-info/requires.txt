@@ -1,3 +1,3 @@
-astropy
-matplotlib
-numpy
+astropy>=0.4.1
+matplotlib>=1.4.1
+numpy>=1.9.1
