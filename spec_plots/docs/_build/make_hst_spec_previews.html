@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Getting Started: Main Program &mdash; spec_plots 1.2 documentation</title>
+    <title>Getting Started: Main Program &mdash; spec_plots 1.32.0 documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1.2',
+        VERSION:     '1.32.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,8 +23,8 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="spec_plots 1.2 documentation" href="index.html" />
-    <link rel="next" title="The work horses: specutils*.py." href="specutils.html" />
+    <link rel="top" title="spec_plots 1.32.0 documentation" href="index.html" />
+    <link rel="next" title="The work horses: utility modules, including instrument-specific read and plot modules." href="utils.html" />
     <link rel="prev" title="Documentation for MAST’s openSAIL project: spec_plots" href="index.html" /> 
   </head>
   <body>
@@ -38,12 +38,12 @@
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="specutils.html" title="The work horses: specutils*.py."
+          <a href="utils.html" title="The work horses: utility modules, including instrument-specific read and plot modules."
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="index.html" title="Documentation for MAST’s openSAIL project: spec_plots"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">spec_plots 1.2 documentation</a> &raquo;</li> 
+        <li><a href="index.html">spec_plots 1.32.0 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -108,9 +108,22 @@
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>args</strong> (<em>argparse.Namespace object.</em>) &#8211; </td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>input_file</strong> (<em>str</em>) &#8211; The full path and name of the FITS file to create a preview for.</li>
+<li><strong>flux_scale_factor</strong> (<em>float</em>) &#8211; The ratio between the flux and the median flux that defines the pass/fail criterion within the edge trim test.</li>
+<li><strong>fluxerr_scale_factor</strong> (<em>float</em>) &#8211; The ratio between the flux uncertainty and the median flux uncertainty that defines the pass/fail criterion within the edge trim test.</li>
+<li><strong>n_consecutive</strong> (<em>int</em>) &#8211; The number of consecutive data points that must pass the edge trim test to define the start and end of the spectrum for plotting purposes.</li>
+<li><strong>output_path</strong> (<em>str</em>) &#8211; Full path to output plot files.  Do not include the output file name in this path.  If not supplied, plots will be created in the same directory as the input file.</li>
+<li><strong>output_type</strong> (<em>str</em>) &#8211; The file type of the plots to make.</li>
+<li><strong>dpi_val</strong> (<em>float</em>) &#8211; The DPI value of your device&#8217;s monitor, which will affect the size of the output plots.</li>
+<li><strong>debug</strong> (<em>bool</em>) &#8211; If True, turns on debug mode, which will plot to the screen and color-code fluxes based on different rejection criteria.</li>
+<li><strong>full_ylabels</strong> (<em>bool</em>) &#8211; If True, label the y-axis with full values, including powers of ten in scientific notation.</li>
+<li><strong>verbose</strong> (<em>bool</em>) &#8211; Turn on verbose messages/logging?</li>
+</ul>
+</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body">HSTSpecPrevError</td>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last">HSTSpecPrevError</p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -151,8 +164,8 @@
   <p class="topless"><a href="index.html"
                         title="previous chapter">Documentation for MAST&#8217;s openSAIL project: spec_plots</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="specutils.html"
-                        title="next chapter">The work horses: specutils*.py.</a></p>
+  <p class="topless"><a href="utils.html"
+                        title="next chapter">The work horses: utility modules, including instrument-specific read and plot modules.</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/make_hst_spec_previews.txt"
@@ -185,16 +198,16 @@
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="specutils.html" title="The work horses: specutils*.py."
+          <a href="utils.html" title="The work horses: utility modules, including instrument-specific read and plot modules."
              >next</a> |</li>
         <li class="right" >
           <a href="index.html" title="Documentation for MAST’s openSAIL project: spec_plots"
              >previous</a> |</li>
-        <li><a href="index.html">spec_plots 1.2 documentation</a> &raquo;</li> 
+        <li><a href="index.html">spec_plots 1.32.0 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2014, Scott W. Fleming.
+        &copy; Copyright 2014,2015 Scott W. Fleming.
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
     </div>
   </body>
