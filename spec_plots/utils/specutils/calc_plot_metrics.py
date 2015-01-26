@@ -1,4 +1,4 @@
-__version__ = '1.31.2'
+__version__ = '1.32.0'
 
 """
 .. module:: calc_plot_metrics

@@ -1,4 +1,4 @@
-The work horses: specutils*.py.
+The work horses: utility modules, including instrument-specific read and plot modules.
 *******************************
 
 ``specutils`` -- Utility functions used in plotting HST spectra in general.

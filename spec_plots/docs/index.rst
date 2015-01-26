@@ -12,7 +12,7 @@ Contents:
    :maxdepth: 3
 
    make_hst_spec_previews
-   specutils
+   utils
    diagnostics
 
 Indices and tables
