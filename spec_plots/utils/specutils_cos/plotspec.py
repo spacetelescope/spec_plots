@@ -129,7 +129,10 @@ def plotspec(cos_spectrum, output_type, output_file, n_consecutive, flux_scale_f
     """ Adjust the plot geometry (margins, etc.) based on plot size. """
     if is_bigplot:
         this_figure.subplots_adjust(hspace=0.3,top=0.915)
-        this_figure.suptitle(os.path.basename(cos_spectrum.orig_file), fontsize=18, color=r'r')
+        this_figure.suptitle(os.path.basename(cos_spectrum.orig_file), fontsize=18, color='r')
+        """ Uncomment the line below to include plot transparency statistics in the plot titles. """
+        this_figure.suptitle(os.path.basename(cos_spectrum.orig_file) + ": " + ','.join(['{0:6.2f}|{1:6.2f}'.format(x["n_bins_gt_per_frac"], x["n_flux_gt_per_frac"]) for x in plot_metrics]), fontsize=18, color='r')
+
     else:
         this_figure.subplots_adjust(top=0.85,bottom=0.3,left=0.25,right=0.8)
 
@@ -168,13 +171,23 @@ def plotspec(cos_spectrum, output_type, output_file, n_consecutive, flux_scale_f
 
         """ Plot the spectrum, but only if valid wavelength ranges for x-axis are returned, otherwise plot a special "Fluxes Are All Zero" plot. """
         if all(numpy.isfinite(optimal_xaxis_range)):
-            """ Plot the spectrum, turn on plot grid lines. """
-            if is_bigplot:
-                plot_metrics[i]["line_collection"].set_alpha(plot_metrics[i]["plot_transparency"])
+            """ Plot the spectrum. """
+            if plot_metrics[i]["line_collection"] is None:
+                this_plotarea.plot(all_wls, all_fls, 'b')
             else:
-                plot_metrics[i]["line_collection"].set_alpha(0.01)
+                """ Determine the line transparency. """
+                if is_bigplot:
+                    if all([x["plot_transparency"] != 1.0 for x in plot_metrics]):
+                        plot_metrics[i]["line_collection"].set_alpha(plot_metrics[i]["plot_transparency"])
+                    else:
+                        plot_metrics[i]["line_collection"].set_alpha(1.0)
+                else:
+                    plot_metrics[i]["line_collection"].set_alpha(0.01)
 
-            this_plotarea.add_collection(plot_metrics[i]["line_collection"])
+                """ Plot the spectrum. """
+                this_plotarea.add_collection(plot_metrics[i]["line_collection"])
+
+            """ Turn on plot grid lines. """
             this_plotarea.grid(True)
 
             if debug:
