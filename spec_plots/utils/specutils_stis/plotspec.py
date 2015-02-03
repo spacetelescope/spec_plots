@@ -9,6 +9,8 @@ __version__ = '1.32.0'
 """
 
 import copy
+import matplotlib
+matplotlib.use('Agg')
 from matplotlib.ticker import FormatStrFormatter
 import matplotlib.pyplot as pyplot
 from matplotlib import rc
@@ -28,6 +30,7 @@ if __package__ is None:
 
 from ..specutils.specutilserror import SpecUtilsError
 from ..specutils.debug_oplot import debug_oplot
+from ..specutils.calc_covering_fraction import calc_covering_fraction
 
 #--------------------
 
@@ -129,14 +132,11 @@ def plotspec(stis_spectrum, association_indices, stitched_spectra, output_type, 
     """ Adjust the plot geometry (margins, etc.) based on plot size. """
     if is_bigplot:
         this_figure.subplots_adjust(hspace=0.3,top=0.915)
-        this_figure.suptitle(os.path.basename(stis_spectrum.orig_file), fontsize=18, color=r'r')
-        """ Uncomment the line below to include plot transparency statistics in the plot titles. """
-        this_figure.suptitle(os.path.basename(stis_spectrum.orig_file) + ": " + ','.join(['{0:6.2f}|{1:6.2f}'.format(x["n_bins_gt_per_frac"], x["n_flux_gt_per_frac"]) for x in plot_metrics]), fontsize=18, color='r')
-
     else:
         this_figure.subplots_adjust(top=0.85,bottom=0.3,left=0.25,right=0.8)
 
     """ Loop over each association. """
+    covering_fractions = [0.] * len(stitched_spectra)
     for i in xrange(len(stitched_spectra)):
         this_plotarea = these_plotareas[i]
 
@@ -150,6 +150,7 @@ def plotspec(stis_spectrum, association_indices, stitched_spectra, output_type, 
         except KeyError as the_error:
             raise SpecUtilsError("The provided stitched spectrum does not have the expected format, missing key "+str(the_error)+".")
 
+        """ Only plot information in the plot title if the plot is large (and therefore sufficient space exists on the plot). """
         if is_bigplot:
             this_plotarea.set_title(title_addendum, loc="right", size="small", color="red")
         if n_associations > 1 and is_bigplot:
@@ -160,28 +161,39 @@ def plotspec(stis_spectrum, association_indices, stitched_spectra, output_type, 
 
         """ Plot the spectrum, but only if valid wavelength ranges for x-axis are returned, otherwise plot a special "Fluxes Are All Zero" plot. """
         if all(numpy.isfinite(optimal_xaxis_range)):
-            """ Plot the spectrum. """
-            if plot_metrics[i]["line_collection"] is None:
-                this_plotarea.plot(all_wls, all_fls, 'b')
-            else:
-                """ Determine the line transparency. """
-                if is_bigplot:
-                    if all([x["plot_transparency"] != 1.0 for x in plot_metrics]):
-                        plot_metrics[i]["line_collection"].set_alpha(plot_metrics[i]["plot_transparency"])
-                    else:
-                        plot_metrics[i]["line_collection"].set_alpha(1.0)
-                else:
-                    plot_metrics[i]["line_collection"].set_alpha(0.01)
+            """ We plot the spectrum as a regular line for use in calc_covering_fraction, it will be removed later. """
+            this_line = this_plotarea.plot(all_wls, all_fls, 'b')
 
-                """ Plot the spectrum. """
-                """ Note: because we are re-using a LineCollection object in the array of plot_metrics (specifically, when creating the thumbnail-sized plot), we have to use a copy of the LineCollection object, otherwise it will have Axes, Figure, etc. all defined and resetting them to None does not work. """
-                if i == 0:
-                    this_plotarea.add_collection(copy.copy(plot_metrics[i]["line_collection"]))
-                else:
-                    this_plotarea.add_collection(plot_metrics[i]["line_collection"])
+            """ Update y-axis range, but only adjust the ranges if this isn't an all-zero flux case (and not in debug mode, in which case I want to see the entire y-axis range). """
+            if not debug:
+                this_plotarea.set_ylim(plot_metrics[i]["y_axis_range"])
+
+            covering_fractions[i] = calc_covering_fraction(this_figure, these_plotareas, i)
+            """ Note: here we remove the line we plotted before, it was only so that calc_covering_fraction would have someting to draw on the canvas and thereby determine which pixels were "blue" (i.e., part of the plotted spectrum vs. background). """
+            this_plotarea.lines.remove(this_line[0])
+            """ Now we plot the spectrum as a LineCollection so that the transparency will have the desired effect, but, this is not rendered on the canvas inside calc_covering_fraction, hence why we need to plot it both as a regular line first. """
+            """ Note: because we are re-using a LineCollection object in the array of plot_metrics (specifically, when creating the thumbnail-sized plot), we have to use a copy of the LineCollection object, otherwise it will have Axes, Figure, etc. all defined and resetting them to None does not work.  Since this is only an issue with thumbnail-sizes, this is only relevant for the first LineCollection. """
+            if i == 0:
+                this_collection = this_plotarea.add_collection(copy.copy(plot_metrics[i]["line_collection"]))
+            else:
+                this_collection = this_plotarea.add_collection(plot_metrics[i]["line_collection"])
+
+            if covering_fractions[i] > 30.:
+                this_collection.set_alpha(0.1)
 
             """ Turn on plot grid lines. """
             this_plotarea.grid(True)
+
+            if is_bigplot:
+                if i == len(stitched_spectra)-1:
+                    this_figure.suptitle(os.path.basename(stis_spectrum.orig_file), fontsize=18, color='r')
+                else:
+                    this_figure.suptitle(os.path.basename(stis_spectrum.orig_file), fontsize=18, color='white')
+                """ Uncomment the lines below to include the covering fraction as part of the suptitle. """
+##                if i == len(stitched_spectra)-1:
+##                    this_figure.suptitle(os.path.basename(stis_spectrum.orig_file) + ": " + ','.join(['{0:6.2f}'.format(y) for y in covering_fractions]), fontsize=18, color='k')
+##                else:
+##                    this_figure.suptitle(os.path.basename(stis_spectrum.orig_file) + ": " + ','.join(['{0:6.2f}'.format(y) for y in covering_fractions]), fontsize=18, color='white')
 
             if debug:
                 """ Overplot points color-coded based on rejection criteria. """
@@ -218,10 +230,6 @@ def plotspec(stis_spectrum, association_indices, stitched_spectra, output_type, 
                 """ If requested, include the powers of 10 part of the y-axis tickmarks. """
                 if full_ylabels:
                     this_plotarea.yaxis.set_major_formatter(FormatStrFormatter('%3.2E'))
-
-            """ Update y-axis range, but only adjust the ranges if this isn't an all-zero flux case (and not in debug mode, in which case I want to see the entire y-axis range). """
-            if not debug:
-                this_plotarea.set_ylim(plot_metrics[i]["y_axis_range"])
 
         else:
             """ Otherwise this is a spectrum that has all zero fluxes, or some other problem, and we make a default plot.  Define the optimal x-axis range to span the original spectrum. """

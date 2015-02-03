@@ -178,7 +178,6 @@ def plotspec(cos_spectrum, output_type, output_file, n_consecutive, flux_scale_f
             if not debug:
                 this_plotarea.set_ylim(plot_metrics[i]["y_axis_range"])
 
-            ### TESTING ###
             covering_fractions[i] = calc_covering_fraction(this_figure, these_plotareas, i)
             """ Note: here we remove the line we plotted before, it was only so that calc_covering_fraction would have someting to draw on the canvas and thereby determine which pixels were "blue" (i.e., part of the plotted spectrum vs. background). """
             this_plotarea.lines.remove(this_line[0])
@@ -186,20 +185,23 @@ def plotspec(cos_spectrum, output_type, output_file, n_consecutive, flux_scale_f
             this_collection = this_plotarea.add_collection(plot_metrics[i]["line_collection"])
 
             if covering_fractions[i] > 30.:
-                plot_metrics[i]["line_collection"].set_alpha(0.1)
-            ### END TESTING ###
+                this_collection.set_alpha(0.1)
 
             """ Turn on plot grid lines. """
             this_plotarea.grid(True)
 
             """ Add the super title AFTER determining plot transparency (to minimize number of colored pixels). """
             if is_bigplot:
-#                this_figure.suptitle(os.path.basename(cos_spectrum.orig_file), fontsize=18, color='r')
-                ### TESTING ALT ###
                 if i == len(subplot_segment_names)-1:
-                    this_figure.suptitle(os.path.basename(cos_spectrum.orig_file) + ": " + ','.join(['{0:6.2f}'.format(y) for y in covering_fractions]), fontsize=18, color='k')
+                    this_figure.suptitle(os.path.basename(cos_spectrum.orig_file), fontsize=18, color='r')
                 else:
-                    this_figure.suptitle(os.path.basename(cos_spectrum.orig_file) + ": " + ','.join(['{0:6.2f}'.format(y) for y in covering_fractions]), fontsize=18, color='white')
+                    this_figure.suptitle(os.path.basename(cos_spectrum.orig_file), fontsize=18, color='white')
+                """ Uncomment the lines below to include the covering fraction as part of the suptitle. """
+##                if i == len(subplot_segment_names)-1:
+##                    #this_figure.suptitle(os.path.basename(cos_spectrum.orig_file), fontsize=18, color='r')
+##                    this_figure.suptitle(os.path.basename(cos_spectrum.orig_file) + ": " + ','.join(['{0:6.2f}'.format(y) for y in covering_fractions]), fontsize=18, color='r')
+##                else:
+##                    this_figure.suptitle(os.path.basename(cos_spectrum.orig_file) + ": " + ','.join(['{0:6.2f}'.format(y) for y in covering_fractions]), fontsize=18, color='white')
 
             if debug:
                 """ Overplot points color-coded based on rejection criteria. """
