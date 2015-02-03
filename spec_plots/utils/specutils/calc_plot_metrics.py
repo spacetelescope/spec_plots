@@ -14,7 +14,6 @@ from get_flux_stats import get_flux_stats
 from avoidregion import generate_avoid_regions
 from set_plot_xrange import set_plot_xrange
 from set_plot_yrange import set_plot_yrange
-from calc_plot_transparency import calc_plot_transparency
 
 #--------------------
 
@@ -69,25 +68,14 @@ def calc_plot_metrics(instrument, wls, fls, flerrs, dqs, n_consecutive, flux_sca
     """ Determine the optimal y-axis. """
     if all(numpy.isfinite(optimal_xaxis_range)):
         y_axis_range = set_plot_yrange(wls, fls, avoid_regions=avoid_regions, wl_range=optimal_xaxis_range)
-        """ Calculate the transparency (alpha) value to use in the plot. """
-        if instrument == "cos":
-            plot_alpha, n_bins_gt_per_frac, n_flux_gt_per_frac = calc_plot_transparency(wls, fls, y_axis_range)
-        else:
-            plot_alpha, n_bins_gt_per_frac, n_flux_gt_per_frac = numpy.nan, numpy.nan, numpy.nan
-    else:
-        y_axis_range = [numpy.nan, numpy.nan]
-        plot_alpha, n_bins_gt_per_frac, n_flux_gt_per_frac = numpy.nan, numpy.nan, numpy.nan
 
     """ Construct the LineCollection of segments for this curve.   Only do so if the plot transparency will be < 1.0. """
-    if plot_alpha < 1.0:
-        points = numpy.array([wls, fls]).T.reshape(-1, 1, 2)
-        segments = numpy.concatenate([points[:-1], points[1:]], axis=1)
-        linecoll = matplotlib.collections.LineCollection(segments)
-    else:
-        linecoll = None
+    points = numpy.array([wls, fls]).T.reshape(-1, 1, 2)
+    segments = numpy.concatenate([points[:-1], points[1:]], axis=1)
+    linecoll = matplotlib.collections.LineCollection(segments)
 
     """ Return the plot_metrics dict. """
-    return {"median_flux":median_flux, "median_fluxerr":median_fluxerr, "fluxerr_95th":fluxerr_95th, "optimal_xaxis_range":optimal_xaxis_range, "avoid_regions":avoid_regions, "y_axis_range":y_axis_range, "plot_transparency":plot_alpha, "line_collection":linecoll, "n_bins_gt_per_frac":n_bins_gt_per_frac, "n_flux_gt_per_frac":n_flux_gt_per_frac}
+    return {"median_flux":median_flux, "median_fluxerr":median_fluxerr, "fluxerr_95th":fluxerr_95th, "optimal_xaxis_range":optimal_xaxis_range, "avoid_regions":avoid_regions, "y_axis_range":y_axis_range, "line_collection":linecoll}
 
 #--------------------
 
