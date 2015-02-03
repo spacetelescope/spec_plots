@@ -118,24 +118,24 @@
 </dd></dl>
 
 </div>
-<div class="section" id="module-utils.specutils.calc_plot_transparency">
-<span id="calc-plot-transparency"></span><h2>calc_plot_transparency<a class="headerlink" href="#module-utils.specutils.calc_plot_transparency" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-utils.specutils.calc_covering_fraction">
+<span id="calc-covering-fraction"></span><h2>calc_covering_fraction<a class="headerlink" href="#module-utils.specutils.calc_covering_fraction" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
-<dt id="utils.specutils.calc_plot_transparency.calc_plot_transparency">
-<tt class="descclassname">utils.specutils.calc_plot_transparency.</tt><tt class="descname">calc_plot_transparency</tt><big>(</big><em>wls</em>, <em>fls</em>, <em>y_axis_range</em><big>)</big><a class="headerlink" href="#utils.specutils.calc_plot_transparency.calc_plot_transparency" title="Permalink to this definition">¶</a></dt>
-<dd><p>Calculates the plot transparency (alpha value) to use, based on the y-axis range compared to the average scatter in the spectrum.</p>
+<dt id="utils.specutils.calc_covering_fraction.calc_covering_fraction">
+<tt class="descclassname">utils.specutils.calc_covering_fraction.</tt><tt class="descname">calc_covering_fraction</tt><big>(</big><em>fig</em>, <em>subplots</em>, <em>subplot_num</em><big>)</big><a class="headerlink" href="#utils.specutils.calc_covering_fraction.calc_covering_fraction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the ratio of pixels that contain plot data vs. background (empty) pixels by temporarily filling the background with RGB value = red and then identifying blue (plot data) pixels.  This ratio is used to determine whether to make the plot lines transparent or not for readability.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>wls</strong> (<em>numpy.ndarray</em>) &#8211; The wavelengths to be plotted.</li>
-<li><strong>fls</strong> (<em>numpy.ndarray</em>) &#8211; The fluxes to be plotted.</li>
-<li><strong>y_axis_range</strong> &#8211; The optimal y-axis plot range for this spectrum.</li>
+<li><strong>fig</strong> (<em>Figure</em>) &#8211; The plot figure.</li>
+<li><strong>subplots</strong> &#8211; The list of subplots.</li>
+<li><strong>subplot_num</strong> (<em>int</em>) &#8211; The index indicating which subplot is currently being examined.</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">float &#8211; The transparency (alpha) value to use in the plot.</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">float &#8211; The ratio of pixels containing plot data (&#8220;blue&#8221;) vs. empty (&#8220;red&#8221;) pixels, as a percentage (0. &lt;= p &lt;= 100.).</p>
 </td>
 </tr>
 </tbody>
@@ -431,7 +431,7 @@
 <li><a class="reference internal" href="#">utils.specutils package</a><ul>
 <li><a class="reference internal" href="#module-utils.specutils.avoidregion">avoidregion</a></li>
 <li><a class="reference internal" href="#module-utils.specutils.calc_plot_metrics">calc_plot_metrics</a></li>
-<li><a class="reference internal" href="#module-utils.specutils.calc_plot_transparency">calc_plot_transparency</a></li>
+<li><a class="reference internal" href="#module-utils.specutils.calc_covering_fraction">calc_covering_fraction</a></li>
 <li><a class="reference internal" href="#module-utils.specutils.debug_oplot">debug_oplot</a></li>
 <li><a class="reference internal" href="#module-utils.specutils.dq_has_flag">dq_has_flag</a></li>
 <li><a class="reference internal" href="#module-utils.specutils.edge_trim">edge_trim</a></li>

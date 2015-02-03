@@ -17,10 +17,10 @@ calc_plot_metrics
     :undoc-members:
     :show-inheritance:
 
-calc_plot_transparency
+calc_covering_fraction
 ---------------------------------------------
 
-.. automodule:: utils.specutils.calc_plot_transparency
+.. automodule:: utils.specutils.calc_covering_fraction
     :members:
     :undoc-members:
     :show-inheritance:
