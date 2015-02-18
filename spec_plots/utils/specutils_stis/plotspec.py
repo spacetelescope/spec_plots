@@ -10,10 +10,11 @@ __version__ = '1.32.0'
 
 import copy
 import matplotlib
-matplotlib.use('Agg')
 from matplotlib.ticker import FormatStrFormatter
 import matplotlib.pyplot as pyplot
 from matplotlib import rc
+if matplotlib.get_backend().lower() != 'agg':
+    pyplot.switch_backend('Agg')
 import numpy
 import os
 import sys
@@ -34,7 +35,7 @@ from ..specutils.calc_covering_fraction import calc_covering_fraction
 
 #--------------------
 
-def plotspec(stis_spectrum, association_indices, stitched_spectra, output_type, output_file, n_consecutive, flux_scale_factor, fluxerr_scale_factor, plot_metrics, dpi_val=96., output_size=1024, debug=False, full_ylabels=False):
+def plotspec(stis_spectrum, association_indices, stitched_spectra, output_type, output_file, n_consecutive, flux_scale_factor, fluxerr_scale_factor, plot_metrics, dpi_val=96., output_size=1024, debug=False, full_ylabels=False, optimize=True):
     """
     Accepts a STIS1DSpectrum object from the READSPEC function and produces preview plots.
 
@@ -89,6 +90,10 @@ def plotspec(stis_spectrum, association_indices, stitched_spectra, output_type, 
     :param full_ylabels: Should the y-labels contain the full values (including the power of 10 in scientific notation)?  Default = False.
 
     :type full_ylabels: bool
+
+    :param optimize: If set to True, will use a slightly optimized version of determining the plot covering fraction.
+
+    :type optimize: bool
 
     :raises: OSError, utils.specutils.SpecUtilsError
 
@@ -168,7 +173,7 @@ def plotspec(stis_spectrum, association_indices, stitched_spectra, output_type, 
             if not debug:
                 this_plotarea.set_ylim(plot_metrics[i]["y_axis_range"])
 
-            covering_fractions[i] = calc_covering_fraction(this_figure, these_plotareas, i)
+            covering_fractions[i] = calc_covering_fraction(this_figure, these_plotareas, i, optimize=optimize)
             """ Note: here we remove the line we plotted before, it was only so that calc_covering_fraction would have someting to draw on the canvas and thereby determine which pixels were "blue" (i.e., part of the plotted spectrum vs. background). """
             this_plotarea.lines.remove(this_line[0])
             """ Now we plot the spectrum as a LineCollection so that the transparency will have the desired effect, but, this is not rendered on the canvas inside calc_covering_fraction, hence why we need to plot it both as a regular line first. """

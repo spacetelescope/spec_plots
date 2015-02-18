@@ -9,10 +9,11 @@ __version__ = '1.32.0'
 """
 
 import matplotlib
-matplotlib.use('Agg')
 from matplotlib.ticker import FormatStrFormatter
 import matplotlib.pyplot as pyplot
 from matplotlib import rc
+if matplotlib.get_backend().lower() != 'agg':
+    pyplot.switch_backend('Agg')
 import numpy
 import os
 import sys
@@ -34,7 +35,7 @@ from ..specutils.calc_covering_fraction import calc_covering_fraction
 
 #--------------------
 
-def plotspec(cos_spectrum, output_type, output_file, n_consecutive, flux_scale_factor, fluxerr_scale_factor, plot_metrics, dpi_val=96., output_size=1024, debug=False, full_ylabels=False, stitched_spectrum=None, title_addendum=""):
+def plotspec(cos_spectrum, output_type, output_file, n_consecutive, flux_scale_factor, fluxerr_scale_factor, plot_metrics, dpi_val=96., output_size=1024, debug=False, full_ylabels=False, stitched_spectrum=None, title_addendum="", optimize=True):
     """
     Accepts a COSSpectrum object from the READSPEC function and produces preview plots.
 
@@ -87,6 +88,10 @@ def plotspec(cos_spectrum, output_type, output_file, n_consecutive, flux_scale_f
     :param title_addendum: A plot title addendum that contains possible warnings (e.g., if all DQ or DQ_WGT flags are defined as bad).  This is only used in the case of large-sized COS plots, otherwise this information is included in the stitched spectrum (COS large-sized plots do not use a stitched version of the spectrum).
 
     :type title_addendum: str
+
+    :param optimize: If set to True, will use a slightly optimized version of determining the plot covering fraction.
+
+    :type optimize: bool
 
     :raises: OSError
     """
@@ -178,7 +183,7 @@ def plotspec(cos_spectrum, output_type, output_file, n_consecutive, flux_scale_f
             if not debug:
                 this_plotarea.set_ylim(plot_metrics[i]["y_axis_range"])
 
-            covering_fractions[i] = calc_covering_fraction(this_figure, these_plotareas, i)
+            covering_fractions[i] = calc_covering_fraction(this_figure, these_plotareas, i, optimize=optimize)
             """ Note: here we remove the line we plotted before, it was only so that calc_covering_fraction would have someting to draw on the canvas and thereby determine which pixels were "blue" (i.e., part of the plotted spectrum vs. background). """
             this_plotarea.lines.remove(this_line[0])
             """ Now we plot the spectrum as a LineCollection so that the transparency will have the desired effect, but, this is not rendered on the canvas inside calc_covering_fraction, hence why we need to plot it both as a regular line first. """
