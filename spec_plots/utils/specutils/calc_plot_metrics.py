@@ -68,6 +68,8 @@ def calc_plot_metrics(instrument, wls, fls, flerrs, dqs, n_consecutive, flux_sca
     """ Determine the optimal y-axis. """
     if all(numpy.isfinite(optimal_xaxis_range)):
         y_axis_range = set_plot_yrange(wls, fls, avoid_regions=avoid_regions, wl_range=optimal_xaxis_range)
+    else:
+        y_axis_range = [numpy.nan, numpy.nan]
 
     """ Construct the LineCollection of segments for this curve.   Only do so if the plot transparency will be < 1.0. """
     points = numpy.array([wls, fls]).T.reshape(-1, 1, 2)

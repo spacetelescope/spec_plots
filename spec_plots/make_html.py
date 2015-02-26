@@ -175,6 +175,8 @@ def make_html(idir, odir="html/plot_previews/", ofile="plot_previews", orig_dir=
         with open(odir+ofile+"_large.html", 'w') as of:
             of.write('<html><head></head><body>\n')
             of.write('<table style="border:1px solid black;border-collapse:collapse;width:'+str(int(round(2.*plot_display_width)))+'px">\n')
+            of.write('<tr><th>New Version</th><th>Old Version</th></tr>\n')
+
 
             for i,ufr in enumerate(uniq_fileroots):
 
