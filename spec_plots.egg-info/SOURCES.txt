@@ -13,8 +13,8 @@ spec_plots.egg-info/top_level.txt
 spec_plots/utils/__init__.py
 spec_plots/utils/specutils/__init__.py
 spec_plots/utils/specutils/avoidregion.py
+spec_plots/utils/specutils/calc_covering_fraction.py
 spec_plots/utils/specutils/calc_plot_metrics.py
-spec_plots/utils/specutils/calc_plot_transparency.py
 spec_plots/utils/specutils/debug_oplot.py
 spec_plots/utils/specutils/dq_has_flag.py
 spec_plots/utils/specutils/edge_trim.py

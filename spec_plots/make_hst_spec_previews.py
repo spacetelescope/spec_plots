@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-__version__ = '1.31.2'
+__version__ = '1.32.0'
 
 """
 .. module:: make_hst_spec_previews
@@ -25,6 +25,7 @@ output_type_default = "png"
 dpi_val_default = 96.
 debug_default = False
 full_ylabels_default = False
+nooptimize_default = False
 verbose_default = False
 
 #--------------------
@@ -73,8 +74,6 @@ def check_input_options(args):
         raise HSTSpecPrevError("File name must be specified.")
     else:
         args.input_file = args.input_file.strip()
-        if not path.isfile(args.input_file):
-            raise HSTSpecPrevError("Input file not found, looking for "+args.input_file)
 
     """ Make sure the output_type string is trimmed and lowercase. """
     args.output_type = args.output_type.strip().lower()
@@ -95,8 +94,13 @@ def get_instrument_name(input_file):
 
     :returns: str -- The name of the instrument based on the FITS header keyword, in uppercase with leading/trailing whitespace removed.
 
-    :raises: KeyError
+    :raises: KeyError, HSTSpecPrevError
     """
+
+    """ Make sure file exists. """
+    if not path.isfile(input_file):
+        raise HSTSpecPrevError("Input file not found, looking for file: " + input_file)
+
     with fits.open(input_file) as hdulist:
         """ Make sure the INSTRUME keyword exists in the primary header, otherwise, catch as a KeyError in this case. """
         try:
@@ -108,7 +112,7 @@ def get_instrument_name(input_file):
 
 #--------------------
 
-def make_hst_spec_previews(input_file, flux_scale_factor=flux_scale_factor_default, fluxerr_scale_factor=fluxerr_scale_factor_default, n_consecutive=n_consecutive_default, output_path=output_path_default, output_type=output_type_default, dpi_val=dpi_val_default, debug=debug_default, full_ylabels=full_ylabels_default, verbose=verbose_default):
+def make_hst_spec_previews(input_file, flux_scale_factor=flux_scale_factor_default, fluxerr_scale_factor=fluxerr_scale_factor_default, n_consecutive=n_consecutive_default, output_path=output_path_default, output_type=output_type_default, dpi_val=dpi_val_default, debug=debug_default, full_ylabels=full_ylabels_default, optimize=not nooptimize_default, verbose=verbose_default):
     """
     Main function in the module.
 
@@ -147,6 +151,10 @@ def make_hst_spec_previews(input_file, flux_scale_factor=flux_scale_factor_defau
     :param full_ylabels: If True, label the y-axis with full values, including powers of ten in scientific notation.
 
     :type full_ylabels: bool
+
+    :param optimize: If set to True, will use a slightly optimized version of determining the plot covering fraction.
+
+    :type optimize: bool
 
     :param verbose: Turn on verbose messages/logging?
 
@@ -195,14 +203,14 @@ def make_hst_spec_previews(input_file, flux_scale_factor=flux_scale_factor_defau
         segment_plot_metrics = [specutils.calc_plot_metrics("cos", cos_spectrum.segments[x].wavelengths, cos_spectrum.segments[x].fluxes, cos_spectrum.segments[x].fluxerrs, cos_spectrum.segments[x].dqs, n_consecutive, flux_scale_factor, fluxerr_scale_factor) for x in cos_segment_names]
 
         """ Make "large-size" plot. """
-        specutils_cos.plotspec(cos_spectrum, output_type, output_file, n_consecutive, flux_scale_factor, fluxerr_scale_factor, segment_plot_metrics, dpi_val=dpi_val, output_size=1024, debug=debug, full_ylabels=full_ylabels, title_addendum=stitched_spectrum["title"])
+        specutils_cos.plotspec(cos_spectrum, output_type, output_file, n_consecutive, flux_scale_factor, fluxerr_scale_factor, segment_plot_metrics, dpi_val=dpi_val, output_size=1024, debug=debug, full_ylabels=full_ylabels, title_addendum=stitched_spectrum["title"], optimize=optimize)
 
         if not debug:
             """ Calculate plot metrics for the stitched spectrum. """
             stitched_plot_metrics = [specutils.calc_plot_metrics("cos", stitched_spectrum["wls"], stitched_spectrum["fls"], stitched_spectrum["flerrs"], stitched_spectrum["dqs"], n_consecutive, flux_scale_factor, fluxerr_scale_factor)]
 
             """ Make "thumbnail-size" plot, if requested. """
-            specutils_cos.plotspec(cos_spectrum, output_type, output_file, n_consecutive, flux_scale_factor, fluxerr_scale_factor, stitched_plot_metrics, dpi_val=dpi_val, output_size=128, stitched_spectrum=stitched_spectrum)
+            specutils_cos.plotspec(cos_spectrum, output_type, output_file, n_consecutive, flux_scale_factor, fluxerr_scale_factor, stitched_plot_metrics, dpi_val=dpi_val, output_size=128, stitched_spectrum=stitched_spectrum, optimize=optimize)
 
     elif this_instrument == 'STIS':
         """ Get wavelengths, fluxes, flux uncertainties. """
@@ -218,11 +226,11 @@ def make_hst_spec_previews(input_file, flux_scale_factor=flux_scale_factor_defau
         association_plot_metrics = [specutils.calc_plot_metrics("stis", x["wls"], x["fls"], x["flerrs"], x["dqs"], n_consecutive, flux_scale_factor, fluxerr_scale_factor) for x in stitched_spectra]
 
         """ Make "large-size" plot. """
-        specutils_stis.plotspec(stis_spectrum, indices_to_plot, stitched_spectra, output_type, output_file, n_consecutive, flux_scale_factor, fluxerr_scale_factor, association_plot_metrics, dpi_val=dpi_val, output_size=1024, debug=debug, full_ylabels=full_ylabels)
+        specutils_stis.plotspec(stis_spectrum, indices_to_plot, stitched_spectra, output_type, output_file, n_consecutive, flux_scale_factor, fluxerr_scale_factor, association_plot_metrics, dpi_val=dpi_val, output_size=1024, debug=debug, full_ylabels=full_ylabels, optimize=optimize)
 
         """ Make "thumbnail-size" plot, if requested.  Notice that in this case we always plot just the first association, by passing only `stitched_spectra[0]`. """
         if not debug:
-            specutils_stis.plotspec(stis_spectrum, indices_to_plot, [stitched_spectra[0]], output_type, output_file, n_consecutive, flux_scale_factor, fluxerr_scale_factor, association_plot_metrics, dpi_val=dpi_val, output_size=128)
+            specutils_stis.plotspec(stis_spectrum, indices_to_plot, [stitched_spectra[0]], output_type, output_file, n_consecutive, flux_scale_factor, fluxerr_scale_factor, association_plot_metrics, dpi_val=dpi_val, output_size=128, optimize=optimize)
 
     else:
         raise HSTSpecPrevError('"INSTRUME" keyword not understood: ' + this_instrument)
@@ -246,6 +254,8 @@ def setup_args():
     parser.add_argument("-e", action="store", type=float, dest="fluxerr_scale_factor", default=fluxerr_scale_factor_default, help="[Optional] Specify the ratio between the flux uncertainty and the median flux uncertainty that defines the pass/fail criterion within the edge trim test.  Default = %(default)s.")
 
     parser.add_argument("-n", action="store", type=int, dest="n_consecutive", default=n_consecutive_default, help="[Optional] Specify the number of consecutive data points that must pass the edge trim test to define the start and end of the spectrum for plotting purposes.  Default = %(default)i.")
+
+    parser.add_argument("--nooptimize", action="store_true", dest="nooptimize", default=nooptimize_default, help='[Optional] If True, do not use an optimized method of calculating plot covering fraction to determine line transparency?  Default = %(default)s.')
 
     parser.add_argument("-o", action="store", type=str, dest="output_path", default=output_path_default, help="[Optional] Full path to output plot files.  Do not include file name in path.    Default = %(default)s, the same directory as the input file.", metavar='output path')
 
@@ -279,6 +289,7 @@ if __name__ == "__main__":
                                dpi_val = args.dpi_val, \
                                debug = args.debug, \
                                full_ylabels = args.full_ylabels, \
+                               optimize = not args.nooptimize, \
                                verbose = args.verbose)
 
 #--------------------

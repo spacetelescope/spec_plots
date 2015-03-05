@@ -1,23 +1,118 @@
-The work horses: specutils*.py.
-*******************************
+specutils package
+=================
 
-``specutils`` -- Utility functions used in plotting HST spectra in general.
-===========================================================================
+Submodules
+----------
+
+specutils.avoidregion module
+----------------------------
+
+.. automodule:: specutils.avoidregion
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+specutils.calc_plot_metrics module
+----------------------------------
+
+.. automodule:: specutils.calc_plot_metrics
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+specutils.calc_plot_transparency module
+---------------------------------------
+
+.. automodule:: specutils.calc_plot_transparency
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+specutils.debug_oplot module
+----------------------------
+
+.. automodule:: specutils.debug_oplot
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+specutils.dq_has_flag module
+----------------------------
+
+.. automodule:: specutils.dq_has_flag
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+specutils.edge_trim module
+--------------------------
+
+.. automodule:: specutils.edge_trim
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+specutils.get_flux_stats module
+-------------------------------
+
+.. automodule:: specutils.get_flux_stats
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+specutils.is_bad_dq module
+--------------------------
+
+.. automodule:: specutils.is_bad_dq
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+specutils.rms module
+--------------------
+
+.. automodule:: specutils.rms
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+specutils.set_plot_xrange module
+--------------------------------
+
+.. automodule:: specutils.set_plot_xrange
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+specutils.set_plot_yrange module
+--------------------------------
+
+.. automodule:: specutils.set_plot_yrange
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+specutils.specutilserror module
+-------------------------------
+
+.. automodule:: specutils.specutilserror
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+specutils.stitch_components module
+----------------------------------
+
+.. automodule:: specutils.stitch_components
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module contents
+---------------
+
 .. automodule:: specutils
-    :members: 
-    :private-members:
+    :members:
     :undoc-members:
-
-``specutils_cos`` -- Functions specific to COS spectra.
-=======================================================
-.. automodule:: specutils_cos
-    :members: 
-    :private-members:
-    :undoc-members:
-
-``specutils_stis`` -- Functions specific to STIS spectra.
-=========================================================
-.. automodule:: specutils_stis
-    :members: 
-    :private-members:
-    :undoc-members:
+    :show-inheritance:

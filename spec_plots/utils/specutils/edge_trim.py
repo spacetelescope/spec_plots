@@ -1,4 +1,4 @@
-__version__ = '1.31.2'
+__version__ = '1.32.0'
 
 """
 .. module:: edge_trim
@@ -10,6 +10,7 @@ __version__ = '1.31.2'
 
 import numpy
 from is_bad_dq import is_bad_dq
+import time
 
 #--------------------
 def _set_plot_xrange_test(instrument, flux_values, flux_err_values, median_flux, flux_scale_factor, median_fluxerr, fluxerr_scale_factor, fluxerr_95th, dqs, checkFluxes=False, checkFluxRatios=False, checkFluxErrRatios=False, checkFluxErrPercentile=False, checkDQs=False):
@@ -93,9 +94,9 @@ def _set_plot_xrange_test(instrument, flux_values, flux_err_values, median_flux,
         bool_results = [False] * len(flux_values)
 
     return bool_results
-#--------------------
 
 #--------------------
+
 def edge_trim(instrument, fluxes, fluxerrs, dqs, n_consecutive, median_flux, flux_scale_factor, median_fluxerr, fluxerr_scale_factor, fluxerr_95th):
     """
     Returns start and end indexes (end indexes are negatively indexed) of the best part of the spectrum to use when defining the plot's wavelength ranges.  Returns two sets of start and end indexes: one set without taking into account DQ flags, and one set that does take into account DQ flags (since some spectra have all DQ flags set > 0).
@@ -143,48 +144,80 @@ def edge_trim(instrument, fluxes, fluxerrs, dqs, n_consecutive, median_flux, flu
     :returns: int tuple -- Indexes that define the best part of the spectrum, in the order of (start_index_nodq, end_index_nodq, start_index_withdq, end_index_withdq).
     """
 
+    """ How many fluxes are there in total? """
     n_fluxes = len(fluxes)
 
-    """ Determine the indices where each flux point satisfies our test criteria, ignoring DQ values. """
-    where_good_fluxes_nodq = numpy.where(numpy.asarray(_set_plot_xrange_test(instrument, fluxes, fluxerrs, median_flux, flux_scale_factor, median_fluxerr, fluxerr_scale_factor, fluxerr_95th, dqs, checkFluxes=True, checkFluxRatios=False, checkFluxErrRatios=True, checkFluxErrPercentile=False, checkDQs=False)))[0]
-    n_good_fluxes_nodq = len(where_good_fluxes_nodq)
+    """ This defines the size of the spectrum at the edges to examine as a "cheat", without having to look at the entire spectrum to find the good boundaries.  It will look at the whole spectrum as a fallback option. """
+    edge_size = 100
 
-    """ Handle the trivial case where the number of valid points is less than the `n_consecutive` desired.  In this case, the start and end indices are set to the last and first indices, simulating what would happen if the entire array was traversed. """
-    if n_good_fluxes_nodq < n_consecutive:
-        start_index_nodq = 0
-        end_index_nodq = -1
+    """ SECTION FOR INDICES IGNORING DQ VALUES """
+
+    """ First run the xrange test on the first and last 100 elements (for speed).  If no good indices are found within those ranges, then and only then will we run it on the entire array. """
+    where_good_fluxes_nodq = numpy.where(numpy.asarray(_set_plot_xrange_test(instrument, numpy.concatenate((fluxes[0:edge_size],fluxes[-1*edge_size:])), numpy.concatenate((fluxerrs[0:edge_size],fluxerrs[-1*edge_size:])), median_flux, flux_scale_factor, median_fluxerr, fluxerr_scale_factor, fluxerr_95th, numpy.concatenate((dqs[0:edge_size],dqs[-1*edge_size:])), checkFluxes=True, checkFluxRatios=False, checkFluxErrRatios=True, checkFluxErrPercentile=False, checkDQs=False)))[0]
+    if len(where_good_fluxes_nodq) > 0:
+        where_good_fluxes_nodq[where_good_fluxes_nodq > edge_size-1] += (len(fluxes) - 2*edge_size)
+        """ Get the start and end indices, ignoring DQ values. """
+        start_index_nodq, end_index_nodq = find_good_indices(where_good_fluxes_nodq, n_consecutive, n_fluxes, first_pass=True)
     else:
-        """ The start index is then the min. index for which the `n_consecutive`'th index is exactly equal to `n_consecutive`-1. """
-        start_indexes_nodq_with_good_diffs = numpy.asarray([x for i,x in enumerate(where_good_fluxes_nodq[0:n_good_fluxes_nodq-n_consecutive+1]) \
-                                                                if where_good_fluxes_nodq[i+n_consecutive-1] - \
-                                                                where_good_fluxes_nodq[i] == n_consecutive-1])
+        """ If there were no results returned from the where call above, make sure the start and end indices will fail the test. """
+        start_index_nodq = edge_size ; end_index_nodq = -2*edge_size-1
 
-        if len(start_indexes_nodq_with_good_diffs) > 0:
-            start_index_nodq = numpy.min(start_indexes_nodq_with_good_diffs)
-            end_index_nodq = numpy.max(start_indexes_nodq_with_good_diffs) - n_fluxes + n_consecutive - 1
-        else:
-            start_index_nodq = 0
-            end_index_nodq = -1
+    """ If the start and stop indices are not located within the range at the end, run the where on the entire array. """
+    if start_index_nodq > edge_size-1 or end_index_nodq < -2*edge_size+edge_size+1:
+        where_good_fluxes_nodq = numpy.where(numpy.asarray(_set_plot_xrange_test(instrument, fluxes, fluxerrs, median_flux, flux_scale_factor, median_fluxerr, fluxerr_scale_factor, fluxerr_95th, dqs, checkFluxes=True, checkFluxRatios=False, checkFluxErrRatios=True, checkFluxErrPercentile=False, checkDQs=False)))[0]
+        start_index_nodq, end_index_nodq = find_good_indices(where_good_fluxes_nodq, n_consecutive, n_fluxes)
 
-    """ Determine the indices where each flux point satisfies our test criteria, taking into account DQ values. """
-    where_good_fluxes_withdq = numpy.where(numpy.asarray(_set_plot_xrange_test(instrument, fluxes, fluxerrs, median_flux, flux_scale_factor, median_fluxerr, fluxerr_scale_factor, fluxerr_95th, dqs, checkFluxes=True, checkFluxRatios=False, checkFluxErrRatios=True, checkFluxErrPercentile=False, checkDQs=True)))[0]
-    n_good_fluxes_withdq = len(where_good_fluxes_withdq)
+    """ SECTION FOR INDICES INCLUDING DQ VALUES """
 
-    """ Handle the trivial case where the number of valid points is less than the `n_consecutive` desired.  In this case, the start and end indices are set to the last and first indices, simulating what would happen if the entire array was traversed. """
-    if n_good_fluxes_withdq < n_consecutive:
-        start_index_withdq = 0
-        end_index_withdq = -1
+    """ First run the xrange test on the first and last 100 elements (for speed).  If no good indices are found within those ranges, then and only then will we run it on the entire array. """
+    where_good_fluxes_withdq = numpy.where(numpy.asarray(_set_plot_xrange_test(instrument, numpy.concatenate((fluxes[0:edge_size],fluxes[-1*edge_size:])), numpy.concatenate((fluxerrs[0:edge_size],fluxerrs[-1*edge_size:])), median_flux, flux_scale_factor, median_fluxerr, fluxerr_scale_factor, fluxerr_95th, numpy.concatenate((dqs[0:edge_size],dqs[-1*edge_size:])), checkFluxes=True, checkFluxRatios=False, checkFluxErrRatios=True, checkFluxErrPercentile=False, checkDQs=True)))[0]
+    if len(where_good_fluxes_withdq) > 0:
+        where_good_fluxes_withdq[where_good_fluxes_withdq > edge_size-1] += (len(fluxes) - 2*edge_size)
+        """ Get the start and end indices, including DQ values. """
+        start_index_withdq, end_index_withdq = find_good_indices(where_good_fluxes_withdq, n_consecutive, n_fluxes, first_pass=True)
     else:
-        """ The start index is then the min. index for which the `n_consecutive`'th index is exactly equal to `n_consecutive`-1. """
-        start_indexes_withdq_with_good_diffs = numpy.asarray([x for i,x in enumerate(where_good_fluxes_withdq[0:n_good_fluxes_withdq-n_consecutive+1]) \
-                                                                if where_good_fluxes_withdq[i+n_consecutive-1] - \
-                                                                where_good_fluxes_withdq[i] == n_consecutive-1])
-        if len(start_indexes_withdq_with_good_diffs) > 0:
-            start_index_withdq = numpy.min(start_indexes_withdq_with_good_diffs)
-            end_index_withdq = numpy.max(start_indexes_withdq_with_good_diffs) - n_fluxes + n_consecutive - 1
-        else:
-            start_index_withdq = 0
-            end_index_withdq = -1
+        """ If there were no results returned from the where call above, make sure the start and end indices will fail the test. """
+        start_index_withdq = edge_size ; end_index_withdq = -2*edge_size-1
+
+    """ If the start and stop indices are not located within the range at the end, run the where on the entire array. """
+    if start_index_withdq > edge_size-1 or end_index_withdq < -2*edge_size+edge_size+1:
+        where_good_fluxes_withdq = numpy.where(numpy.asarray(_set_plot_xrange_test(instrument, fluxes, fluxerrs, median_flux, flux_scale_factor, median_fluxerr, fluxerr_scale_factor, fluxerr_95th, dqs, checkFluxes=True, checkFluxRatios=False, checkFluxErrRatios=True, checkFluxErrPercentile=False, checkDQs=True)))[0]
+        start_index_withdq, end_index_withdq = find_good_indices(where_good_fluxes_withdq, n_consecutive, n_fluxes)
 
     return start_index_nodq, end_index_nodq, start_index_withdq, end_index_withdq
+
+#--------------------
+
+def find_good_indices(indices_arr, n_consecutive, n_fluxes, first_pass=False):
+
+    """ How many total good indices are there to work with? """
+    n_good_fluxes = len(indices_arr)
+
+    """ Handle the trivial case where the number of valid points is less than the `n_consecutive` desired.  In this case, the start and end indices are set to the last and first indices, simulating what would happen if the entire array was traversed. """
+    if n_good_fluxes < n_consecutive:
+        if not first_pass:
+            start_index = 0
+            end_index = -1
+        else:
+            start_index = n_fluxes
+            end_index = -1 * n_fluxes
+            
+    else:
+        """ The start index is then the min. index for which the `n_consecutive`'th index is exactly equal to `n_consecutive`-1. """
+        start_indexes_with_good_diffs = numpy.asarray([x for i,x in enumerate(indices_arr[0:n_good_fluxes-n_consecutive+1]) \
+                                                                if indices_arr[i+n_consecutive-1] - \
+                                                                indices_arr[i] == n_consecutive-1])
+
+        if len(start_indexes_with_good_diffs) > 0:
+            start_index = numpy.min(start_indexes_with_good_diffs)
+            end_index = numpy.max(start_indexes_with_good_diffs) - n_fluxes + n_consecutive - 1
+        else:
+            if not first_pass:
+                start_index = 0
+                end_index = -1
+            else:
+                start_index = n_fluxes
+                end_index = -1 * n_fluxes
+
+    return start_index, end_index
 #--------------------
