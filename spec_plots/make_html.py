@@ -7,7 +7,7 @@
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
 """
 
-__version__ = '1.33.0'
+__version__ = '1.33.2'
 
 import argparse
 from glob import glob

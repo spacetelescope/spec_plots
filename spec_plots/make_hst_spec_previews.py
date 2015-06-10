@@ -12,7 +12,7 @@
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
 """
 
-__version__ = '1.33.0'
+__version__ = '1.33.2'
 
 import argparse
 from astropy.io import fits

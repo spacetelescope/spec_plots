@@ -7,7 +7,7 @@
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
 """
 
-__version__ = '1.33.0'
+__version__ = '1.33.2'
 
 import sys
 import spec_plots.make_hst_spec_previews as mhsp
