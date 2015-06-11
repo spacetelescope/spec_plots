@@ -1,21 +1,24 @@
-__version__ = '1.33.2'
-
 """
 .. module:: specutilserror
 
-   :synopsis: Defines a custom Error class for use with spec_plots utility functions.
+   :synopsis: Defines a custom Error class for use with spec_plots utility
+   functions.
 
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
 """
 
+__version__ = '1.33.2'
+
 #--------------------
 class SpecUtilsError(Exception, object):
     """
-    This class defines a generic Exception to use for errors raised in the SPECUTILS modules (specutils, specutils_cos, specutils_stis, etc.).  It simply prints the given value when raising the exception, e.g., 
-    
+    This class defines a generic Exception to use for errors raised in the
+    SPECUTILS modules (specutils, specutils_cos, specutils_stis, etc.).  It
+    simply prints the given value when raising the exception, e.g.,
+
     .. code-block:: python
-    
-         raise SpecUtilsError("Print this string") 
+
+         raise SpecUtilsError("Print this string")
          SpecUtilsError: *** SPECUTILS ERROR: 'Print this string'
     """
 
@@ -27,6 +30,7 @@ class SpecUtilsError(Exception, object):
 
         :type value: str
         """
+        super(SpecUtilsError, self).__init__(value)
         self.value = value
 
     def __str__(self):
