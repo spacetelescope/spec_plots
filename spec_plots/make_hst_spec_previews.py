@@ -316,7 +316,7 @@ def make_hst_spec_previews(input_file, flux_scale_factor=
         # Make "large-size" plot.
         specutils_stis.plotspec(stis_spectrum, indices_to_plot,
                                 stitched_spectra, output_type, output_file,
-                                n_consecutive, flux_scale_factor,
+                                flux_scale_factor,
                                 fluxerr_scale_factor, association_plot_metrics,
                                 dpi_val=dpi_val, output_size=1024, debug=debug,
                                 full_ylabels=full_ylabels, optimize=optimize)
@@ -327,8 +327,8 @@ def make_hst_spec_previews(input_file, flux_scale_factor=
         if not debug:
             specutils_stis.plotspec(stis_spectrum, indices_to_plot,
                                     [stitched_spectra[0]], output_type,
-                                    output_file, n_consecutive,
-                                    flux_scale_factor, fluxerr_scale_factor,
+                                    output_file, flux_scale_factor,
+                                    fluxerr_scale_factor,
                                     association_plot_metrics, dpi_val=dpi_val,
                                     output_size=128, optimize=optimize)
 
