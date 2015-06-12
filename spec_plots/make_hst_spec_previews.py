@@ -259,7 +259,7 @@ def make_hst_spec_previews(input_file, flux_scale_factor=
 
         # Make "large-size" plot.
         specutils_cos.plotspec(cos_spectrum, output_type, output_file,
-                               n_consecutive, flux_scale_factor,
+                               flux_scale_factor,
                                fluxerr_scale_factor, segment_plot_metrics,
                                dpi_val=dpi_val, output_size=1024, debug=debug,
                                full_ylabels=full_ylabels,
@@ -278,7 +278,7 @@ def make_hst_spec_previews(input_file, flux_scale_factor=
 
             # Make "thumbnail-size" plot, if requested.
             specutils_cos.plotspec(cos_spectrum, output_type, output_file,
-                                   n_consecutive, flux_scale_factor,
+                                   flux_scale_factor,
                                    fluxerr_scale_factor, stitched_plot_metrics,
                                    dpi_val=dpi_val, output_size=128,
                                    stitched_spectrum=stitched_spectrum,
