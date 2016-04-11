@@ -2,7 +2,7 @@
 .. module:: make_html
 
    :synopsis: Creates a webpage of thumbnail and full-size previews for review
-   purposes.
+       purposes.
 
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
 """
@@ -24,17 +24,17 @@ def find_orig_preview(ufr, orig_files):
     determine if an original preview exists for this ufr.
 
     :param ufr: Unique file root to test (this is equivalent to the IPPPSSOOT ID
-    from MAST).
+        from MAST).
 
     :type ufr: str
 
     :param orig_files: Array of original preview file names in which to find a
-    match.
+        match.
 
     :type orig_files: numpy.ndarray
 
     :returns: int -- The index in `orig_files` that matches the specified `ufr`,
-    if there is no match then returns None.
+        if there is no match then returns None.
     """
 
     # Find all indices where the ufr is a substring of the original CADC
@@ -63,28 +63,28 @@ def make_html(idir, odir="html/plot_previews/", ofile="plot_previews",
     CADC, provided they can be located in the expected location).
 
     :param idir: Input directory containing the set of preview images generated
-    by spec_plots.
+        by spec_plots.
 
     :type idir: str
 
-    :param odir: Output path for the HTML files.  Default =
-    `html/plot_previews/`
+    :param odir: Output path for the HTML files.  Default = html/plot_previews/`
 
     :type odir: str
 
     :param ofile: Base file name of the output HTML files.  Default =
-    `plot_previews`
+        plot_previews`
 
     :type ofile: str
 
     :param orig_dir: [Optional] Directory containing the original preview plots
-    from CADC.  If provided, these will be included in the HTML pages for
-    comparison purposes.
+        from CADC.  If provided, these will be included in the HTML pages for
+        comparison purposes.
 
     :type orig_dir: str
 
     :param plot_display_width: [Optional] The width of the preview plots in the
-    HTML tables (specified through the <img> tag), in pixels.  Default = 512.
+        HTML tables (specified through the <img> tag), in pixels.  Default =
+        512.
 
     :type plot_display_width: int
 

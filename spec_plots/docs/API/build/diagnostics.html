@@ -62,29 +62,20 @@ determine if an original preview exists for this ufr.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>ufr</strong> &#8211; Unique file root to test (this is equivalent to the IPPPSSOOT ID</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>ufr</strong> (<em>str</em>) &#8211; Unique file root to test (this is equivalent to the IPPPSSOOT ID
+from MAST).</li>
+<li><strong>orig_files</strong> (<em>numpy.ndarray</em>) &#8211; Array of original preview file names in which to find a
+match.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">int &#8211; The index in <cite>orig_files</cite> that matches the specified <cite>ufr</cite>,
+if there is no match then returns None.</p>
+</td>
 </tr>
 </tbody>
 </table>
-<p>from MAST).</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>orig_files</strong> &#8211; Array of original preview file names in which to find a</td>
-</tr>
-</tbody>
-</table>
-<p>match.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">int &#8211; The index in <cite>orig_files</cite> that matches the specified <cite>ufr</cite>,</td>
-</tr>
-</tbody>
-</table>
-<p>if there is no match then returns None.</p>
 </dd></dl>
 
 <dl class="function">
@@ -97,53 +88,23 @@ CADC, provided they can be located in the expected location).</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>idir</strong> &#8211; Input directory containing the set of preview images generated</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>idir</strong> (<em>str</em>) &#8211; Input directory containing the set of preview images generated
+by spec_plots.</li>
+<li><strong>odir</strong> (<em>str</em>) &#8211; Output path for the HTML files.  Default = html/plot_previews/`</li>
+<li><strong>ofile</strong> (<em>str</em>) &#8211; Base file name of the output HTML files.  Default =
+plot_previews`</li>
+<li><strong>orig_dir</strong> (<em>str</em>) &#8211; [Optional] Directory containing the original preview plots
+from CADC.  If provided, these will be included in the HTML pages for
+comparison purposes.</li>
+<li><strong>plot_display_width</strong> (<em>int</em>) &#8211; [Optional] The width of the preview plots in the
+HTML tables (specified through the &lt;img&gt; tag), in pixels.  Default =
+512.</li>
+</ul>
+</td>
 </tr>
-</tbody>
-</table>
-<p>by spec_plots.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>odir</strong> &#8211; Output path for the HTML files.  Default =</td>
-</tr>
-</tbody>
-</table>
-<p><cite>html/plot_previews/</cite></p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>ofile</strong> &#8211; Base file name of the output HTML files.  Default =</td>
-</tr>
-</tbody>
-</table>
-<p><cite>plot_previews</cite></p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>orig_dir</strong> &#8211; [Optional] Directory containing the original preview plots</td>
-</tr>
-</tbody>
-</table>
-<p>from CADC.  If provided, these will be included in the HTML pages for
-comparison purposes.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>plot_display_width</strong> &#8211; [Optional] The width of the preview plots in the</td>
-</tr>
-</tbody>
-</table>
-<p>HTML tables (specified through the &lt;img&gt; tag), in pixels.  Default = 512.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body">OSError, IOError, ValueError</td>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last">OSError, IOError, ValueError</p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -206,7 +167,7 @@ comparison purposes.</p>
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &copy; Copyright 2014,2015 Scott W. Fleming.
+        &copy; Copyright 2014,2015,2016 Scott W. Fleming.
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.
     </div>
   </body>
