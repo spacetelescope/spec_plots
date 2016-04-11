@@ -6,9 +6,9 @@
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
 """
 
-__version__ = '1.33.2'
-
 import numpy
+
+__version__ = '1.33.2'
 
 #--------------------
 class STIS1DSpectrum(object):

@@ -6,12 +6,12 @@
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
 """
 
-__version__ = '1.33.2'
-
+import numpy
 from astropy.io import fits
 from spec_plots.utils.specutils_cos.check_segments import check_segments
-import numpy
 from spec_plots.utils.specutils_cos.cosspectrum import COSSpectrum, COSSegment
+__version__ = '1.33.2'
+
 #--------------------
 
 #--------------------
@@ -114,7 +114,8 @@ def readspec(input_file):
                                              wavelength_table[fuva_index, :],
                                              fluxes=flux_table[fuva_index, :],
                                              fluxerrs=fluxerr_table[
-                        fuva_index, :], dqs=dq_table[fuva_index, :])
+                                                 fuva_index, :],
+                                             dqs=dq_table[fuva_index, :])
 
             # Try creating FUVB COSSegment object.
             try:
@@ -127,9 +128,11 @@ def readspec(input_file):
             if fuvb_index is not None:
                 fuvb_cossegment = COSSegment(nelem=nelems_arr[fuvb_index],
                                              wavelengths=wavelength_table[
-                        fuvb_index, :], fluxes=flux_table[fuvb_index, :],
+                                                 fuvb_index, :],
+                                             fluxes=flux_table[fuvb_index, :],
                                              fluxerrs=fluxerr_table[
-                        fuvb_index, :], dqs=dq_table[fuvb_index, :])
+                                                 fuvb_index, :],
+                                             dqs=dq_table[fuvb_index, :])
         elif band == 'NUV':
             # Try creating NUVA COSSegment object.
             try:
@@ -141,9 +144,11 @@ def readspec(input_file):
             if nuva_index is not None:
                 nuva_cossegment = COSSegment(nelem=nelems_arr[nuva_index],
                                              wavelengths=wavelength_table[
-                        nuva_index, :], fluxes=flux_table[nuva_index, :],
+                                                 nuva_index, :],
+                                             fluxes=flux_table[nuva_index, :],
                                              fluxerrs=fluxerr_table[
-                        nuva_index, :], dqs=dq_table[nuva_index, :])
+                                                 nuva_index, :],
+                                             dqs=dq_table[nuva_index, :])
 
             # Try creating NUVB COSSegment object.
             try:
@@ -155,9 +160,11 @@ def readspec(input_file):
             if nuvb_index is not None:
                 nuvb_cossegment = COSSegment(nelem=nelems_arr[nuvb_index],
                                              wavelengths=wavelength_table[
-                        nuvb_index, :], fluxes=flux_table[nuvb_index, :],
+                                                 nuvb_index, :],
+                                             fluxes=flux_table[nuvb_index, :],
                                              fluxerrs=fluxerr_table[
-                        nuvb_index, :], dqs=dq_table[nuvb_index, :])
+                                                 nuvb_index, :],
+                                             dqs=dq_table[nuvb_index, :])
 
             # Try creating NUVC COSSegment object.
             try:
@@ -169,9 +176,11 @@ def readspec(input_file):
             if nuvc_index is not None:
                 nuvc_cossegment = COSSegment(nelem=nelems_arr[nuvc_index],
                                              wavelengths=wavelength_table[
-                        nuvc_index, :], fluxes=flux_table[nuvc_index, :],
+                                                 nuvc_index, :],
+                                             fluxes=flux_table[nuvc_index, :],
                                              fluxerrs=fluxerr_table[
-                        nuvc_index, :], dqs=dq_table[nuvc_index, :])
+                                                 nuvc_index, :],
+                                             dqs=dq_table[nuvc_index, :])
 
         # Create COSSpectrum object.
         if band == 'FUV':
@@ -197,7 +206,7 @@ def readspec(input_file):
         elif band == 'NUV':
             # Handle case where all three are supplied.
             if (nuva_index is not None and nuvb_index is not None and
-                nuvc_index is not None):
+                    nuvc_index is not None):
                 return_spec = COSSpectrum(optical_element, band=band,
                                           cos_segments={'NUVA':nuva_cossegment,
                                                         'NUVB':nuvb_cossegment,

@@ -6,11 +6,12 @@
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
 """
 
-__version__ = '1.33.2'
-
 from astropy.io import fits
 from spec_plots.utils.specutils_stis.stis1dspectrum import (
     STIS1DSpectrum, STISExposureSpectrum, STISOrderSpectrum)
+
+__version__ = '1.33.2'
+
 #--------------------
 
 #--------------------
@@ -42,11 +43,11 @@ def readspec(input_file):
 
             # Create a list of STISOrderSpectra for this extension.
             all_order_spectra = [STISOrderSpectrum(
-                    nelem=exten_data_table["nelem"][order],
-                    wavelengths=exten_data_table["WAVELENGTH"][order],
-                    fluxes=exten_data_table["FLUX"][order],
-                    fluxerrs=exten_data_table["ERROR"][order],
-                    dqs=exten_data_table["DQ"][order]) for order in xrange(
+                nelem=exten_data_table["nelem"][order],
+                wavelengths=exten_data_table["WAVELENGTH"][order],
+                fluxes=exten_data_table["FLUX"][order],
+                fluxerrs=exten_data_table["ERROR"][order],
+                dqs=exten_data_table["DQ"][order]) for order in xrange(
                     n_orders)]
 
             # Create a STISExposureSpectrum from the STISOrderSpectrum

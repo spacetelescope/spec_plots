@@ -7,10 +7,10 @@
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
 """
 
-__version__ = '1.33.2'
-
 import numpy
 from spec_plots.utils.specutils.is_bad_dq import is_bad_dq
+
+__version__ = '1.33.2'
 
 #--------------------
 def debug_oplot(this_plotarea, instrument, all_wls, all_fls, all_flerrs,

@@ -6,9 +6,9 @@
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
 """
 
-__version__ = '1.33.2'
-
 import numpy
+
+__version__ = '1.33.2'
 
 #--------------------
 def set_plot_yrange(wavelengths, fluxes, avoid_regions=None, wl_range=None):
@@ -63,16 +63,16 @@ def set_plot_yrange(wavelengths, fluxes, avoid_regions=None, wl_range=None):
                 # through the `wl_range` parameter, in addition to checking if
                 # they are within the Avoid Region itself.
                 reject_indices = [i for i in range(len(wavelengths)) if (
-                        wavelengths[i] >= region.minwl and
-                        wavelengths[i] <= region.maxwl or
-                        wavelengths[i] < wl_range[0] or
-                        wavelengths[i] > wl_range[1])]
+                    wavelengths[i] >= region.minwl and
+                    wavelengths[i] <= region.maxwl or
+                    wavelengths[i] < wl_range[0] or
+                    wavelengths[i] > wl_range[1])]
             else:
                 # Don't need to worry about checking wavelengths within bounds
                 # after the first Avoid Region is examined.
                 reject_indices = [i for i in range(len(wavelengths)) if (
-                        wavelengths[i] >= region.minwl and
-                        wavelengths[i] <= region.maxwl)]
+                    wavelengths[i] >= region.minwl and
+                    wavelengths[i] <= region.maxwl)]
             # Set indices that we don't want to keep to 0.  Note that if
             # reject_indices is an empty list then nothing will change.
             keep_indices[reject_indices] = 0
@@ -80,7 +80,7 @@ def set_plot_yrange(wavelengths, fluxes, avoid_regions=None, wl_range=None):
     # After all indices have been set to keep or reject, pull out just the
     # fluxes that should be kept.
     keep_fluxes = numpy.asarray([f for ii, f in enumerate(fluxes) if (
-                keep_indices[ii] == 1 and numpy.isfinite(fluxes[ii]))])
+        keep_indices[ii] == 1 and numpy.isfinite(fluxes[ii]))])
 
     # Don't just take the pure min and max, since large outliers can affect
     # the calculation.  Instead, take the 1th and 99th percentile fluxes within

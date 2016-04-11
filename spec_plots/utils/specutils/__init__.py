@@ -1,3 +1,11 @@
+"""
+.. module:: __init__
+
+   :synopsis: Used to treat "specutils" as a directory and package.
+
+.. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
+"""
+
 from .specutilserror import SpecUtilsError
 from .avoidregion import AvoidRegion, generate_avoid_regions
 from .is_bad_dq import is_bad_dq

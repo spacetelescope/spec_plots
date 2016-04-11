@@ -8,12 +8,16 @@
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
 """
 
-__version__ = '1.33.2'
-
+import os
+import sys
 import numpy
 from spec_plots.utils.specutils.is_bad_dq import is_bad_dq
 from spec_plots.utils.specutils.get_flux_stats import get_flux_stats
 from spec_plots.utils.specutils.edge_trim import edge_trim
+from ..specutils_cos import COSSpectrum
+from ..specutils_stis import STISExposureSpectrum
+
+__version__ = '1.33.2'
 
 # <DEVEL> Note that this hack to make it so that the user can import
 # `stitch_components` directly as a module or run it from the command line as
@@ -21,7 +25,6 @@ from spec_plots.utils.specutils.edge_trim import edge_trim
 # efforts to work around it.  I don't think it will be a major issue, but worth
 # thinking about in the future. </DEVEL>
 if __package__ is None:
-    import sys, os
     SPECUTILS_DIR = os.path.dirname(os.path.abspath(__file__))
     UTILS_DIR = os.path.dirname(SPECUTILS_DIR)
     PARENT_DIR = os.path.dirname(UTILS_DIR)
@@ -29,9 +32,6 @@ if __package__ is None:
     __package__ = str("utils.specutils")
     __name__ = str(__package__+"."+__name__)
     del sys, os
-
-from ..specutils_cos import COSSpectrum
-from ..specutils_stis import STISExposureSpectrum
 #--------------------
 
 #--------------------

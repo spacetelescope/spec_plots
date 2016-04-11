@@ -1,3 +1,11 @@
+"""
+.. module:: __init__
+
+   :synopsis: Used to treat "specutils_cos" as a directory and package.
+
+.. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
+"""
+
 from .cosspectrum import COSSpectrum
 from .check_segments import check_segments
 from .extract_subspec import extract_subspec

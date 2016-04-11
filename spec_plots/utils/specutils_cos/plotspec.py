@@ -6,18 +6,22 @@
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
 """
 
-__version__ = '1.33.2'
-
+import os
+import sys
 import matplotlib
 from matplotlib.ticker import FormatStrFormatter
 import matplotlib.pyplot as pyplot
 from matplotlib import rc
+import numpy
+from spec_plots.utils.specutils_cos.get_segment_names import get_segment_names
+from ..specutils.specutilserror import SpecUtilsError
+from ..specutils.debug_oplot import debug_oplot
+from ..specutils.calc_covering_fraction import calc_covering_fraction
+
+__version__ = '1.33.2'
+
 if matplotlib.get_backend().lower() != 'agg':
     pyplot.switch_backend('Agg')
-import numpy
-import os
-import sys
-from spec_plots.utils.specutils_cos.get_segment_names import get_segment_names
 
 # <DEVEL> Note that this hack to make it so that the user can import
 # `plotspec` directly as a module or run it from the command line as __main__
@@ -31,10 +35,6 @@ if __package__ is None:
     sys.path.insert(1, PARENT_DIR)
     __package__ = str("utils.specutils")
     __name__ = str(__package__+"."+__name__)
-
-from ..specutils.specutilserror import SpecUtilsError
-from ..specutils.debug_oplot import debug_oplot
-from ..specutils.calc_covering_fraction import calc_covering_fraction
 #--------------------
 
 #--------------------
@@ -124,7 +124,7 @@ def plotspec(cos_spectrum, output_type, output_file,
     # Make sure the output path exists, if not, create it.
     if output_type != 'screen':
         if (os.path.dirname(output_file) != "" and
-            not os.path.isdir(os.path.dirname(output_file))):
+                not os.path.isdir(os.path.dirname(output_file))):
             try:
                 os.mkdir(os.path.dirname(output_file))
             except OSError as this_error:
@@ -253,10 +253,10 @@ def plotspec(cos_spectrum, output_type, output_file,
             if is_bigplot:
                 if i == len(subplot_segment_names)-1:
                     this_figure.suptitle(os.path.basename(
-                            cos_spectrum.orig_file), fontsize=18, color='r')
+                        cos_spectrum.orig_file), fontsize=18, color='r')
                 else:
                     this_figure.suptitle(os.path.basename(
-                            cos_spectrum.orig_file), fontsize=18, color='white')
+                        cos_spectrum.orig_file), fontsize=18, color='white')
                 # Uncomment the lines below to include the covering fraction
                 # as part of the suptitle.
 #                if i == len(subplot_segment_names)-1:
@@ -314,7 +314,7 @@ def plotspec(cos_spectrum, output_type, output_file,
                 this_plotarea.set_xticklabels(this_plotarea.get_xticks(),
                                               rotation=25.)
                 this_plotarea.xaxis.set_major_formatter(FormatStrFormatter(
-                        "%6.1f"))
+                    "%6.1f"))
             else:
                 # Make sure the font properties go back to normal.
                 pyplot.rcdefaults()
@@ -328,7 +328,7 @@ def plotspec(cos_spectrum, output_type, output_file,
                 # tickmarks.
                 if full_ylabels:
                     this_plotarea.yaxis.set_major_formatter(FormatStrFormatter(
-                            '%3.2E'))
+                        '%3.2E'))
 
         else:
             # Otherwise this is a spectrum that has all zero fluxes, or some
@@ -352,7 +352,7 @@ def plotspec(cos_spectrum, output_type, output_file,
                 this_plotarea.set_xticklabels(this_plotarea.get_xticks(),
                                               rotation=25.)
                 this_plotarea.xaxis.set_major_formatter(FormatStrFormatter(
-                        "%6.1f"))
+                    "%6.1f"))
                 textsize = "small"
                 plottext = "Fluxes are \n all 0."
             else:
@@ -368,7 +368,7 @@ def plotspec(cos_spectrum, output_type, output_file,
                 # tickmarks.
                 if full_ylabels:
                     this_plotarea.yaxis.set_major_formatter(FormatStrFormatter(
-                            '%3.2E'))
+                        '%3.2E'))
 
                 textsize = "x-large"
                 plottext = "Fluxes are all 0."

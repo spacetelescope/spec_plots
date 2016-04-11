@@ -7,13 +7,13 @@
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
 """
 
-__version__ = '1.33.2'
-
 import argparse
 from glob import glob
-import numpy
 import os
 import sys
+import numpy
+
+__version__ = '1.33.2'
 
 #--------------------
 
@@ -167,14 +167,14 @@ def make_html(idir, odir="html/plot_previews/", ofile="plot_previews",
         # without creating a new array. </DEVEL>
         if n_thumb_png_files > 0 and n_large_png_files > 0:
             uniq_fileroots = numpy.sort(numpy.unique(
-                    numpy.concatenate([all_thumb_png_files_froots,
-                                       all_large_png_files_froots])))
+                numpy.concatenate([all_thumb_png_files_froots,
+                                   all_large_png_files_froots])))
         elif n_thumb_png_files > 0:
             uniq_fileroots = numpy.sort(numpy.unique(
-                    all_thumb_png_files_froots))
+                all_thumb_png_files_froots))
         elif n_large_png_files > 0:
             uniq_fileroots = numpy.sort(numpy.unique(
-                    all_large_png_files_froots))
+                all_large_png_files_froots))
         else:
             raise IOError("No thumb-size or large-size files found."
                           "  Looking in " + orig_dir)
@@ -186,7 +186,7 @@ def make_html(idir, odir="html/plot_previews/", ofile="plot_previews",
         with open(odir+ofile+"_thumbs.html", 'w') as ofi:
             ofi.write('<html><head></head><body>\n')
             ofi.write('<table style="border:1px solid black;border-collapse:'
-                     'collapse;width:100%">\n')
+                      'collapse;width:100%">\n')
 
             for i, ufr in enumerate(uniq_fileroots):
 
@@ -210,17 +210,17 @@ def make_html(idir, odir="html/plot_previews/", ofile="plot_previews",
                     # Write the cell containing the thumbnail preview, (or
                     # just fill it grey if missing).
                     ofi.write('    <td style="border:1px solid black;width:'
-                             '135px;vertical-align:top"><div style="width:'
-                             '128px;text-align:center"><span style='
-                             '"font-weight:bold">'+'_<br>'.join(ufr.split('_'))
-                             +'</span></div>')
+                              '135px;vertical-align:top"><div style="width:'
+                              '128px;text-align:center"><span style='
+                              '"font-weight:bold">'+'_<br>'.join(ufr.split('_'))
+                              +'</span></div>')
                     if has_thumb:
                         ofi.write('    <img src="'+os.path.relpath(
-                                all_thumb_png_files[where_this_thumb], odir)+
-                                 '" width="128px">')
+                            all_thumb_png_files[where_this_thumb], odir)+
+                                  '" width="128px">')
                     else:
                         ofi.write('    <div style="background-color:#86867D;'
-                                 'width:128px;height:128px"></div>')
+                                  'width:128px;height:128px"></div>')
                     ofi.write('    </td>\n')
 
                     if i % n_thumbs_per_row == n_thumbs_per_row-1:
@@ -236,8 +236,8 @@ def make_html(idir, odir="html/plot_previews/", ofile="plot_previews",
         with open(odir+ofile+"_large.html", 'w') as ofi:
             ofi.write('<html><head></head><body>\n')
             ofi.write('<table style="border:1px solid black;border-collapse:'
-                     'collapse;width:'+str(int(round(2.*plot_display_width)))+
-                     'px">\n')
+                      'collapse;width:'+str(int(round(2.*plot_display_width)))+
+                      'px">\n')
             ofi.write('<tr><th>New Version</th><th>Old Version</th></tr>\n')
 
 
@@ -264,15 +264,15 @@ def make_html(idir, odir="html/plot_previews/", ofile="plot_previews",
                     # Write the cell containing the large preview, (or just
                     # fill it grey if missing).
                     ofi.write('    <td style="border:1px solid black;width:'
-                             '100%">')
+                              '100%">')
                     if has_large:
                         ofi.write('    <img src="'+os.path.relpath(
-                                all_large_png_files[where_this_large], odir)+
-                                 '" width="'+str(plot_display_width)+'px">')
+                            all_large_png_files[where_this_large], odir)+
+                                  '" width="'+str(plot_display_width)+'px">')
                     else:
                         ofi.write('    <div style="background-color:#86867D;'
-                                 'width:'+str(plot_display_width)+'px;height:'+
-                                 str(plot_display_width)+'px"></div>')
+                                  'width:'+str(plot_display_width)+'px;height:'+
+                                  str(plot_display_width)+'px"></div>')
                     ofi.write('    </td>\n')
 
                     # If requested, write the cell containing the original
@@ -284,17 +284,17 @@ def make_html(idir, odir="html/plot_previews/", ofile="plot_previews",
                         orig_preview_index = find_orig_preview(ufr,
                                                                all_orig_files)
                         ofi.write('    <td style="border:1px solid black;width:'
-                                 '100%">')
+                                  '100%">')
                         if orig_preview_index is not None:
                             ofi.write('    <img src="'+os.path.relpath(
-                                    all_orig_files_withpath[orig_preview_index],
-                                    odir)+'" width="'+str(plot_display_width)+
-                                     'px">')
+                                all_orig_files_withpath[orig_preview_index],
+                                odir)+'" width="'+str(plot_display_width)+
+                                      'px">')
                         else:
                             ofi.write('    <div style="background-color:'
                                       '#86867D;width:'+str(plot_display_width)+
-                                     'px;height:'+str(plot_display_width)+
-                                     'px"></div>')
+                                      'px;height:'+str(plot_display_width)+
+                                      'px"></div>')
                         ofi.write('    </td>\n')
 
                     ofi.write('  </tr>\n')

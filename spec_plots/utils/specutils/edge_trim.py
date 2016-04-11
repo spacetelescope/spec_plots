@@ -7,10 +7,10 @@
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
 """
 
-__version__ = '1.33.2'
-
 import numpy
 from spec_plots.utils.specutils.is_bad_dq import is_bad_dq
+
+__version__ = '1.33.2'
 
 #--------------------
 def _set_plot_xrange_test(instrument, flux_values, flux_err_values, median_flux,
@@ -99,8 +99,8 @@ def _set_plot_xrange_test(instrument, flux_values, flux_err_values, median_flux,
 
     # Make sure input parameters are all numpy arrays.
     if (not isinstance(flux_values, numpy.ndarray) or
-        not isinstance(flux_err_values, numpy.ndarray) or
-        not isinstance(dqs, numpy.ndarray)):
+            not isinstance(flux_err_values, numpy.ndarray) or
+            not isinstance(dqs, numpy.ndarray)):
         raise ValueError("The flux, flux uncertainty, and DQ values must be"
                          " passed as a numpy.ndarray object.")
 
@@ -205,16 +205,15 @@ def edge_trim(instrument, fluxes, fluxerrs, dqs, n_consecutive, median_flux,
     # speed).  If no good indices are found within those ranges, then and only
     # then will we run it on the entire array. """
     where_good_fluxes_nodq = numpy.where(numpy.asarray(_set_plot_xrange_test(
-                instrument, numpy.concatenate((fluxes[0:edge_size],
-                                               fluxes[-1*edge_size:])),
-                numpy.concatenate((fluxerrs[0:edge_size],
-                                   fluxerrs[-1*edge_size:])), median_flux,
-                flux_scale_factor, median_fluxerr, fluxerr_scale_factor,
-                fluxerr_95th, numpy.concatenate((dqs[0:edge_size],
-                                                 dqs[-1*edge_size:])),
-                check_fluxes=True, check_flux_ratios=False,
-                check_flux_err_ratios=True, check_flux_err_percentile=False,
-                check_dqs=False)))[0]
+        instrument, numpy.concatenate((fluxes[0:edge_size],
+                                       fluxes[-1*edge_size:])),
+        numpy.concatenate((fluxerrs[0:edge_size],
+                           fluxerrs[-1*edge_size:])), median_flux,
+        flux_scale_factor, median_fluxerr, fluxerr_scale_factor,
+        fluxerr_95th, numpy.concatenate((dqs[0:edge_size], dqs[-1*edge_size:])),
+        check_fluxes=True, check_flux_ratios=False,
+        check_flux_err_ratios=True, check_flux_err_percentile=False,
+        check_dqs=False)))[0]
     if len(where_good_fluxes_nodq) > 0:
         where_good_fluxes_nodq[where_good_fluxes_nodq > edge_size-1] += (
             len(fluxes) - 2*edge_size)
@@ -230,16 +229,16 @@ def edge_trim(instrument, fluxes, fluxerrs, dqs, n_consecutive, median_flux,
     # If the start and stop indices are not located within the range at the
     # end, run the where on the entire array.
     if (start_index_nodq > edge_size-1 or end_index_nodq < -2*edge_size+
-        edge_size+1):
+            edge_size+1):
         where_good_fluxes_nodq = numpy.where(numpy.asarray(
-                _set_plot_xrange_test(instrument, fluxes, fluxerrs, median_flux,
-                                      flux_scale_factor, median_fluxerr,
-                                      fluxerr_scale_factor, fluxerr_95th, dqs,
-                                      check_fluxes=True,
-                                      check_flux_ratios=False,
-                                      check_flux_err_ratios=True,
-                                      check_flux_err_percentile=False,
-                                      check_dqs=False)))[0]
+            _set_plot_xrange_test(instrument, fluxes, fluxerrs, median_flux,
+                                  flux_scale_factor, median_fluxerr,
+                                  fluxerr_scale_factor, fluxerr_95th, dqs,
+                                  check_fluxes=True,
+                                  check_flux_ratios=False,
+                                  check_flux_err_ratios=True,
+                                  check_flux_err_percentile=False,
+                                  check_dqs=False)))[0]
         start_index_nodq, end_index_nodq = find_good_indices(
             where_good_fluxes_nodq, n_consecutive, n_fluxes)
 
@@ -249,16 +248,16 @@ def edge_trim(instrument, fluxes, fluxerrs, dqs, n_consecutive, median_flux,
     # speed).  If no good indices are found within those ranges, then and only
     # then will we run it on the entire array.
     where_good_fluxes_withdq = numpy.where(numpy.asarray(_set_plot_xrange_test(
-                instrument, numpy.concatenate((fluxes[0:edge_size],
-                                               fluxes[-1*edge_size:])),
-                numpy.concatenate((fluxerrs[0:edge_size],
-                                   fluxerrs[-1*edge_size:])), median_flux,
-                flux_scale_factor, median_fluxerr, fluxerr_scale_factor,
-                fluxerr_95th, numpy.concatenate((dqs[0:edge_size],
-                                                 dqs[-1*edge_size:])),
-                check_fluxes=True, check_flux_ratios=False,
-                check_flux_err_ratios=True, check_flux_err_percentile=False,
-                check_dqs=True)))[0]
+        instrument, numpy.concatenate((fluxes[0:edge_size],
+                                       fluxes[-1*edge_size:])),
+        numpy.concatenate((fluxerrs[0:edge_size],
+                           fluxerrs[-1*edge_size:])), median_flux,
+        flux_scale_factor, median_fluxerr, fluxerr_scale_factor,
+        fluxerr_95th, numpy.concatenate((dqs[0:edge_size],
+                                         dqs[-1*edge_size:])),
+        check_fluxes=True, check_flux_ratios=False,
+        check_flux_err_ratios=True, check_flux_err_percentile=False,
+        check_dqs=True)))[0]
     if len(where_good_fluxes_withdq) > 0:
         where_good_fluxes_withdq[where_good_fluxes_withdq > edge_size-1] += (
             len(fluxes) - 2*edge_size)
@@ -274,16 +273,16 @@ def edge_trim(instrument, fluxes, fluxerrs, dqs, n_consecutive, median_flux,
     # If the start and stop indices are not located within the range at the
     # end, run the where on the entire array.
     if (start_index_withdq > edge_size-1 or end_index_withdq < -2*edge_size+
-        edge_size+1):
+            edge_size+1):
         where_good_fluxes_withdq = numpy.where(numpy.asarray(
-                _set_plot_xrange_test(instrument, fluxes, fluxerrs, median_flux,
-                                      flux_scale_factor, median_fluxerr,
-                                      fluxerr_scale_factor, fluxerr_95th, dqs,
-                                      check_fluxes=True,
-                                      check_flux_ratios=False,
-                                      check_flux_err_ratios=True,
-                                      check_flux_err_percentile=False,
-                                      check_dqs=True)))[0]
+            _set_plot_xrange_test(instrument, fluxes, fluxerrs, median_flux,
+                                  flux_scale_factor, median_fluxerr,
+                                  fluxerr_scale_factor, fluxerr_95th, dqs,
+                                  check_fluxes=True,
+                                  check_flux_ratios=False,
+                                  check_flux_err_ratios=True,
+                                  check_flux_err_percentile=False,
+                                  check_dqs=True)))[0]
         start_index_withdq, end_index_withdq = find_good_indices(
             where_good_fluxes_withdq, n_consecutive, n_fluxes)
 
@@ -342,7 +341,7 @@ def find_good_indices(indices_arr, n_consecutive, n_fluxes, first_pass=False):
         # `n_consecutive`'th index is exactly equal to `n_consecutive`-1.
         start_indexes_with_good_diffs = numpy.asarray(
             [x for i, x in enumerate(indices_arr[0:n_good_fluxes-n_consecutive+
-                                                1]) if
+                                                 1]) if
              indices_arr[i+n_consecutive-1]-indices_arr[i] == n_consecutive-1])
 
         if len(start_indexes_with_good_diffs) > 0:

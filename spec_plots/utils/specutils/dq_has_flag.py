@@ -44,11 +44,8 @@ def dq_has_flag(dqf, flag_to_check):
         # string version of the DQ value, then we know it can't be part of the
         # DQ  bitmask.  If not, then look for that bit to be set (by counting
         # from the right).
-        if (len(flag_16bit_str) <= len(dq_16bit_str) and
-            dq_16bit_str[-1 * len(flag_16bit_str)] == '1'):
-            return True
-        else:
-            return False
+        return (len(flag_16bit_str) <= len(dq_16bit_str) and
+                dq_16bit_str[-1 * len(flag_16bit_str)] == '1')
     else:
         raise ValueError("Flag to check must be a power of 2.  Asked to check"
                          " whether flag " + str(flag_to_check) + " is set to"

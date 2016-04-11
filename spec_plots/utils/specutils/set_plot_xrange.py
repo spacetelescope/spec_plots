@@ -6,10 +6,10 @@
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
 """
 
-__version__ = '1.33.2'
-
 import numpy
 from spec_plots.utils.specutils.edge_trim import edge_trim
+
+__version__ = '1.33.2'
 
 #--------------------
 def set_plot_xrange(instrument, wavelengths, fluxes, fluxerrs, dqs,

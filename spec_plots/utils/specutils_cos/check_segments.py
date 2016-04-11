@@ -7,9 +7,12 @@
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
 """
 
-__version__ = '1.33.2'
-
+import os
+import sys
 import numpy
+from ..specutils import SpecUtilsError
+
+__version__ = '1.33.2'
 
 # <DEVEL> Note that this hack to make it so that the user can import
 # `check_segments` directly as a module or run it from the command line as
@@ -17,7 +20,6 @@ import numpy
 # efforts to work around it.  I don't think it will be a major issue, but worth
 # thinking about in the future. </DEVEL>
 if __package__ is None:
-    import sys, os
     SPECUTILS_COS_DIR = os.path.dirname(os.path.abspath(__file__))
     UTILS_DIR = os.path.dirname(SPECUTILS_COS_DIR)
     PARENT_DIR = os.path.dirname(UTILS_DIR)
@@ -25,8 +27,6 @@ if __package__ is None:
     __package__ = str("utils.specutils")
     __name__ = str(__package__+"."+__name__)
     del sys, os
-
-from ..specutils import SpecUtilsError
 #--------------------
 
 #--------------------
@@ -62,7 +62,7 @@ def check_segments(segments_list, input_file):
         # This can happen with FUV data for some reason, so it can be either
         # "FUVA" or "FUVB".
         if (numpy.array_equal(segments_list, ["FUVA"]) or
-            numpy.array_equal(segments_list, ["FUVB"])):
+                numpy.array_equal(segments_list, ["FUVB"])):
             this_band = "FUV"
         else:
             raise SpecUtilsError("The array of SEGMENT strings contains one"

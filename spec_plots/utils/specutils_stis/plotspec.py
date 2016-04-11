@@ -6,18 +6,22 @@
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
 """
 
-__version__ = '1.33.2'
-
 import copy
+import os
+import sys
 import matplotlib
 from matplotlib.ticker import FormatStrFormatter
 import matplotlib.pyplot as pyplot
 from matplotlib import rc
+import numpy
+from ..specutils.specutilserror import SpecUtilsError
+from ..specutils.debug_oplot import debug_oplot
+from ..specutils.calc_covering_fraction import calc_covering_fraction
+
+__version__ = '1.33.2'
+
 if matplotlib.get_backend().lower() != 'agg':
     pyplot.switch_backend('Agg')
-import numpy
-import os
-import sys
 
 # <DEVEL> Note that this hack to make it so that the user can import
 # `plotspec` directly as a module or run it from the command line as
@@ -31,10 +35,6 @@ if __package__ is None:
     sys.path.insert(1, PARENT_DIR)
     __package__ = str("utils.specutils")
     __name__ = str(__package__+"."+__name__)
-
-from ..specutils.specutilserror import SpecUtilsError
-from ..specutils.debug_oplot import debug_oplot
-from ..specutils.calc_covering_fraction import calc_covering_fraction
 #--------------------
 
 #--------------------
@@ -129,7 +129,7 @@ def plotspec(stis_spectrum, association_indices, stitched_spectra, output_type,
     # Make sure the output path exists, if not, create it.
     if output_type != 'screen':
         if (os.path.dirname(output_file) != "" and
-            not os.path.isdir(os.path.dirname(output_file))):
+                not os.path.isdir(os.path.dirname(output_file))):
             try:
                 os.mkdir(os.path.dirname(output_file))
             except OSError as this_error:
@@ -145,15 +145,14 @@ def plotspec(stis_spectrum, association_indices, stitched_spectra, output_type,
     # otherwise force only one association on the plot.
     n_associations = len(stis_spectrum.associations)
     n_subplots = len(stitched_spectra)
-    if output_size > 128:
-        is_bigplot = True
-    else:
-        is_bigplot = False
+    is_bigplot = output_size > 128
 
     # Start plot figure.
     this_figure, these_plotareas = pyplot.subplots(nrows=n_subplots, ncols=1,
                                                    figsize=(
-            output_size/dpi_val, output_size/dpi_val), dpi=dpi_val)
+                                                       output_size/dpi_val,
+                                                       output_size/dpi_val),
+                                                   dpi=dpi_val)
 
     # Make sure the subplots are in a numpy array (I think by default it is
     # not if there is only one).
@@ -233,7 +232,7 @@ def plotspec(stis_spectrum, association_indices, stitched_spectra, output_type,
             # LineCollection.
             if i == 0:
                 this_collection = this_plotarea.add_collection(copy.copy(
-                        plot_metrics[i]["line_collection"]))
+                    plot_metrics[i]["line_collection"]))
             else:
                 this_collection = this_plotarea.add_collection(
                     plot_metrics[i]["line_collection"])
@@ -247,10 +246,10 @@ def plotspec(stis_spectrum, association_indices, stitched_spectra, output_type,
             if is_bigplot:
                 if i == len(stitched_spectra)-1:
                     this_figure.suptitle(os.path.basename(
-                            stis_spectrum.orig_file), fontsize=18, color='r')
+                        stis_spectrum.orig_file), fontsize=18, color='r')
                 else:
                     this_figure.suptitle(os.path.basename(
-                            stis_spectrum.orig_file), fontsize=18,
+                        stis_spectrum.orig_file), fontsize=18,
                                          color='white')
                 # Uncomment the lines below to include the covering fraction
                 # as part of the suptitle.
@@ -310,7 +309,7 @@ def plotspec(stis_spectrum, association_indices, stitched_spectra, output_type,
                 this_plotarea.set_xticklabels(this_plotarea.get_xticks(),
                                               rotation=25.)
                 this_plotarea.xaxis.set_major_formatter(FormatStrFormatter(
-                        "%6.1f"))
+                    "%6.1f"))
             else:
                 # Make sure the font properties go back to normal.
                 pyplot.rcdefaults()
@@ -324,7 +323,7 @@ def plotspec(stis_spectrum, association_indices, stitched_spectra, output_type,
                 # tickmarks.
                 if full_ylabels:
                     this_plotarea.yaxis.set_major_formatter(FormatStrFormatter(
-                            '%3.2E'))
+                        '%3.2E'))
 
         else:
             # Otherwise this is a spectrum that has all zero fluxes, or some
@@ -348,7 +347,7 @@ def plotspec(stis_spectrum, association_indices, stitched_spectra, output_type,
                 this_plotarea.set_xticklabels(this_plotarea.get_xticks(),
                                               rotation=25.)
                 this_plotarea.xaxis.set_major_formatter(FormatStrFormatter(
-                        "%6.1f"))
+                    "%6.1f"))
                 textsize = "small"
                 plottext = "Fluxes are \n all 0."
             else:
@@ -364,7 +363,7 @@ def plotspec(stis_spectrum, association_indices, stitched_spectra, output_type,
                 # tickmarks.
                 if full_ylabels:
                     this_plotarea.yaxis.set_major_formatter(FormatStrFormatter(
-                            '%3.2E'))
+                        '%3.2E'))
 
                 textsize = "x-large"
                 plottext = "Fluxes are all 0."

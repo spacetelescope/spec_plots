@@ -6,9 +6,9 @@
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
 """
 
-__version__ = '1.33.2'
-
 from setuptools import setup
+
+__version__ = '1.33.2'
 
 setup(name="spec_plots",
       version="1.33.2",

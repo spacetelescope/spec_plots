@@ -8,10 +8,10 @@
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
 """
 
-__version__ = '1.33.2'
-
 import math
 import numpy
+
+__version__ = '1.33.2'
 
 #--------------------
 def rms(values, offset=0.):

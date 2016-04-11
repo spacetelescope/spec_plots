@@ -12,14 +12,13 @@
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
 """
 
-__version__ = '1.33.2'
-
 import argparse
-from astropy.io import fits
-import numpy
 from os import path
-# These are local modules that are imported.
+import numpy
+from astropy.io import fits
 from spec_plots.utils import specutils, specutils_cos, specutils_stis
+
+__version__ = '1.33.2'
 
 FLUX_SCALE_FACTOR_DEFAULT = 10.
 FLUXERR_SCALE_FACTOR_DEFAULT = 5.
@@ -235,7 +234,7 @@ def make_hst_spec_previews(input_file, flux_scale_factor=
         # Trim the wavelengths < 900 Angstroms for FUVB segment if optical
         # element used is G140L.
         if ("FUVB" in cos_spectrum.segments and cos_spectrum.optical_element ==
-            "G140L"):
+                "G140L"):
             specutils_cos.extract_subspec(cos_spectrum, "FUVB", min_wl=900.)
 
         # Create a stitched spectrum for use when making thumb-size plots.
@@ -401,7 +400,8 @@ def setup_args():
                         "output_type", default=OUTPUT_TYPE_DEFAULT, help=
                         "[Optional] Specify the file type of the plots to make."
                         "  Default = %(default)s.", choices=['png', 'eps',
-                        'screen'], metavar="{png,ps,screen}")
+                                                             'screen'],
+                        metavar="{png,ps,screen}")
 
     parser.add_argument("-v", action="store_true", dest="verbose",
                         default=VERBOSE_DEFAULT, help="[Optional] Turn on"
