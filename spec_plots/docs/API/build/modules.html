@@ -1,0 +1,151 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Utility Modules, Including Instrument-Specific READ and PLOT Modules &mdash; spec_plots 1.32.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.32.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="spec_plots 1.32.0 documentation" href="index.html" />
+    <link rel="next" title="utils.specutils package" href="utils.specutils.html" />
+    <link rel="prev" title="Getting Started: Main Program" href="make_hst_spec_previews.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="utils.specutils.html" title="utils.specutils package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="make_hst_spec_previews.html" title="Getting Started: Main Program"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">spec_plots 1.32.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="utility-modules-including-instrument-specific-read-and-plot-modules">
+<h1>Utility Modules, Including Instrument-Specific READ and PLOT Modules<a class="headerlink" href="#utility-modules-including-instrument-specific-read-and-plot-modules" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="utils.specutils.html">utils.specutils package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="utils.specutils.html#module-utils.specutils.avoidregion">avoidregion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.specutils.html#module-utils.specutils.calc_plot_metrics">calc_plot_metrics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.specutils.html#module-utils.specutils.calc_covering_fraction">calc_covering_fraction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.specutils.html#module-utils.specutils.debug_oplot">debug_oplot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.specutils.html#module-utils.specutils.dq_has_flag">dq_has_flag</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.specutils.html#module-utils.specutils.edge_trim">edge_trim</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.specutils.html#module-utils.specutils.get_flux_stats">get_flux_stats</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.specutils.html#module-utils.specutils.is_bad_dq">is_bad_dq</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.specutils.html#module-utils.specutils.rms">rms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.specutils.html#module-utils.specutils.set_plot_xrange">set_plot_xrange</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.specutils.html#module-utils.specutils.set_plot_yrange">set_plot_yrange</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.specutils.html#module-utils.specutils.specutilserror">specutilserror</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.specutils.html#module-utils.specutils.stitch_components">stitch_components</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="utils.specutils_cos.html">utils.specutils_cos package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="utils.specutils_cos.html#module-utils.specutils_cos.check_segments">check_segments</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.specutils_cos.html#module-utils.specutils_cos.cosspectrum">cosspectrum</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.specutils_cos.html#module-utils.specutils_cos.extract_subspec">extract_subspec</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.specutils_cos.html#module-utils.specutils_cos.get_segment_names">get_segment_names</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.specutils_cos.html#module-utils.specutils_cos.plotspec">plotspec</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.specutils_cos.html#module-utils.specutils_cos.readspec">readspec</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="utils.specutils_stis.html">utils.specutils_stis package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="utils.specutils_stis.html#module-utils.specutils_stis.get_association_indices">get_association_indices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.specutils_stis.html#module-utils.specutils_stis.plotspec">plotspec</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.specutils_stis.html#module-utils.specutils_stis.readspec">readspec</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.specutils_stis.html#module-utils.specutils_stis.stis1dspectrum">stis1dspectrum</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="make_hst_spec_previews.html"
+                        title="previous chapter">Getting Started: Main Program</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="utils.specutils.html"
+                        title="next chapter">utils.specutils package</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/modules.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="utils.specutils.html" title="utils.specutils package"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="make_hst_spec_previews.html" title="Getting Started: Main Program"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">spec_plots 1.32.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2014,2015 Scott W. Fleming.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.
+    </div>
+  </body>
+</html>
