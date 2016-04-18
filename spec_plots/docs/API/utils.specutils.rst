@@ -1,7 +1,7 @@
 utils.specutils package
 =======================
 
-``avoidregion``
+avoidregion
 ----------------------------------
 .. automodule:: utils.specutils.avoidregion
     :members:

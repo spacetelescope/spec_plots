@@ -1,8 +1,8 @@
 After The Fact: Diagnostic Modules.
 ***********************************
 
-``make_html``
-=============
+make_html
+=========
 .. automodule:: make_html
     :members: 
     :private-members:
