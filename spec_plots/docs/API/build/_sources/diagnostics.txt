@@ -7,4 +7,5 @@ After The Fact: Diagnostic Modules.
     :members: 
     :private-members:
     :undoc-members:
+    :noindex:
 

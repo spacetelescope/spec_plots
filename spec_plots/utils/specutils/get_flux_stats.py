@@ -1,8 +1,8 @@
 """
 .. module:: get_flux_stats
-
    :synopsis: Calculates statistics on an arrays of fluxes and corresponding
-   flux uncertainties, such as the median values and the 95th percentile values.
+       flux uncertainties, such as the median values and the 95th percentile
+       values.
 
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
 """
@@ -26,7 +26,7 @@ def get_flux_stats(fluxes, fluxerrs):
     :type fluxerrs: numpy.ndarray
 
     :returns: tuple -- The median flux, median flux uncertainty, and the 95th
-    percentile flux uncertainty.
+        percentile flux uncertainty.
     """
 
     # Find the median flux value, ignoring any NaN values or fluxes that are

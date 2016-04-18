@@ -1,8 +1,7 @@
 """
 .. module:: check_segments
-
    :synopsis: Checks that the array of segment names in the COS FITS extension
-   table are some combination of allowed values.
+       table are some combination of allowed values.
 
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
 """
@@ -33,8 +32,8 @@ if __package__ is None:
 def check_segments(segments_list, input_file):
     """
     Checks that the array of "segments" in the COS spectrum header are expected
-    values.  It returns a scalar string representing the band (either "FUV" or
-    "NUV").  If the array is not what's expected, an Exception is raised.
+    values.  It returns a scalar string representing the band (either "FUV"
+    or "NUV").  If the array is not what's expected, an Exception is raised.
 
     :param segments_list: List of segment labels.
 

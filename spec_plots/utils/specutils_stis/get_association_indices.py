@@ -1,8 +1,7 @@
 """
 .. module:: get_association_indices
-
    :synopsis: Determines which indices in the array of STIS associations to
-   plot in the preview plots.
+       plot in the preview plots.
 
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
 """

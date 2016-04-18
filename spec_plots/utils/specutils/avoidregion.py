@@ -1,8 +1,7 @@
 """
 .. module:: avoidregion
-
    :synopsis: Create AvoidRegions in wavelength space that will not be used
-   when determining the optimal y-axis plot rangex.
+       when determining the optimal y-axis plot rangex.
 
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
 """

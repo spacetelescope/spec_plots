@@ -1,6 +1,5 @@
 """
 .. module:: set_plot_xrange
-
    :synopsis: Determines the optimal x-axis plot range, in wavelength space.
 
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
@@ -36,22 +35,22 @@ def set_plot_xrange(instrument, wavelengths, fluxes, fluxerrs, dqs,
     :type fluxerrs: numpy.ndarray
 
     :param dqs: The DQ flags of the spectrum to be plotted.  For COS, these are
-    the DQ_WGT bits from the header.
+        the DQ_WGT bits from the header.
 
     :type dqs: numpy.ndarray
 
     :param n_consecutive: How many consecutive points must pass the test for the
-    index to count as the valid start/end of the spectrum?
+        index to count as the valid start/end of the spectrum?
 
     :type n_consecutive: int
 
     :param flux_scale_factor: Max. allowed ratio between the flux and a median
-    flux value, used in edge trimming.
+        flux value, used in edge trimming.
 
     :type flux_scale_factor: float
 
     :param fluxerr_scale_factor: Max. allowed ratio between the flux uncertainty
-    and a median flux uncertainty value, used in edge trimming.
+        and a median flux uncertainty value, used in edge trimming.
 
     :type fluxerr_scale_factor: float
 
@@ -64,12 +63,12 @@ def set_plot_xrange(instrument, wavelengths, fluxes, fluxerrs, dqs,
     :type median_fluxerr: float
 
     :param fluxerr_95th: The flux uncertainty corresponding to the 95th
-    percentile.
+        percentile.
 
     :type fluxerr_95th: float
 
     :returns: list -- Two-element list containing the optimal [xmin,xmax] values
-    to define the x-axis plot range.
+        to define the x-axis plot range.
     """
 
     # Test if there are any NaN's in the wavelength array.  If so, issue a

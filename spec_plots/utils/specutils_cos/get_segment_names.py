@@ -1,8 +1,7 @@
 """
 .. module:: get_segment_names
-
    :synopsis: Returns a list of segment names such that the bluest segment
-   comes first.
+       comes first.
 
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
 """

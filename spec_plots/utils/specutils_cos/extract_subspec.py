@@ -1,9 +1,8 @@
 """
 .. module:: extract_subspec
-
    :synopsis: Extracts a sub-spectrum from the provided COS spectrum object.
-   Modifies the COS spectrum object to replace that segment's spectrum with the
-   specified sub-spectrum.
+       Modifies the COS spectrum object to replace that segment's spectrum with
+       the specified sub-spectrum.
 
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
 """
@@ -48,12 +47,12 @@ def extract_subspec(cos_spectrum, segment, min_wl=None, max_wl=None):
     :type segment: str
 
     :param min_wl: The minimum wavlength value to keep.  If None, then there
-    will be no lower bound.
+        will be no lower bound.
 
     :type min_wl: float
 
     :param max_wl: The maximum wavelength value to keep.  If None, then there
-    will be no upper bound.
+        will be no upper bound.
 
     :type max_wl: float
     """

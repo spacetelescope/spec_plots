@@ -1,9 +1,8 @@
 """
 .. module:: stitch_components
-
    :synopsis: Given a COS or STIS spectrum, will stitch each segment/order,
-   respectively, into a contiguous array.  Does not handle any overlap in
-   wavelength between sections.
+       respectively, into a contiguous array.  Does not handle any overlap in
+       wavelength between sections.
 
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
 """
@@ -46,29 +45,29 @@ def stitch_components(input_exposure, n_consecutive, flux_scale_factor,
     :type input_exposure: COSSpectrum or STISExposureSpectrum
 
     :param n_consecutive: How many consecutive points must pass the test for the
-    index to count as the valid start/end of the spectrum?
+        index to count as the valid start/end of the spectrum?
 
     :type n_consecutive: int
 
     :param flux_scale_factor: Max. allowed ratio between the flux and a median
-    flux value, used in edge trimming.
+        flux value, used in edge trimming.
 
     :type flux_scale_factor: float
 
     :param fluxerr_scale_factor: Max. allowed ratio between the flux uncertainty
-    and a median flux uncertainty value, used in edge trimming.
+        and a median flux uncertainty value, used in edge trimming.
 
     :type fluxerr_scale_factor: float
 
     :param segment_names: List of segment names if input_exposure is a
-    COSSpectrum object.
+        COSSpectrum object.
 
     :type segment_names: list
 
     :returns: dict{numpy array, numpy array, numpy array, str} -- The stitched
-    wavelengths, fluxes, flux errors, and an informational plot title in the
-    event that all the fluxes had the DQ flag set.  These are packaged in a
-    dict.
+        wavelengths, fluxes, flux errors, and an informational plot title in the
+        event that all the fluxes had the DQ flag set.  These are packaged in a
+        dict.
 
     :raises: ValueError
     """

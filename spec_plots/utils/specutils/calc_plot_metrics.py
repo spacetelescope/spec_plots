@@ -1,8 +1,7 @@
 """
 .. module:: calc_plot_metrics
-
    :synopsis: Calculates metrics related to a plot, including flux statistics,
-   avoid regions, and optimal x- and y-axis ranges for plots.
+       avoid regions, and optimal x- and y-axis ranges for plots.
 
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
 """
@@ -40,22 +39,22 @@ def calc_plot_metrics(instrument, wls, fls, flerrs, dqs, n_consecutive,
     :type flerrs: numpy.ndarray
 
     :param dqs: The DQ flags of the spectrum to be plotted.  For COS, these are
-    the DQ_WGT bits from the header.
+        the DQ_WGT bits from the header.
 
     :type dqs: numpy.ndarray
 
     :param n_consecutive: How many consecutive points must pass the test for
-    the index to count as the valid start/end of the spectrum?
+        the index to count as the valid start/end of the spectrum?
 
     :type n_consecutive: int
 
     :param flux_scale_factor: Max. allowed ratio between the flux and a median
-    flux value, used in edge trimming.
+        flux value, used in edge trimming.
 
     :type flux_scale_factor: float
 
     :param fluxerr_scale_factor: Max. allowed ratio between the flux uncertainty
-    and a median flux uncertainty value, used in edge trimming.
+        and a median flux uncertainty value, used in edge trimming.
 
     :type fluxerr_scale_factor: float
 

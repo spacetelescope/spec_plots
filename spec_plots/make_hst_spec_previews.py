@@ -2,12 +2,11 @@
 
 """
 .. module:: make_hst_spec_previews
-
    :synopsis: Given an HST spectrum file name, this script will read in the
-   data and generate preview plots of the spectra.  The plots are generated in
-   different dimensions (large, thumbnail) and, depending on the instrument /
-   configuration, are plotted in different formats to maximize readability and
-   usability.
+       data and generate preview plots of the spectra.  The plots are generated
+       in different dimensions (large, thumbnail) and, depending on the
+       instrument / configuration, are plotted in different formats to maximize
+       readability and usability.
 
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
 """
@@ -102,7 +101,7 @@ def get_instrument_name(input_file):
     :type input_file: str
 
     :returns: str -- The name of the instrument based on the FITS header
-    keyword, in uppercase with leading/trailing whitespace removed.
+        keyword, in uppercase with leading/trailing whitespace removed.
 
     :raises: KeyError, HSTSpecPrevError
     """
@@ -137,30 +136,30 @@ def make_hst_spec_previews(input_file, flux_scale_factor=
     Main function in the module.
 
     :param input_file: The full path and name of the FITS file to create a
-    preview for.
+        preview for.
 
     :type input_file: str
 
     :param flux_scale_factor: The ratio between the flux and the median flux
-    that defines the pass/fail criterion within the edge trim test.
+        that defines the pass/fail criterion within the edge trim test.
 
     :type flux_scale_factor: float
 
     :param fluxerr_scale_factor: The ratio between the flux uncertainty and the
-    median flux uncertainty that defines the pass/fail criterion within the edge
-    trim test.
+        median flux uncertainty that defines the pass/fail criterion within the
+        edge trim test.
 
     :type fluxerr_scale_factor: float
 
     :param n_consecutive: The number of consecutive data points that must pass
-    the edge trim test to define the start and end of the spectrum for plotting
-    purposes.
+        the edge trim test to define the start and end of the spectrum for
+        plotting purposes.
 
     :type n_consecutive: int
 
     :param output_path: Full path to output plot files.  Do not include the
-    output file name in this path.  If not supplied, plots will be created in
-    the same directory as the input file.
+        output file name in this path.  If not supplied, plots will be created
+        in the same directory as the input file.
 
     :type output_path: str
 
@@ -169,22 +168,22 @@ def make_hst_spec_previews(input_file, flux_scale_factor=
     :type output_type: str
 
     :param dpi_val: The DPI value of your device's monitor, which will affect
-    the size of the output plots.
+        the size of the output plots.
 
     :type dpi_val: float
 
     :param debug: If True, turns on debug mode, which will plot to the screen
-    and color-code fluxes based on different rejection criteria.
+        and color-code fluxes based on different rejection criteria.
 
     :type debug: bool
 
     :param full_ylabels: If True, label the y-axis with full values, including
-    powers of ten in scientific notation.
+        powers of ten in scientific notation.
 
     :type full_ylabels: bool
 
     :param optimize: If set to True, will use a slightly optimized version of
-    determining the plot covering fraction.
+        determining the plot covering fraction.
 
     :type optimize: bool
 

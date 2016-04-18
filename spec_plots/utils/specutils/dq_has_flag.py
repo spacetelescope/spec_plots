@@ -1,8 +1,7 @@
 """
 .. module:: dq_has_flag
-
    :synopsis: Utility function that returns True if a given Data Quality bitmask
-   contains a specific flag.
+       contains a specific flag.
 
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
 """

@@ -1,6 +1,5 @@
 """
 .. module:: make_html
-
    :synopsis: Creates a webpage of thumbnail and full-size previews for review
        purposes.
 

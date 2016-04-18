@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>utils.specutils_cos package &mdash; spec_plots 1.32.0 documentation</title>
+    <title>utils.specutils_cos package &mdash; spec_plots 1.33.2 documentation</title>
     
     <link rel="stylesheet" href="_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1.32.0',
+        VERSION:     '1.33.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="spec_plots 1.32.0 documentation" href="index.html" />
+    <link rel="top" title="spec_plots 1.33.2 documentation" href="index.html" />
     <link rel="up" title="Utility Modules, Including Instrument-Specific READ and PLOT Modules" href="modules.html" />
     <link rel="next" title="utils.specutils_stis package" href="utils.specutils_stis.html" />
     <link rel="prev" title="utils.specutils package" href="utils.specutils.html" /> 
@@ -44,7 +44,7 @@
         <li class="right" >
           <a href="utils.specutils.html" title="utils.specutils package"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">spec_plots 1.32.0 documentation</a> &raquo;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">spec_plots 1.33.2 documentation</a> &raquo;</li>
           <li class="nav-item nav-item-1"><a href="modules.html" accesskey="U">Utility Modules, Including Instrument-Specific READ and PLOT Modules</a> &raquo;</li> 
       </ul>
     </div>  
@@ -58,12 +58,12 @@
 <h1>utils.specutils_cos package<a class="headerlink" href="#utils-specutils-cos-package" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="module-utils.specutils_cos.check_segments">
 <span id="check-segments"></span><h2>check_segments<a class="headerlink" href="#module-utils.specutils_cos.check_segments" title="Permalink to this headline">¶</a></h2>
-<dl class="function">
+<span class="target" id="module-check_segments"></span><dl class="function">
 <dt id="utils.specutils_cos.check_segments.check_segments">
 <code class="descclassname">utils.specutils_cos.check_segments.</code><code class="descname">check_segments</code><span class="sig-paren">(</span><em>segments_list</em>, <em>input_file</em><span class="sig-paren">)</span><a class="headerlink" href="#utils.specutils_cos.check_segments.check_segments" title="Permalink to this definition">¶</a></dt>
 <dd><p>Checks that the array of &#8220;segments&#8221; in the COS spectrum header are expected
-values.  It returns a scalar string representing the band (either &#8220;FUV&#8221; or
-&#8220;NUV&#8221;).  If the array is not what&#8217;s expected, an Exception is raised.</p>
+values.  It returns a scalar string representing the band (either &#8220;FUV&#8221;
+or &#8220;NUV&#8221;).  If the array is not what&#8217;s expected, an Exception is raised.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -92,7 +92,7 @@ requires the name of the file for error reporting purposes.</p>
 </div>
 <div class="section" id="module-utils.specutils_cos.cosspectrum">
 <span id="cosspectrum"></span><h2>cosspectrum<a class="headerlink" href="#module-utils.specutils_cos.cosspectrum" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
+<span class="target" id="module-cosspectrum"></span><dl class="class">
 <dt id="utils.specutils_cos.cosspectrum.COSSegment">
 <em class="property">class </em><code class="descclassname">utils.specutils_cos.cosspectrum.</code><code class="descname">COSSegment</code><span class="sig-paren">(</span><em>nelem=None</em>, <em>wavelengths=None</em>, <em>fluxes=None</em>, <em>fluxerrs=None</em>, <em>dqs=None</em><span class="sig-paren">)</span><a class="headerlink" href="#utils.specutils_cos.cosspectrum.COSSegment" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
@@ -122,7 +122,7 @@ wavelengths, fluxes, flux errors, etc.</p>
 </div>
 <div class="section" id="module-utils.specutils_cos.extract_subspec">
 <span id="extract-subspec"></span><h2>extract_subspec<a class="headerlink" href="#module-utils.specutils_cos.extract_subspec" title="Permalink to this headline">¶</a></h2>
-<dl class="function">
+<span class="target" id="module-extract_subspec"></span><dl class="function">
 <dt id="utils.specutils_cos.extract_subspec.extract_subspec">
 <code class="descclassname">utils.specutils_cos.extract_subspec.</code><code class="descname">extract_subspec</code><span class="sig-paren">(</span><em>cos_spectrum</em>, <em>segment</em>, <em>min_wl=None</em>, <em>max_wl=None</em><span class="sig-paren">)</span><a class="headerlink" href="#utils.specutils_cos.extract_subspec.extract_subspec" title="Permalink to this definition">¶</a></dt>
 <dd><p>Extracts a sub-spectrum of a COS segment&#8217;s spectrum.  If both min. and max.
@@ -137,26 +137,13 @@ bound is retained.</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>cos_spectrum</strong> (<a class="reference internal" href="#utils.specutils_cos.cosspectrum.COSSpectrum" title="utils.specutils_cos.cosspectrum.COSSpectrum"><em>COSSpectrum</em></a>) &#8211; COS spectrum as returned by READSPEC.</li>
 <li><strong>segment</strong> (<em>str</em>) &#8211; The segment to do the extraction on.</li>
-<li><strong>min_wl</strong> &#8211; The minimum wavlength value to keep.  If None, then there</li>
+<li><strong>min_wl</strong> (<em>float</em>) &#8211; The minimum wavlength value to keep.  If None, then there
+will be no lower bound.</li>
+<li><strong>max_wl</strong> (<em>float</em>) &#8211; The maximum wavelength value to keep.  If None, then there
+will be no upper bound.</li>
 </ul>
 </td>
 </tr>
-</tbody>
-</table>
-<p>will be no lower bound.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>max_wl</strong> &#8211; The maximum wavelength value to keep.  If None, then there</td>
-</tr>
-</tbody>
-</table>
-<p>will be no upper bound.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
 </tbody>
 </table>
 </dd></dl>
@@ -164,7 +151,7 @@ bound is retained.</p>
 </div>
 <div class="section" id="module-utils.specutils_cos.get_segment_names">
 <span id="get-segment-names"></span><h2>get_segment_names<a class="headerlink" href="#module-utils.specutils_cos.get_segment_names" title="Permalink to this headline">¶</a></h2>
-<dl class="function">
+<span class="target" id="module-get_segment_names"></span><dl class="function">
 <dt id="utils.specutils_cos.get_segment_names.get_segment_names">
 <code class="descclassname">utils.specutils_cos.get_segment_names.</code><code class="descname">get_segment_names</code><span class="sig-paren">(</span><em>cos_spectrum</em><span class="sig-paren">)</span><a class="headerlink" href="#utils.specutils_cos.get_segment_names.get_segment_names" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a list of segment names sorted such that the bluest segment come
@@ -182,7 +169,7 @@ first.</p>
 </div>
 <div class="section" id="module-utils.specutils_cos.plotspec">
 <span id="plotspec"></span><h2>plotspec<a class="headerlink" href="#module-utils.specutils_cos.plotspec" title="Permalink to this headline">¶</a></h2>
-<dl class="function">
+<span class="target" id="module-plotspec"></span><dl class="function">
 <dt id="utils.specutils_cos.plotspec.plotspec">
 <code class="descclassname">utils.specutils_cos.plotspec.</code><code class="descname">plotspec</code><span class="sig-paren">(</span><em>cos_spectrum</em>, <em>output_type</em>, <em>output_file</em>, <em>flux_scale_factor</em>, <em>fluxerr_scale_factor</em>, <em>plot_metrics</em>, <em>dpi_val=96.0</em>, <em>output_size=1024</em>, <em>debug=False</em>, <em>full_ylabels=False</em>, <em>stitched_spectrum=None</em>, <em>title_addendum=''</em>, <em>optimize=True</em><span class="sig-paren">)</span><a class="headerlink" href="#utils.specutils_cos.plotspec.plotspec" title="Permalink to this definition">¶</a></dt>
 <dd><p>Accepts a COSSpectrum object from the READSPEC function and produces preview
@@ -191,114 +178,45 @@ plots.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>cos_spectrum</strong> &#8211; COS spectrum as returned by READSPEC.</li>
 <li><strong>output_type</strong> (<em>str</em>) &#8211; What kind of output to make?</li>
 <li><strong>output_file</strong> (<em>str</em>) &#8211; Name of output file (including full path).</li>
-<li><strong>flux_scale_factor</strong> &#8211; Max. allowed ratio between the flux and a median</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-<p>flux value, used in edge trimming.  Default = 10.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>fluxerr_scale_factor</strong> &#8211; Max. allowed ratio between the flux uncertainty</td>
-</tr>
-</tbody>
-</table>
-<p>and a median flux uncertainty value, used in edge trimming.  Default = 5.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>plot_metrics</strong> &#8211; Collection of plot metrics (flux statistics, axis</td>
-</tr>
-</tbody>
-</table>
-<p>ranges, etc.) to use when making the plots.  These are computed using
-<cite>utils.specutils.calc_plot_metrics()</cite>.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>dpi_val</strong> &#8211; The DPI value of your device&#8217;s monitor.  Affects the size of</td>
-</tr>
-</tbody>
-</table>
-<p>the output plots.  Default = 96. (applicable to most modern monitors).</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>output_size</strong> &#8211; Size of plot in pixels (plots are square in dimensions).</td>
-</tr>
-</tbody>
-</table>
-<p>Defaults to 1024.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>flux_scale_factor</strong> (<em>float</em>) &#8211; Max. allowed ratio between the flux and a median
+flux value, used in edge trimming.  Default = 10.</li>
+<li><strong>fluxerr_scale_factor</strong> (<em>float</em>) &#8211; Max. allowed ratio between the flux uncertainty
+and a median flux uncertainty value, used in edge trimming.  Default =
+5.</li>
+<li><strong>plot_metrics</strong> (<em>list</em>) &#8211; Collection of plot metrics (flux statistics, axis
+ranges, etc.) to use when making the plots.  These are computed using
+<cite>utils.specutils.calc_plot_metrics()</cite>.</li>
+<li><strong>dpi_val</strong> (<em>float</em>) &#8211; The DPI value of your device&#8217;s monitor.  Affects the size of
+the output plots.  Default = 96. (applicable to most modern monitors).</li>
+<li><strong>output_size</strong> &#8211; Size of plot in pixels (plots are square in dimensions).
+Defaults to 1024.</li>
 <li><strong>output_size</strong> &#8211; int</li>
-<li><strong>debug</strong> &#8211; Should the output plots include debugging information</li>
+<li><strong>debug</strong> (<em>bool</em>) &#8211; Should the output plots include debugging information
+(color-coded data points based on rejection criteria, shaded exclude
+regions)?  Default = False.</li>
+<li><strong>full_ylabels</strong> (<em>bool</em>) &#8211; Should the y-labels contain the full values (including
+the power of 10 in scientific notation)?  Default = False.</li>
+<li><strong>stitched_spectrum</strong> (<em>dict</em>) &#8211; The stitched version of the COS spectrum, where
+each segment has been stitched using
+<cite>utils.specutils.stitch_components()</cite>.
+This is required is making a small (thumb-sized) plot, but not used if
+making a large-sized plot.</li>
+<li><strong>title_addendum</strong> (<em>str</em>) &#8211; A plot title addendum that contains possible warnings
+(e.g., if all DQ or DQ_WGT flags are defined as bad).  This is only used
+in the case of large-sized COS plots, otherwise this information is
+included in the stitched spectrum (COS large-sized plots do not use a
+stitched version of the spectrum).</li>
+<li><strong>optimize</strong> (<em>bool</em>) &#8211; If set to True, will use a slightly optimized version of
+determining the plot covering fraction.</li>
 </ul>
 </td>
 </tr>
-</tbody>
-</table>
-<p>(color-coded data points based on rejection criteria, shaded exclude
-regions)?  Default = False.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>full_ylabels</strong> &#8211; Should the y-labels contain the full values (including</td>
-</tr>
-</tbody>
-</table>
-<p>the power of 10 in scientific notation)?  Default = False.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>stitched_spectrum</strong> &#8211; The stitched version of the COS spectrum, where</td>
-</tr>
-</tbody>
-</table>
-<p>each segment has been stitched using <cite>utils.specutils.stitch_components()</cite>.
-This is required is making a small (thumb-sized) plot, but not used if
-making a large-sized plot.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>title_addendum</strong> &#8211; A plot title addendum that contains possible warnings</td>
-</tr>
-</tbody>
-</table>
-<p>(e.g., if all DQ or DQ_WGT flags are defined as bad).  This is only used in
-the case of large-sized COS plots, otherwise this information is included
-in the stitched spectrum (COS large-sized plots do not use a stitched
-version of the spectrum).</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>optimize</strong> &#8211; If set to True, will use a slightly optimized version of</td>
-</tr>
-</tbody>
-</table>
-<p>determining the plot covering fraction.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body">OSError</td>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last">OSError</p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -307,7 +225,7 @@ version of the spectrum).</p>
 </div>
 <div class="section" id="module-utils.specutils_cos.readspec">
 <span id="readspec"></span><h2>readspec<a class="headerlink" href="#module-utils.specutils_cos.readspec" title="Permalink to this headline">¶</a></h2>
-<dl class="function">
+<span class="target" id="module-readspec"></span><dl class="function">
 <dt id="utils.specutils_cos.readspec.readspec">
 <code class="descclassname">utils.specutils_cos.readspec.</code><code class="descname">readspec</code><span class="sig-paren">(</span><em>input_file</em><span class="sig-paren">)</span><a class="headerlink" href="#utils.specutils_cos.readspec.readspec" title="Permalink to this definition">¶</a></dt>
 <dd><p>Reads in a COS spectrum FITS file (x1d, x1dsum, or x1dsum{1,2,3,4}) and
@@ -319,15 +237,9 @@ the two (FUV segments) or three (NUV stripes).</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>input_file</strong> (<em>str</em>) &#8211; Name of input FITS file.</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">COSSpectrum &#8211; The spectroscopic data (wavelength, flux,</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">COSSpectrum &#8211; The spectroscopic data (wavelength, flux,
+flux error, etc):</td>
 </tr>
-</tbody>
-</table>
-<p>flux error, etc):</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body">KeyError</td>
 </tr>
 </tbody>
@@ -398,7 +310,7 @@ the two (FUV segments) or three (NUV stripes).</p>
         <li class="right" >
           <a href="utils.specutils.html" title="utils.specutils package"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">spec_plots 1.32.0 documentation</a> &raquo;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">spec_plots 1.33.2 documentation</a> &raquo;</li>
           <li class="nav-item nav-item-1"><a href="modules.html" >Utility Modules, Including Instrument-Specific READ and PLOT Modules</a> &raquo;</li> 
       </ul>
     </div>

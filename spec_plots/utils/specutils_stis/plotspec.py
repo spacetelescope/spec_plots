@@ -1,6 +1,5 @@
 """
 .. module:: plotspec
-
    :synopsis: Creates preview plots for the provided STIS spectrum.
 
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
@@ -51,14 +50,14 @@ def plotspec(stis_spectrum, association_indices, stitched_spectra, output_type,
     :type stis_spectrum: STIS1DSpectrum
 
     :param association_indices: The indices of the original list of associations
-    for this spectrum that will be plotted.  Used in the informational plot
-    title, e.g., `Association <x> of <y>.`, where <x> is the association index
-    and <y> is the total number of associations in this spectrum.
+        for this spectrum that will be plotted.  Used in the informational plot
+        title, e.g., `Association <x> of <y>.`, where <x> is the association
+        index and <y> is the total number of associations in this spectrum.
 
     :type association_indices: list
 
     :param stitched_spectra: List of order-stitched spectra for each
-    association, as created in `utils.specutils.stitch_components()`.
+        association, as created in `utils.specutils.stitch_components()`.
 
     :type stitched_spectra: list
 
@@ -71,44 +70,45 @@ def plotspec(stis_spectrum, association_indices, stitched_spectra, output_type,
     :type output_file: str
 
     :param flux_scale_factor: Max. allowed ratio between the flux and a median
-    flux value, used in edge trimming.  Default = 10.
+        flux value, used in edge trimming.  Default = 10.
 
     :type flux_scale_factor: float
 
     :param fluxerr_scale_factor: Max. allowed ratio between the flux uncertainty
-    and a median flux uncertainty value, used in edge trimming.  Default = 5.
+        and a median flux uncertainty value, used in edge trimming.
+        Default = 5.
 
     :type fluxerr_scale_factor: float
 
     :param plot_metrics: Collection of plot metrics (flux statistics, axis
-    ranges, etc.) to use when making the plots.  These are computed using
-    `utils.specutils.calc_plot_metrics()`.
+        ranges, etc.) to use when making the plots.  These are computed using
+        `utils.specutils.calc_plot_metrics()`.
 
     :type plot_metrics: list
 
     :param dpi_val: The DPI value of your device's monitor.  Affects the size of
-    the output plots.  Default = 96. (applicable to most modern monitors).
+        the output plots.  Default = 96. (applicable to most modern monitors).
 
     :type dpi_val: float
 
     :param output_size: Size of plot in pixels (plots are square in dimensions).
-    Defaults to 1024.
+        Defaults to 1024.
 
     :param output_size: int
 
     :param debug: Should the output plots include debugging information
-    (color-coded data points based on rejection criteria, shaded exclude
-    regions)?  Default = False.
+        (color-coded data points based on rejection criteria, shaded exclude
+        regions)?  Default = False.
 
     :type debug: bool
 
     :param full_ylabels: Should the y-labels contain the full values (including
-    the power of 10 in scientific notation)?  Default = False.
+        the power of 10 in scientific notation)?  Default = False.
 
     :type full_ylabels: bool
 
     :param optimize: If set to True, will use a slightly optimized version of
-    determining the plot covering fraction.
+        determining the plot covering fraction.
 
     :type optimize: bool
 

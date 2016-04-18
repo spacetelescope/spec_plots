@@ -1,6 +1,5 @@
 """
 .. module:: stis1dspectrum
-
    :synopsis: Defines the class for STIS 1D spectra.
 
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>

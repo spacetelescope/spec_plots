@@ -1,8 +1,7 @@
 """
 .. module:: calc_covering_fraction
-
    :synopsis: Calculates the ratio of the number of pixels containing plot data
-   vs. empty (background) plot pixels.
+       vs. empty (background) plot pixels.
 
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
 """
@@ -17,13 +16,13 @@ def count_blue_red(buf):
     Counts the number of "blue" vs. "red" pixels in the plot area.
 
     :param buf: The plot pixels read into a buffer of RGB values (
-    one-dimensional, [r,g,b,r,g,b,...]).
+        one-dimensional, [r,g,b,r,g,b,...]).
 
     :type buf: numpy.ndarray
 
     :returns: tuple -- The number of blue and red pixels, respectively.  Blue
-    represent pixels that have plot data in them, red represent background
-    pixels that do not have any plot lines going through them.
+        represent pixels that have plot data in them, red represent background
+        pixels that do not have any plot lines going through them.
     """
 
     blue_count = 0
@@ -43,9 +42,9 @@ def count_blue_red(buf):
 def calc_covering_fraction(fig, subplots, subplot_num, optimize=True):
     """
     Calculates the ratio of pixels that contain plot data vs. background (empty)
-    pixels by temporarily filling the background with RGB value = red and then
-    identifying blue (plot data) pixels.  This ratio is used to determine
-    whether to make the plot lines transparent or not for readability.
+    pixels by temporarily filling the background with RGB value = red and
+    then identifying blue (plot data) pixels.  This ratio is used to
+    determine whether to make the plot lines transparent or not for readability.
 
     :param fig: The plot figure.
 
@@ -56,22 +55,22 @@ def calc_covering_fraction(fig, subplots, subplot_num, optimize=True):
     :type subplots: list
 
     :param subplot_num: The index indicating which subplot is currently being
-    examined.
+        examined.
 
     :type subplot_num: int
 
     :param optimize: If set to True, will use a slightly optimized version of
-    determining the plot covering fraction.  This has been tested to *almost*
-    always give the same result as the non-optimized version.  There has been
-    (rare) instances where the covering fractions differed slightly, so if the
-    preference is to have more accurate/robust covering fractions, set
-    optimize=False!  The speed benefit is on the order of 10-20%, but is largest
-    for plots with multiple subplots.
+        determining the plot covering fraction.  This has been tested to
+        *almost* always give the same result as the non-optimized version.
+        There has been (rare) instances where the covering fractions differed
+        slightly, so if the preference is to have more accurate/robust covering
+        fractions, set optimize=False!  The speed benefit is on the order of
+        10-20%, but is largest for plots with multiple subplots.
 
     :type optimize: bool
 
     :returns: float -- The ratio of pixels containing plot data ("blue") vs.
-    empty ("red") pixels, as a percentage (0. <= p <= 100.).
+        empty ("red") pixels, as a percentage (0. <= p <= 100.).
     """
     # Turn off all other subplots since the RGB array is for the entire
     # figure, not just this subplot part of it.

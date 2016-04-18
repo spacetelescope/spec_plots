@@ -1,8 +1,7 @@
 """
 .. module:: debug_oplot
-
    :synopsis: Plots spectral data points color-coded based on a suite of
-   rejection criteria, primarily for debugging purposes.
+       rejection criteria, primarily for debugging purposes.
 
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
 """
@@ -18,8 +17,9 @@ def debug_oplot(this_plotarea, instrument, all_wls, all_fls, all_flerrs,
                 fluxerr_scale_factor, fluxerr_95th, oplot_percentiles=False):
     """
     Creates plots of the spectra with color-coding and special annotation to
-    identify which points were rejected by which tests.  Useful for debugging
-    and understanding why a given plot had its plot axes defined the way it did.
+    identify which points were rejected by which tests.  Useful for
+    debugging and understanding why a given plot had its plot axes defined
+    the way it did.
 
     :param this_plotarea: The AxesSubplot object to plot on.
 
@@ -42,37 +42,37 @@ def debug_oplot(this_plotarea, instrument, all_wls, all_fls, all_flerrs,
     :type all_flerrs: numpy.ndarray
 
     :param all_dqs: Array of data quality flags.  For COS, these are the DQ_WGT
-    bits from the header.
+        bits from the header.
 
     :type all_dqs: numpy.ndarray
 
     :param median_flux: The median flux used in determining where the best part
-    of the spectrum is.
+        of the spectrum is.
 
     :type median_flux: float
 
     :param median_fluxerr: The median flux uncertainty used in determining where
-    the best part of the spectrum is.
+        the best part of the spectrum is.
 
     :type median_fluxerr: float
 
     :param flux_scale_factor: Max. allowed ratio between the flux and a median
-    flux value used in edge trimming.
+        flux value used in edge trimming.
 
     :type flux_scale_factor: float
 
     :param fluxerr_scale_factor: Max. allowed ratio between the flux uncertainty
-    and a median flux uncertainty value used in edge trimming.
+        and a median flux uncertainty value used in edge trimming.
 
     :type fluxerr_scale_factor: float
 
     :param fluxerr_95th: The flux uncertainty corresponding to the 95th
-    percentile.
+        percentile.
 
     :type fluxerr_95th: float
 
     :param oplot_percentiles: Set this to True to overplot points where the flux
-    uncertainties are greater than the 95th percentile.  Default = False.
+        uncertainties are greater than the 95th percentile.  Default = False.
 
     :type oplot_percentiles: bool
     """

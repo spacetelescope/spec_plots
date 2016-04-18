@@ -1,6 +1,5 @@
 """
 .. module:: plotspec
-
    :synopsis: Makes preview plots of the provided COS spectrum.
 
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
@@ -57,59 +56,61 @@ def plotspec(cos_spectrum, output_type, output_file,
     :type output_file: str
 
     :param flux_scale_factor: Max. allowed ratio between the flux and a median
-    flux value, used in edge trimming.  Default = 10.
+        flux value, used in edge trimming.  Default = 10.
 
     :type flux_scale_factor: float
 
     :param fluxerr_scale_factor: Max. allowed ratio between the flux uncertainty
-    and a median flux uncertainty value, used in edge trimming.  Default = 5.
+        and a median flux uncertainty value, used in edge trimming.  Default =
+        5.
 
     :type fluxerr_scale_factor: float
 
     :param plot_metrics: Collection of plot metrics (flux statistics, axis
-    ranges, etc.) to use when making the plots.  These are computed using
-    `utils.specutils.calc_plot_metrics()`.
+        ranges, etc.) to use when making the plots.  These are computed using
+        `utils.specutils.calc_plot_metrics()`.
 
     :type plot_metrics: list
 
     :param dpi_val: The DPI value of your device's monitor.  Affects the size of
-    the output plots.  Default = 96. (applicable to most modern monitors).
+        the output plots.  Default = 96. (applicable to most modern monitors).
 
     :type dpi_val: float
 
     :param output_size: Size of plot in pixels (plots are square in dimensions).
-    Defaults to 1024.
+        Defaults to 1024.
 
     :param output_size: int
 
     :param debug: Should the output plots include debugging information
-    (color-coded data points based on rejection criteria, shaded exclude
-    regions)?  Default = False.
+        (color-coded data points based on rejection criteria, shaded exclude
+        regions)?  Default = False.
 
     :type debug: bool
 
     :param full_ylabels: Should the y-labels contain the full values (including
-    the power of 10 in scientific notation)?  Default = False.
+        the power of 10 in scientific notation)?  Default = False.
 
     :type full_ylabels: bool
 
     :param stitched_spectrum: The stitched version of the COS spectrum, where
-    each segment has been stitched using `utils.specutils.stitch_components()`.
-    This is required is making a small (thumb-sized) plot, but not used if
-    making a large-sized plot.
+        each segment has been stitched using
+        `utils.specutils.stitch_components()`.
+        This is required is making a small (thumb-sized) plot, but not used if
+        making a large-sized plot.
 
     :type stitched_spectrum: dict
 
     :param title_addendum: A plot title addendum that contains possible warnings
-    (e.g., if all DQ or DQ_WGT flags are defined as bad).  This is only used in
-    the case of large-sized COS plots, otherwise this information is included
-    in the stitched spectrum (COS large-sized plots do not use a stitched
-    version of the spectrum).
+        (e.g., if all DQ or DQ_WGT flags are defined as bad).  This is only used
+        in the case of large-sized COS plots, otherwise this information is
+        included in the stitched spectrum (COS large-sized plots do not use a
+        stitched version of the spectrum).
 
     :type title_addendum: str
 
     :param optimize: If set to True, will use a slightly optimized version of
-    determining the plot covering fraction.
+        determining the plot covering fraction.
 
     :type optimize: bool
 

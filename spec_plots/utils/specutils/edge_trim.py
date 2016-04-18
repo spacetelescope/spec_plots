@@ -1,8 +1,7 @@
 """
 .. module:: edge_trim
-
    :synopsis: Returns the start and end indices of a spectrum that represent the
-   `best` wavelengths to use when defining the optimal plot axis ranges.
+       `best` wavelengths to use when defining the optimal plot axis ranges.
 
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
 """
@@ -40,7 +39,7 @@ def _set_plot_xrange_test(instrument, flux_values, flux_err_values, median_flux,
     :type median_flux: float
 
     :param flux_scale_factor: Max. allowed ratio between the flux and a median
-    flux value, used in edge trimming.
+        flux value, used in edge trimming.
 
     :type flux_scale_factor: float
 
@@ -49,42 +48,42 @@ def _set_plot_xrange_test(instrument, flux_values, flux_err_values, median_flux,
     :type median_fluxerr: float
 
     :param fluxerr_scale_factor: Max. allowed ratio between the flux uncertainty
-    and a median flux uncertainty value, used in edge trimming.
+        and a median flux uncertainty value, used in edge trimming.
 
     :type fluxerr_scale_factor: float
 
     :param fluxerr_95th: The flux uncertainty corresponding to the 95th
-    percentile.
+        percentile.
 
     :type fluxerr_95th: float
 
     :param dqs: The array of DQ flags to use in the test.  For COS, these are
-    the DQ_WGT bits from the header.
+        the DQ_WGT bits from the header.
 
     :type dqs: numpy.ndarray
 
     :param check_fluxes: Should the value of the fluxes be used to test edge
-    trimming?
+        trimming?
 
     :type check_fluxes: bool
 
     :param check_flux_ratios: Should the ratio of the fluxes to the median flux
-    value be used to test edge trimming?
+        value be used to test edge trimming?
 
     :type check_flux_ratios: bool
 
     :param check_flux_err_ratios: Should the ratio of the flux uncertainties to
-    the median flux uncertainty be used to test edge trimming?
+        the median flux uncertainty be used to test edge trimming?
 
     :type check_flux_err_ratios: bool
 
     :param check_flux_err_percentile: Should the highest percentile flux
-    uncertainties be used to test edge trimming?
+        uncertainties be used to test edge trimming?
 
     :type check_flux_err_percentile: bool
 
     :param check_dqs: Should the highest percentile flux uncertainties be used
-    to test edge trimming?
+        to test edge trimming?
 
     :type check_dqs: bool
 
@@ -134,10 +133,10 @@ def edge_trim(instrument, fluxes, fluxerrs, dqs, n_consecutive, median_flux,
               fluxerr_95th):
     """
     Returns start and end indexes (end indexes are negatively indexed) of the
-    best part of the spectrum to use when defining the plot's wavelength ranges.
-    Returns two sets of start and end indexes: one set without taking into
-    account DQ flags, and one set that does take into account DQ flags (since
-    some spectra have all DQ flags set > 0).
+    best part of the spectrum to use when defining the plot's wavelength
+    ranges.  Returns two sets of start and end indexes: one set without
+    taking into account DQ flags, and one set that does take into account DQ
+    flags (since some spectra have all DQ flags set > 0).
 
     :param instrument: The instrument that is being tested.
 
@@ -152,43 +151,43 @@ def edge_trim(instrument, fluxes, fluxerrs, dqs, n_consecutive, median_flux,
     :type fluxerrs: numpy.ndarray
 
     :param dqs: The DQ flags of the spectrum.  For COS, these are the DQ_WGT
-    bits from the header.
+        bits from the header.
 
     :type dqs: numpy.ndarray
 
     :param n_consecutive: The consecutive number of fluxes that must belong to
-    the "best" part of the spectrum for the start/end index to count.
+        the "best" part of the spectrum for the start/end index to count.
 
     :type n_consecutive: int
 
     :param median_flux: The median flux, used in determining where the best part
-    of the spectrum is.
+        of the spectrum is.
 
     :type median_flux: float
 
     :param flux_scale_factor: Max. allowed ratio between the flux and a median
-    flux value, used in edge trimming.
+        flux value, used in edge trimming.
 
     :type flux_scale_factor: float
 
     :param median_fluxerr: The median flux uncertainty, used in determining
-    where the best part of the spectrum is.
+        where the best part of the spectrum is.
 
     :type median_fluxerr: float
 
     :param fluxerr_scale_factor: Max. allowed ratio between the flux uncertainty
-    and a median flux uncertainty value, used in edge trimming.
+        and a median flux uncertainty value, used in edge trimming.
 
     :type fluxerr_scale_factor: float
 
     :param fluxerr_95th: The flux uncertainty corresponding to the 95th
-    percentile.
+        percentile.
 
     :type fluxerr_95th: float
 
     :returns: int tuple -- Indexes that define the best part of the spectrum,
-    in the order of (start_index_nodq, end_index_nodq, start_index_withdq,
-    end_index_withdq).
+        in the order of (start_index_nodq, end_index_nodq, start_index_withdq,
+        end_index_withdq).
     """
 
     # How many fluxes are there in total?
@@ -295,14 +294,14 @@ def find_good_indices(indices_arr, n_consecutive, n_fluxes, first_pass=False):
     """
     Given an array of indices, determines the start and stop indices of the
     `best` part of the spectrum based on the required number of consecutive
-    `good fluxes.
+    `good` fluxes.
 
     :param indices_arr: Something
 
     :type indices_arr: list
 
     :param n_consecutive: The consecutive number of fluxes that must belong to
-    the "best" part of the spectrum for the start/end index to count.
+        the "best" part of the spectrum for the start/end index to count.
 
     :type n_consecutive: int
 
@@ -311,15 +310,16 @@ def find_good_indices(indices_arr, n_consecutive, n_fluxes, first_pass=False):
     :type n_fluxes: int
 
     :param first_pass: Used to determine if this is the first attempt to find
-    good start and stop indices or not.  The first pass normally uses only a
-    part of the spectrum (pieces at the beginning and end), while the next pass
-    uses the entire spectrum.  If it's not the first pass and no good start and
-    stop indices are found, then it must return the last and first index.
+        good start and stop indices or not.  The first pass normally uses only a
+        part of the spectrum (pieces at the beginning and end), while the next
+        pass uses the entire spectrum.  If it's not the first pass and no good
+        start and stop indices are found, then it must return the last and first
+        index.
 
     :type first_pass: bool
 
     :returns: int tuple -- Indices that define the best part of the spectrum
-    (start and stop).
+        (start and stop).
     """
 
     # How many total good indices are there to work with?

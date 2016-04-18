@@ -1,6 +1,5 @@
 """
 .. module:: readspec
-
    :synopsis: Reads in a STIS spectrum from a FITS file.
 
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
@@ -26,7 +25,7 @@ def readspec(input_file):
     :type input_file: str
 
     :returns: STIS1DSpectrum -- The spectroscopic data (wavelength, flux, flux
-    error, etc):
+        error, etc):
     """
 
     with fits.open(input_file) as hdulist:

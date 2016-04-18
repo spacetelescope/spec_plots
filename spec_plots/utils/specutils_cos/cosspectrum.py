@@ -1,6 +1,5 @@
 """
 .. module:: cosspectrum
-
    :synopsis: Class definitions for a COS Spectrum object.
 
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>

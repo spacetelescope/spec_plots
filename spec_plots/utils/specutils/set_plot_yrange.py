@@ -1,6 +1,5 @@
 """
 .. module:: set_plot_yrange
-
    :synopsis: Determines the optimal y-axis plot range.
 
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
@@ -25,18 +24,18 @@ def set_plot_yrange(wavelengths, fluxes, avoid_regions=None, wl_range=None):
     :type fluxes: numpy.ndarray
 
     :param avoid_regions: A list of wavelength ranges to avoid when calculating
-    optimal y-axis plot range.
+        optimal y-axis plot range.
 
     :type avoid_regions: list of STISAvoidRegion objects.
 
     :param wl_range: The min. and max. wavelength that defines the x-axis plot
-    range.  The default is None, in which case the min. and max. if the input
-    wavelength array will be used.
+        range.  The default is None, in which case the min. and max. if the
+        input wavelength array will be used.
 
     :type wl_range: list
 
     :returns: list -- Two-element list containing the optimal [ymin,ymax] values
-    to define the y-axis plot range.
+        to define the y-axis plot range.
 
     .. note::
 

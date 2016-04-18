@@ -1,9 +1,8 @@
 """
 .. module:: rms
-
    :synopsis: Calculates the root-mean-square of an array of input values.
-   Optionally, a constant offset value can be subtracted before calculating the
-   rms.
+       Optionally, a constant offset value can be subtracted before calculating
+       the rms.
 
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
 """

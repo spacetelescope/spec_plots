@@ -1,6 +1,5 @@
 """
 .. module:: readspec
-
    :synopsis: Reads in a COS spectrum from a FITS file.
 
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
@@ -26,7 +25,7 @@ def readspec(input_file):
     :type input_file: str
 
     :returns: COSSpectrum -- The spectroscopic data (wavelength, flux,
-    flux error, etc):
+        flux error, etc):
 
     :raises: KeyError
     """

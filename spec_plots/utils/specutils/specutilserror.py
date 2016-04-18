@@ -1,8 +1,7 @@
 """
 .. module:: specutilserror
-
    :synopsis: Defines a custom Error class for use with spec_plots utility
-   functions.
+       functions.
 
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
 """
