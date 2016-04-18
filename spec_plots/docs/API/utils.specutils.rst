@@ -3,7 +3,6 @@ utils.specutils package
 
 ``avoidregion``
 ----------------------------------
-
 .. automodule:: utils.specutils.avoidregion
     :members:
     :undoc-members:
