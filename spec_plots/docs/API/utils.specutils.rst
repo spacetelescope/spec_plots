@@ -8,6 +8,7 @@ avoidregion
     :members:
     :undoc-members:
     :show-inheritance:
+    :noindex:
 
 calc_plot_metrics
 ----------------------------------------
@@ -16,6 +17,7 @@ calc_plot_metrics
     :members:
     :undoc-members:
     :show-inheritance:
+    :noindex:
 
 calc_covering_fraction
 ---------------------------------------------
@@ -24,6 +26,7 @@ calc_covering_fraction
     :members:
     :undoc-members:
     :show-inheritance:
+    :noindex:
 
 debug_oplot
 ----------------------------------
@@ -32,6 +35,7 @@ debug_oplot
     :members:
     :undoc-members:
     :show-inheritance:
+    :noindex:
 
 dq_has_flag
 ----------------------------------
@@ -40,6 +44,7 @@ dq_has_flag
     :members:
     :undoc-members:
     :show-inheritance:
+    :noindex:
 
 edge_trim
 --------------------------------
@@ -48,6 +53,7 @@ edge_trim
     :members:
     :undoc-members:
     :show-inheritance:
+    :noindex:
 
 get_flux_stats
 -------------------------------------
@@ -56,6 +62,7 @@ get_flux_stats
     :members:
     :undoc-members:
     :show-inheritance:
+    :noindex:
 
 is_bad_dq
 --------------------------------
@@ -64,6 +71,7 @@ is_bad_dq
     :members:
     :undoc-members:
     :show-inheritance:
+    :noindex:
 
 rms
 --------------------------
@@ -72,6 +80,7 @@ rms
     :members:
     :undoc-members:
     :show-inheritance:
+    :noindex:
 
 set_plot_xrange
 --------------------------------------
@@ -80,6 +89,7 @@ set_plot_xrange
     :members:
     :undoc-members:
     :show-inheritance:
+    :noindex:
 
 set_plot_yrange
 --------------------------------------
@@ -88,6 +98,7 @@ set_plot_yrange
     :members:
     :undoc-members:
     :show-inheritance:
+    :noindex:
 
 specutilserror
 -------------------------------------
@@ -96,6 +107,7 @@ specutilserror
     :members:
     :undoc-members:
     :show-inheritance:
+    :noindex:
 
 stitch_components
 ----------------------------------------
@@ -104,3 +116,4 @@ stitch_components
     :members:
     :undoc-members:
     :show-inheritance:
+    :noindex:
