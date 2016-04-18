@@ -10,7 +10,7 @@ Contents:
 
 .. toctree::
    :numbered:
-   :maxdepth: 3
+   :maxdepth: 4
 
    make_hst_spec_previews
    modules
