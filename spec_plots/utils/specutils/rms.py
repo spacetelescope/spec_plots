@@ -1,14 +1,16 @@
-__version__ = '1.32.0'
-
 """
 .. module:: rms
-
-   :synopsis: Calculates the root-mean-square of an array of input values.  Optionally, a constant offset value can be subtracted before calculating the rms.
+   :synopsis: Calculates the root-mean-square of an array of input values.
+       Optionally, a constant offset value can be subtracted before calculating
+       the rms.
 
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
 """
 
 import math
+import numpy
+
+__version__ = '1.33.2'
 
 #--------------------
 def rms(values, offset=0.):
