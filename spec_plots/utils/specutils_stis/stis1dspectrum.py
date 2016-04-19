@@ -32,14 +32,14 @@ class STIS1DSpectrum(object):
         objects, which themselves are lists of STISOrderSpectrum objects.
 
         :param association_spectra: A list whose length is equal to the number
-        of associations (length = "N" associations).  Each element in this
-        list is a STISExposureSpectrum object, which itself is a list (length
-        = "M" orders) of STISOrderSpectrum objects.
+            of associations (length = "N" associations).  Each element in this
+            list is a STISExposureSpectrum object, which itself is a list
+            (length = "M" orders) of STISOrderSpectrum objects.
 
         :type association_spectra: list
 
         :param orig_file: Original FITS file read to create the spectrum
-        (includes full path).
+            (includes full path).
 
         :type orig_file: str
         """
@@ -61,7 +61,7 @@ class STISExposureSpectrum(object):
         objects.
 
         :param order_spectra: The STISOrderSpectrum objects to build the
-        STISExposureSpectrum object out of.
+            STISExposureSpectrum object out of.
 
         :type order_spectra: list
 

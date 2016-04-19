@@ -72,6 +72,7 @@ def calc_covering_fraction(fig, subplots, subplot_num, optimize=True):
     :returns: float -- The ratio of pixels containing plot data ("blue") vs.
         empty ("red") pixels, as a percentage (0. <= p <= 100.).
     """
+
     # Turn off all other subplots since the RGB array is for the entire
     # figure, not just this subplot part of it.
     for i, subplot in enumerate(subplots):

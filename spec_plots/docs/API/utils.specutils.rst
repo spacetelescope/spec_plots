@@ -9,19 +9,19 @@ avoidregion
     :show-inheritance:
     :noindex:
 
-calc_plot_metrics
-----------------------------------------
+calc_covering_fraction
+---------------------------------------------
 
-.. automodule:: utils.specutils.calc_plot_metrics
+.. automodule:: utils.specutils.calc_covering_fraction
     :members:
     :undoc-members:
     :show-inheritance:
     :noindex:
 
-calc_covering_fraction
----------------------------------------------
+calc_plot_metrics
+----------------------------------------
 
-.. automodule:: utils.specutils.calc_covering_fraction
+.. automodule:: utils.specutils.calc_plot_metrics
     :members:
     :undoc-members:
     :show-inheritance:

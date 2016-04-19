@@ -87,7 +87,7 @@ def check_input_options(args):
     args.output_type = args.output_type.strip().lower()
 
     # The DPI value must be greater than zero...
-    if args.dpi_val < 0.:
+    if args.dpi_val <= 0.:
         raise ValueError("DPI value must be > 0.")
 
 #--------------------
@@ -435,5 +435,4 @@ if __name__ == "__main__":
                            full_ylabels=INPUT_ARGS.full_ylabels,
                            optimize=not INPUT_ARGS.nooptimize,
                            verbose=INPUT_ARGS.verbose)
-
 #--------------------

@@ -26,7 +26,7 @@ class COSSpectrum(object):
         "NUV").
 
         :param optical_element: The string representation of the optical
-        element used for this observation, e.g., "G140L".
+            element used for this observation, e.g., "G140L".
 
         :type optical_element: str
 
@@ -35,12 +35,12 @@ class COSSpectrum(object):
         :type band: str
 
         :param cos_segments: [Optional] COSSegment objects to populate the
-        COSSpectrum with.
+            COSSpectrum with.
 
         :type cos_segments: dict
 
         :param orig_file: Original FITS file read to create the spectrum
-        (includes full path).
+            (includes full path).
 
         :type orig_file: str
 

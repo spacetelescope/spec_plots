@@ -359,5 +359,4 @@ if __name__ == "__main__":
     # Call main method.
     make_html(ARGS.input_dir, ARGS.output_dir, ARGS.output_file, ARGS.orig_dir,
               ARGS.plot_display_width)
-
 #--------------------

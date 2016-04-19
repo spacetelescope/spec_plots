@@ -17,6 +17,8 @@ def get_segment_names(cos_spectrum):
     :param cos_spectrum: COS spectrum as returned by READSPEC.
 
     :type cos_spectrum: COSSpectrum
+
+    :returns: list -- A list of segment names.
     """
 
     # Get an initial list of segment names.
