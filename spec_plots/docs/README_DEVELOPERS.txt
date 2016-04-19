@@ -17,3 +17,5 @@ Best Practices for Development Of A New Branch
 8.)  After doing a final commit of the branch, make sure all github Issues are closed for that branch, or re-assigned if punting to a later build for that Issue.
 
 9.)  After regression testing is finished and all Issues assigned to this branch or closed for moved to a future build, initiate a pull request and merge into master.
+
+10)  To upload to PyPI with twine: twine upload dist/*, with the -u and -p options.
