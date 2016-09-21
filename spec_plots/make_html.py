@@ -6,13 +6,16 @@
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
 """
 
+from __future__ import unicode_literals
+from __future__ import print_function
+from builtins import str
 import argparse
 from glob import glob
 import os
 import sys
 import numpy
 
-__version__ = '1.34.0'
+from spec_plots import __version__
 
 #--------------------
 
@@ -46,8 +49,8 @@ def find_orig_preview(ufr, orig_files):
     if len(where_match) == 1:
         return where_match[0]
     elif len(where_match) > 1:
-        print ("*** WARNING in MAKE_HTML: Found more than one CADC match, using"
-               " the first one for file " + ufr)
+        print("*** WARNING in MAKE_HTML: Found more than one CADC match, using"
+              " the first one for file " + ufr)
         return where_match[0]
     else:
         return None
@@ -195,9 +198,9 @@ def make_html(idir, odir="html/plot_previews/", ofile="plot_previews",
                     where_this_thumb = numpy.where(
                         all_thumb_png_files_froots == ufr)[0]
                     if len(where_this_thumb) > 1:
-                        print ("Warning: This unique file root appeared more"
-                               "than once in the list of all thumbnails: " +
-                               ufr)
+                        print("Warning: This unique file root appeared more"
+                              "than once in the list of all thumbnails: " +
+                              ufr)
                     where_this_thumb = where_this_thumb[0]
                 else:
                     has_thumb = False
@@ -226,8 +229,8 @@ def make_html(idir, odir="html/plot_previews/", ofile="plot_previews",
                         ofi.write('  </tr>\n')
 
                 else:
-                    print ("Warning: Could not find full-size PNG for"
-                           " IPPPSSOOT_filetype = " + ufr)
+                    print("Warning: Could not find full-size PNG for"
+                          " IPPPSSOOT_filetype = " + ufr)
             ofi.write('</table>/n')
             ofi.write('</body></html>/n')
 
@@ -248,9 +251,9 @@ def make_html(idir, odir="html/plot_previews/", ofile="plot_previews",
                     where_this_large = numpy.where(
                         all_large_png_files_froots == ufr)[0]
                     if len(where_this_large) > 1:
-                        print ("Warning: This unique file root appeared more"
-                               " than once in the list of all large previews: "+
-                               ufr)
+                        print("Warning: This unique file root appeared more"
+                              " than once in the list of all large previews: "+
+                              ufr)
                     where_this_large = where_this_large[0]
                 else:
                     has_large = False
@@ -299,8 +302,8 @@ def make_html(idir, odir="html/plot_previews/", ofile="plot_previews",
                     ofi.write('  </tr>\n')
 
                 else:
-                    print ("Warning: Could not find full-size PNG for "
-                           "IPPPSSOOT_filetype = " + ufr)
+                    print("Warning: Could not find full-size PNG for "
+                          "IPPPSSOOT_filetype = " + ufr)
 
             ofi.write('</table>\n')
             ofi.write('</body></html>\n')
@@ -350,10 +353,10 @@ if __name__ == "__main__":
     # least greater than a minimum value.
     MIN_DISPLAY_WIDTH = 128.
     if ARGS.plot_display_width < MIN_DISPLAY_WIDTH:
-        print ("Warning: Display width for full-size preview plots is very,"
-               " very small.  Will use a display width of "+
-               str(MIN_DISPLAY_WIDTH)+" px instead of "+
-               str(ARGS.plot_display_width)+" px.")
+        print("Warning: Display width for full-size preview plots is very,"
+              " very small.  Will use a display width of "+
+              str(MIN_DISPLAY_WIDTH)+" px instead of "+
+              str(ARGS.plot_display_width)+" px.")
         ARGS.plot_display_width = MIN_DISPLAY_WIDTH
 
     # Call main method.

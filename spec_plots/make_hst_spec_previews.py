@@ -11,13 +11,15 @@
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
 """
 
+from __future__ import unicode_literals
+from __future__ import print_function
 import argparse
 from os import path
 import numpy
 from astropy.io import fits
 from spec_plots.utils import specutils, specutils_cos, specutils_stis
 
-__version__ = '1.34.0'
+from spec_plots import __version__
 
 FLUX_SCALE_FACTOR_DEFAULT = 10.
 FLUXERR_SCALE_FACTOR_DEFAULT = 5.
@@ -117,8 +119,8 @@ def get_instrument_name(input_file):
         try:
             this_instrument = hdulist[0].header["INSTRUME"]
         except KeyError:
-            print ("*** MAKE_HST_SPEC_PREVIEWS ERROR: INSTRUME keyword not"
-                   " found in this file's primary header: " + input_file)
+            print("*** MAKE_HST_SPEC_PREVIEWS ERROR: INSTRUME keyword not"
+                  " found in this file's primary header: " + input_file)
             exit(1)
     return this_instrument.strip().upper()
 
@@ -196,7 +198,7 @@ def make_hst_spec_previews(input_file, flux_scale_factor=
 
     # Print file name, if verbose is turned on.
     if verbose:
-        print "Input file: " + input_file
+        print("Input file: " + input_file)
 
     # Derive output file name from input file name.
     if output_type != "screen":
@@ -209,16 +211,16 @@ def make_hst_spec_previews(input_file, flux_scale_factor=
     # Print name of output file, if verbose is turned on and not plotting to
     # screen.
     if verbose and output_type != "screen":
-        print "Output file: " + output_file
+        print("Output file: " + output_file)
     elif verbose:
-        print "Output file: Plotting to screen."
+        print("Output file: Plotting to screen.")
 
     # Read in the FITS file to determine which instrument it comes from.
     # Print the name of the instrument found in the header if verbose is turned
     # on.
     this_instrument = get_instrument_name(input_file)
     if verbose:
-        print "Instrument: " + this_instrument
+        print("Instrument: " + this_instrument)
 
     # Read in the FITS files and create plots using the local package
     # appropriate for the instrument used in the input file.

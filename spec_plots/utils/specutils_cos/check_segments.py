@@ -6,6 +6,8 @@
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
 """
 
+from __future__ import unicode_literals
+from builtins import str
 import os
 import sys
 import numpy

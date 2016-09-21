@@ -7,6 +7,7 @@
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
 """
 
+from __future__ import unicode_literals
 import math
 import numpy
 

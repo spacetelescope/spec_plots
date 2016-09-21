@@ -6,6 +6,7 @@
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
 """
 
+from __future__ import unicode_literals
 from .specutilserror import SpecUtilsError
 from .avoidregion import AvoidRegion, generate_avoid_regions
 from .is_bad_dq import is_bad_dq

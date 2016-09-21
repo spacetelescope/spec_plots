@@ -6,12 +6,13 @@
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
 """
 
+from __future__ import unicode_literals
 from setuptools import setup
 
 __version__ = '1.34.0'
 
 setup(name="spec_plots",
-      version="1.34.0",
+      version=__version__,
       description="Create preview plots of HST spectra.",
       classifiers=["Programming Language :: Python :: 2.7"],
       url="https://github.com/openSAIL/spec_plots",

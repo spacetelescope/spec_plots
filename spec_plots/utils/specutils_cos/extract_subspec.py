@@ -7,6 +7,9 @@
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
 """
 
+from __future__ import print_function
+from __future__ import unicode_literals
+from builtins import str
 import os
 import sys
 import numpy
@@ -83,9 +86,9 @@ def extract_subspec(cos_spectrum, segment, min_wl=None, max_wl=None):
             cos_spectrum.segments[segment].dqs = (
                 cos_spectrum.segments[segment].dqs[where_within])
         else:
-            print ("*** WARNING in SPECUTILS_COS: Requested subspectrum does"
-                   " not overlap with this segment's spectrum.  No extraction"
-                   " will be done.")
+            print("*** WARNING in SPECUTILS_COS: Requested subspectrum does"
+                  " not overlap with this segment's spectrum.  No extraction"
+                  " will be done.")
     else:
         raise SpecUtilsError("The segment where you want to perform the"
                              " subspectrum extraction is not present."

@@ -6,6 +6,9 @@
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
 """
 
+from __future__ import unicode_literals
+from __future__ import division
+from builtins import zip
 import numpy
 from spec_plots.utils.specutils.is_bad_dq import is_bad_dq
 

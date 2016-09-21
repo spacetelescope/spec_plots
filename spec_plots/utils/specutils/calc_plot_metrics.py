@@ -6,6 +6,7 @@
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
 """
 
+from __future__ import unicode_literals
 import numpy
 import matplotlib.collections
 from spec_plots.utils.specutils.get_flux_stats import get_flux_stats

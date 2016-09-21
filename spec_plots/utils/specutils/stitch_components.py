@@ -7,6 +7,10 @@
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
 """
 
+from __future__ import unicode_literals
+from __future__ import division
+from builtins import str
+from builtins import range
 import os
 import sys
 import numpy
@@ -91,7 +95,7 @@ def stitch_components(input_exposure, n_consecutive, flux_scale_factor,
 
     elif isinstance(input_exposure, STISExposureSpectrum):
         n_components = len(input_exposure.orders)
-        loop_iterable = xrange(n_components)
+        loop_iterable = list(range(n_components))
         inst_type = "stis"
 
     else:

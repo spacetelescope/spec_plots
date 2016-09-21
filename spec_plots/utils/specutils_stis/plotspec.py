@@ -5,6 +5,10 @@
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
 """
 
+from __future__ import unicode_literals
+from __future__ import division
+from builtins import str
+from builtins import range
 import copy
 import os
 import sys
@@ -167,7 +171,7 @@ def plotspec(stis_spectrum, association_indices, stitched_spectra, output_type,
 
     # Loop over each association.
     covering_fractions = [0.] * len(stitched_spectra)
-    for i in xrange(len(stitched_spectra)):
+    for i in range(len(stitched_spectra)):
         this_plotarea = these_plotareas[i]
 
         # Get the wavelengths, fluxes, flux uncertainties, and data quality

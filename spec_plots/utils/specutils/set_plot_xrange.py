@@ -5,6 +5,8 @@
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
 """
 
+from __future__ import unicode_literals
+from __future__ import print_function
 import numpy
 from spec_plots.utils.specutils.edge_trim import edge_trim
 

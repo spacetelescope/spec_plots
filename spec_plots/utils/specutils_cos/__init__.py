@@ -5,7 +5,7 @@
 
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
 """
-
+from __future__ import unicode_literals
 from .cosspectrum import COSSpectrum
 from .check_segments import check_segments
 from .extract_subspec import extract_subspec

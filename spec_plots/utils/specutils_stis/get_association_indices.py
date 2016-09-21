@@ -6,6 +6,9 @@
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
 """
 
+from __future__ import unicode_literals
+from __future__ import division
+from builtins import range
 __version__ = '1.34.0'
 
 #--------------------
@@ -24,9 +27,9 @@ def get_association_indices(associations):
 
     n_associations = len(associations)
     if n_associations <= 3:
-        subplot_indices = range(n_associations)
+        subplot_indices = list(range(n_associations))
     else:
-        midindex = int(round(float(n_associations)/2.))
+        midindex = int(round(n_associations/2.))
         subplot_indices = [0, midindex, n_associations-1]
 
     return subplot_indices

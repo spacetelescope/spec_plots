@@ -6,6 +6,9 @@
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
 """
 
+from __future__ import unicode_literals
+from __future__ import division
+from builtins import range
 import numpy
 
 __version__ = '1.34.0'
@@ -27,7 +30,7 @@ def count_blue_red(buf):
 
     blue_count = 0
     red_count = 0
-    for i in xrange(0, len(buf), 3):
+    for i in range(0, len(buf), 3):
         # First make sure this isn't a grey pixel, where R=G=B.
         if not (buf[i] == buf[i+1] and buf[i] == buf[i+2]):
             if buf[i] > 0 and buf[i+2] == 0:

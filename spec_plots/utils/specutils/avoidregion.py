@@ -6,6 +6,9 @@
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
 """
 
+from __future__ import unicode_literals
+from builtins import str
+from builtins import object
 __version__ = '1.34.0'
 
 #--------------------

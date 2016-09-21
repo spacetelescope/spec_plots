@@ -6,6 +6,7 @@
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
 """
 
+from __future__ import unicode_literals
 __version__ = '1.34.0'
 
 #--------------------
@@ -22,7 +23,7 @@ def get_segment_names(cos_spectrum):
     """
 
     # Get an initial list of segment names.
-    segment_names = cos_spectrum.segments.keys()
+    segment_names = list(cos_spectrum.segments.keys())
 
     # Reverse the list of segment names *FOR FUV DATA*, becaue the bluest
     # segment is the latter in the alphabet, but only for the FUV spectra.  If
