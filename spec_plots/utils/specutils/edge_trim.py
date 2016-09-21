@@ -9,7 +9,7 @@
 import numpy
 from spec_plots.utils.specutils.is_bad_dq import is_bad_dq
 
-__version__ = '1.33.2'
+__version__ = '1.34.0'
 
 #--------------------
 def _set_plot_xrange_test(instrument, flux_values, flux_err_values, median_flux,

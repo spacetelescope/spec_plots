@@ -6,7 +6,7 @@
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
 """
 
-__version__ = '1.33.2'
+__version__ = '1.34.0'
 
 #--------------------
 class AvoidRegion(object):

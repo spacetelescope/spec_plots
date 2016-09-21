@@ -9,7 +9,7 @@ import numpy
 from astropy.io import fits
 from spec_plots.utils.specutils_cos.check_segments import check_segments
 from spec_plots.utils.specutils_cos.cosspectrum import COSSpectrum, COSSegment
-__version__ = '1.33.2'
+__version__ = '1.34.0'
 
 #--------------------
 

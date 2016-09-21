@@ -17,7 +17,7 @@ from ..specutils.specutilserror import SpecUtilsError
 from ..specutils.debug_oplot import debug_oplot
 from ..specutils.calc_covering_fraction import calc_covering_fraction
 
-__version__ = '1.33.2'
+__version__ = '1.34.0'
 
 if matplotlib.get_backend().lower() != 'agg':
     pyplot.switch_backend('Agg')
@@ -28,11 +28,11 @@ if matplotlib.get_backend().lower() != 'agg':
 # efforts to work around it.  I don't think it will be a major issue, but
 #  worth thinking about in the future. </DEVEL>
 if __package__ is None:
-    SPECUTILS_COS_DIR = os.path.dirname(os.path.abspath(__file__))
-    UTILS_DIR = os.path.dirname(SPECUTILS_COS_DIR)
+    SPECUTILS_STIS_DIR = os.path.dirname(os.path.abspath(__file__))
+    UTILS_DIR = os.path.dirname(SPECUTILS_STIS_DIR)
     PARENT_DIR = os.path.dirname(UTILS_DIR)
     sys.path.insert(1, PARENT_DIR)
-    __package__ = str("utils.specutils")
+    __package__ = str("utils.specutils_stis")
     __name__ = str(__package__+"."+__name__)
 #--------------------
 

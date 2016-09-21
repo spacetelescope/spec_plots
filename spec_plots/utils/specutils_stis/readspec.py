@@ -9,7 +9,7 @@ from astropy.io import fits
 from spec_plots.utils.specutils_stis.stis1dspectrum import (
     STIS1DSpectrum, STISExposureSpectrum, STISOrderSpectrum)
 
-__version__ = '1.33.2'
+__version__ = '1.34.0'
 
 #--------------------
 

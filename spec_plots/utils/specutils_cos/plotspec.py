@@ -17,7 +17,7 @@ from ..specutils.specutilserror import SpecUtilsError
 from ..specutils.debug_oplot import debug_oplot
 from ..specutils.calc_covering_fraction import calc_covering_fraction
 
-__version__ = '1.33.2'
+__version__ = '1.34.0'
 
 if matplotlib.get_backend().lower() != 'agg':
     pyplot.switch_backend('Agg')
@@ -32,7 +32,7 @@ if __package__ is None:
     UTILS_DIR = os.path.dirname(SPECUTILS_COS_DIR)
     PARENT_DIR = os.path.dirname(UTILS_DIR)
     sys.path.insert(1, PARENT_DIR)
-    __package__ = str("utils.specutils")
+    __package__ = str("utils.specutils_cos")
     __name__ = str(__package__+"."+__name__)
 #--------------------
 

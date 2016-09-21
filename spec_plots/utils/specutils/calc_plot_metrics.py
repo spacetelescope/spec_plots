@@ -13,7 +13,7 @@ from spec_plots.utils.specutils.avoidregion import generate_avoid_regions
 from spec_plots.utils.specutils.set_plot_xrange import set_plot_xrange
 from spec_plots.utils.specutils.set_plot_yrange import set_plot_yrange
 
-__version__ = '1.33.2'
+__version__ = '1.34.0'
 
 #--------------------
 def calc_plot_metrics(instrument, wls, fls, flerrs, dqs, n_consecutive,

@@ -17,7 +17,7 @@ import numpy
 from astropy.io import fits
 from spec_plots.utils import specutils, specutils_cos, specutils_stis
 
-__version__ = '1.33.2'
+__version__ = '1.34.0'
 
 FLUX_SCALE_FACTOR_DEFAULT = 10.
 FLUXERR_SCALE_FACTOR_DEFAULT = 5.

@@ -7,7 +7,7 @@
 
 import numpy
 
-__version__ = '1.33.2'
+__version__ = '1.34.0'
 
 #--------------------
 def set_plot_yrange(wavelengths, fluxes, avoid_regions=None, wl_range=None):

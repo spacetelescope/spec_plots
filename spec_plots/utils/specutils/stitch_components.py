@@ -16,7 +16,7 @@ from spec_plots.utils.specutils.edge_trim import edge_trim
 from ..specutils_cos import COSSpectrum
 from ..specutils_stis import STISExposureSpectrum
 
-__version__ = '1.33.2'
+__version__ = '1.34.0'
 
 # <DEVEL> Note that this hack to make it so that the user can import
 # `stitch_components` directly as a module or run it from the command line as

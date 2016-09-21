@@ -8,10 +8,10 @@
 
 from setuptools import setup
 
-__version__ = '1.33.2'
+__version__ = '1.34.0'
 
 setup(name="spec_plots",
-      version="1.33.2",
+      version="1.34.0",
       description="Create preview plots of HST spectra.",
       classifiers=["Programming Language :: Python :: 2.7"],
       url="https://github.com/openSAIL/spec_plots",
