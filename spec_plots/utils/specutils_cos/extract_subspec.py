@@ -7,15 +7,24 @@
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
 """
 
+#--------------------
+# Built-In Imports
+#--------------------
+from __future__ import absolute_import
 from __future__ import print_function
 from __future__ import unicode_literals
-from builtins import str
 import os
 import sys
+from builtins import str
+#--------------------
+# External Imports
+#--------------------
 import numpy
-from ..specutils import SpecUtilsError
-
-__version__ = '1.34.0'
+#--------------------
+# Package Imports
+#--------------------
+from spec_plots.utils.specutils.specutilserror import SpecUtilsError
+from spec_plots import __version__
 
 # <DEVEL> Note that this hack to make it so that the user can import
 # `extract_subspec` directly as a module or run it from the command line as

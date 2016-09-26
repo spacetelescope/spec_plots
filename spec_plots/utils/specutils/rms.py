@@ -7,13 +7,23 @@
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
 """
 
+#--------------------
+# Built-In Imports
+#--------------------
+from __future__ import absolute_import
 from __future__ import unicode_literals
 import math
+#--------------------
+# External Imports
+#--------------------
 import numpy
-
-__version__ = '1.34.0'
+#--------------------
+# Package Imports
+#--------------------
+from spec_plots import __version__
 
 #--------------------
+
 def rms(values, offset=0.):
     """
     Calculates the RMS about some offset (default offset is 0.)

@@ -6,14 +6,24 @@
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
 """
 
-from __future__ import unicode_literals
+#--------------------
+# Built-In Imports
+#--------------------
+from __future__ import absolute_import
 from __future__ import division
+from __future__ import unicode_literals
 from builtins import range
+#--------------------
+# External Imports
+#--------------------
 import numpy
-
-__version__ = '1.34.0'
+#--------------------
+# Package Imports
+#--------------------
+from spec_plots import __version__
 
 #--------------------
+
 def count_blue_red(buf):
     """
     Counts the number of "blue" vs. "red" pixels in the plot area.

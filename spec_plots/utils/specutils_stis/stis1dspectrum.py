@@ -5,13 +5,23 @@
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
 """
 
+#--------------------
+# Built-In Imports
+#--------------------
+from __future__ import absolute_import
 from __future__ import unicode_literals
 from builtins import object
+#--------------------
+# External Imports
+#--------------------
 import numpy
-
-__version__ = '1.34.0'
+#--------------------
+# Package Imports
+#--------------------
+from spec_plots import __version__
 
 #--------------------
+
 class STIS1DSpectrum(object):
     """
     Defines a STIS 1D spectrum (either "x1d" extracted or "sx1" summed

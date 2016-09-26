@@ -5,13 +5,22 @@
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
 """
 
+#--------------------
+# Built-In Imports
+#--------------------
+from __future__ import absolute_import
 from __future__ import unicode_literals
 from builtins import range
+#--------------------
+# External Imports
+#--------------------
 from astropy.io import fits
+#--------------------
+# Package Imports
+#--------------------
 from spec_plots.utils.specutils_stis.stis1dspectrum import (
     STIS1DSpectrum, STISExposureSpectrum, STISOrderSpectrum)
-
-__version__ = '1.34.0'
+from spec_plots import __version__
 
 #--------------------
 

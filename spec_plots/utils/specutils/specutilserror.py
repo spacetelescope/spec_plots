@@ -6,10 +6,18 @@
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
 """
 
+#--------------------
+# Built-In Imports
+#--------------------
+from __future__ import absolute_import
 from __future__ import unicode_literals
-__version__ = '1.34.0'
+#--------------------
+# Package Imports
+#--------------------
+from spec_plots import __version__
 
 #--------------------
+
 class SpecUtilsError(Exception, object):
     """
     This class defines a generic Exception to use for errors raised in the

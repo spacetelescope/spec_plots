@@ -5,13 +5,23 @@
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
 """
 
+#--------------------
+# Built-In Imports
+#--------------------
+from __future__ import absolute_import
 from __future__ import print_function
 from __future__ import unicode_literals
-import numpy
+#--------------------
+# External Imports
+#--------------------
 from astropy.io import fits
+import numpy
+#--------------------
+# Package Imports
+#--------------------
+from spec_plots import __version__
 from spec_plots.utils.specutils_cos.check_segments import check_segments
 from spec_plots.utils.specutils_cos.cosspectrum import COSSpectrum, COSSegment
-__version__ = '1.34.0'
 
 #--------------------
 

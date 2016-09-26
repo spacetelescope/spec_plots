@@ -5,23 +5,33 @@
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
 """
 
-from __future__ import unicode_literals
+#--------------------
+# Built-In Imports
+#--------------------
+from __future__ import absolute_import
 from __future__ import division
-from builtins import str
-from builtins import range
+from __future__ import unicode_literals
 import copy
 import os
 import sys
+from builtins import str
+from builtins import range
+#--------------------
+# External Imports
+#--------------------
 import matplotlib
 from matplotlib.ticker import FormatStrFormatter
 import matplotlib.pyplot as pyplot
 from matplotlib import rc
 import numpy
-from ..specutils.specutilserror import SpecUtilsError
-from ..specutils.debug_oplot import debug_oplot
-from ..specutils.calc_covering_fraction import calc_covering_fraction
-
-__version__ = '1.34.0'
+#--------------------
+# Package Imports
+#--------------------
+from spec_plots.utils.specutils.specutilserror import SpecUtilsError
+from spec_plots.utils.specutils.debug_oplot import debug_oplot
+from spec_plots.utils.specutils.calc_covering_fraction import (
+    calc_covering_fraction)
+from spec_plots import __version__
 
 if matplotlib.get_backend().lower() != 'agg':
     pyplot.switch_backend('Agg')

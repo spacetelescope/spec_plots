@@ -6,11 +6,19 @@
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
 """
 
+#--------------------
+# Built-In Imports
+#--------------------
+from __future__ import absolute_import
 from __future__ import unicode_literals
 from builtins import str
-__version__ = '1.34.0'
+#--------------------
+# Package Imports
+#--------------------
+from spec_plots import __version__
 
 #--------------------
+
 def dq_has_flag(dqf, flag_to_check):
     """
     Returns true/false if the given DQ value has a specific flag value set after

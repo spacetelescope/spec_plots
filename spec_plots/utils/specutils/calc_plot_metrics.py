@@ -6,17 +6,27 @@
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
 """
 
+#--------------------
+# Built-In Imports
+#--------------------
+from __future__ import absolute_import
 from __future__ import unicode_literals
-import numpy
+#--------------------
+# External Imports
+#--------------------
 import matplotlib.collections
+import numpy
+#--------------------
+# Package Imports
+#--------------------
 from spec_plots.utils.specutils.get_flux_stats import get_flux_stats
 from spec_plots.utils.specutils.avoidregion import generate_avoid_regions
 from spec_plots.utils.specutils.set_plot_xrange import set_plot_xrange
 from spec_plots.utils.specutils.set_plot_yrange import set_plot_yrange
-
-__version__ = '1.34.0'
+from spec_plots import __version__
 
 #--------------------
+
 def calc_plot_metrics(instrument, wls, fls, flerrs, dqs, n_consecutive,
                       flux_scale_factor, fluxerr_scale_factor):
     """

@@ -8,12 +8,21 @@
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
 """
 
-from __future__ import unicode_literals
-import numpy
-
-__version__ = '1.34.0'
-
 #--------------------
+# Built-In Imports
+#--------------------
+from __future__ import absolute_import
+from __future__ import unicode_literals
+#--------------------
+# External Imports
+#--------------------
+import numpy
+#--------------------
+# Package Imports
+#--------------------
+from spec_plots import __version__
+#--------------------
+
 def is_bad_dq(instrument, dqs):
     """
     Returns True/False whether the DQ values are from a good part of the

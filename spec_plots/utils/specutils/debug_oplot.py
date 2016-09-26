@@ -6,14 +6,24 @@
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
 """
 
-from __future__ import unicode_literals
+#--------------------
+# Built-In Imports
+#--------------------
+from __future__ import absolute_import
 from __future__ import division
+from __future__ import unicode_literals
+#--------------------
+# External Imports
+#--------------------
 import numpy
+#--------------------
+# Package Imports
+#--------------------
 from spec_plots.utils.specutils.is_bad_dq import is_bad_dq
-
-__version__ = '1.34.0'
+from spec_plots import __version__
 
 #--------------------
+
 def debug_oplot(this_plotarea, instrument, all_wls, all_fls, all_flerrs,
                 all_dqs, median_flux, median_fluxerr, flux_scale_factor,
                 fluxerr_scale_factor, fluxerr_95th, oplot_percentiles=False):

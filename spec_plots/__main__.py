@@ -6,10 +6,20 @@
 
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
 """
+
+#--------------------
+# Built-In Imports
+#--------------------
+from __future__ import absolute_import
 from __future__ import unicode_literals
 import sys
+#--------------------
+# Package Imports
+#--------------------
 import spec_plots.make_hst_spec_previews as mhsp
 from spec_plots import __version__
+
+#--------------------
 
 def main():
     """ This is the main function used when invoking make_hst_spec_previews

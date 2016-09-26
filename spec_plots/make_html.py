@@ -6,15 +6,24 @@
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
 """
 
+#--------------------
+# Built-In Imports
+#--------------------
+from __future__ import absolute_import
 from __future__ import unicode_literals
 from __future__ import print_function
-from builtins import str
 import argparse
 from glob import glob
 import os
 import sys
+from builtins import str
+#--------------------
+# External Imports
+#--------------------
 import numpy
-
+#--------------------
+# Package Imports
+#--------------------
 from spec_plots import __version__
 
 #--------------------

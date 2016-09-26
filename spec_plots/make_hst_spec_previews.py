@@ -11,14 +11,23 @@
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
 """
 
+#--------------------
+# Built-In Imports
+#--------------------
+from __future__ import absolute_import
 from __future__ import unicode_literals
 from __future__ import print_function
 import argparse
 from os import path
-import numpy
+#--------------------
+# External Imports
+#--------------------
 from astropy.io import fits
+import numpy
+#--------------------
+# Package Imports
+#--------------------
 from spec_plots.utils import specutils, specutils_cos, specutils_stis
-
 from spec_plots import __version__
 
 FLUX_SCALE_FACTOR_DEFAULT = 10.

@@ -7,20 +7,29 @@
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
 """
 
-from __future__ import unicode_literals
+#--------------------
+# Built-In Imports
+#--------------------
+from __future__ import absolute_import
 from __future__ import division
-from builtins import str
-from builtins import range
+from __future__ import unicode_literals
 import os
 import sys
+from builtins import range
+from builtins import str
+#--------------------
+# External Imports
+#--------------------
 import numpy
+#--------------------
+# Package Imports
+#--------------------
 from spec_plots.utils.specutils.is_bad_dq import is_bad_dq
 from spec_plots.utils.specutils.get_flux_stats import get_flux_stats
 from spec_plots.utils.specutils.edge_trim import edge_trim
-from ..specutils_cos import COSSpectrum
-from ..specutils_stis import STISExposureSpectrum
-
-__version__ = '1.34.0'
+from spec_plots.utils.specutils_cos.cosspectrum import COSSpectrum
+from spec_plots.utils.specutils_stis.stis1dspectrum import STISExposureSpectrum
+from spec_plots import __version__
 
 # <DEVEL> Note that this hack to make it so that the user can import
 # `stitch_components` directly as a module or run it from the command line as
