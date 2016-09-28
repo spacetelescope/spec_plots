@@ -13,7 +13,7 @@ from spec_plots import __version__
 
 setup(name="spec_plots",
       version=__version__,
-      description="Create preview plots of HST spectra.",
+      description="Create preview plots of HST or JWST spectra.",
       classifiers=["Programming Language :: Python :: 2.7",
                    "Programming Language :: Python :: 3.5"],
       url="https://github.com/openSAIL/spec_plots",
@@ -25,5 +25,7 @@ setup(name="spec_plots",
                 "spec_plots.utils.specutils_stis"],
       install_requires=["astropy>=0.4.1", "matplotlib>=1.4.1", "numpy>=1.9.1"],
       entry_points={"console_scripts" :
-                    ["make_hst_spec_previews = spec_plots.__main__:main"]},
+                    ["make_hst_spec_previews = spec_plots.__main__:main",
+                     "make_jwst_spec_previews = spec_plots.__main-jwst__:main"
+                    ]},
       zip_safe=False)

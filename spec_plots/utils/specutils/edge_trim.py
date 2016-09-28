@@ -120,6 +120,7 @@ def _set_plot_xrange_test(instrument, flux_values, flux_err_values, median_flux,
     if numpy.isfinite(median_flux):
         bool_results = [((instrument == "cos" and x != 0. and check_fluxes) or
                          (instrument == "stis" and x != 0. and check_fluxes) or
+                         (instrument == "miri" and x != 0. and check_fluxes) or
                          (not check_fluxes))
                         and ((abs(x/median_flux) < flux_scale_factor and
                               check_flux_ratios) or (not check_flux_ratios))
@@ -131,6 +132,8 @@ def _set_plot_xrange_test(instrument, flux_values, flux_err_values, median_flux,
                         and ((instrument == "stis" and not
                               is_bad_dq(instrument, z) and check_dqs) or
                              (instrument == "cos" and not
+                              is_bad_dq(instrument, z) and check_dqs) or
+                             (instrument == "miri" and not
                               is_bad_dq(instrument, z) and check_dqs) or
                              (not check_dqs))
                         for x, y, z in zip(flux_values, flux_err_values, dqs)]
