@@ -1,8 +1,10 @@
 setup.py
 spec_plots/__init__.py
 spec_plots/__main__.py
+spec_plots/__main_jwst__.py
 spec_plots/make_hst_spec_previews.py
 spec_plots/make_html.py
+spec_plots/make_jwst_spec_previews.py
 spec_plots.egg-info/PKG-INFO
 spec_plots.egg-info/SOURCES.txt
 spec_plots.egg-info/dependency_links.txt
