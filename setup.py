@@ -7,7 +7,6 @@
 """
 
 from __future__ import absolute_import
-from __future__ import unicode_literals
 from setuptools import setup
 from spec_plots import __version__
 
