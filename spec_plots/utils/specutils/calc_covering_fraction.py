@@ -107,7 +107,7 @@ def calc_covering_fraction(fig, subplots, subplot_num, optimize=True):
     # red and blue pixels can be done quicker.  Early tests have shown this
     # usually produces the same results.
     if optimize:
-        n_per_subplot = numpy.ceil(len(buf) / len(subplots))
+        n_per_subplot = int(numpy.ceil(len(buf) / len(subplots)))
         while n_per_subplot % 3 != 0:
             n_per_subplot += 1
         startindex = subplot_num * n_per_subplot

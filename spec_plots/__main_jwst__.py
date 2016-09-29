@@ -1,5 +1,5 @@
 """
-.. module:: __main-jwst__
+.. module:: __main_jwst__
 
    :synopsis: This script is used when make_jwst_spec_previews is called
    directly as an executable from the command line.

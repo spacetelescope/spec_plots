@@ -15,7 +15,6 @@ from __future__ import unicode_literals
 # External Imports
 #--------------------
 from astropy.io import fits
-import numpy
 #--------------------
 # Package Imports
 #--------------------

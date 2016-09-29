@@ -15,7 +15,6 @@ import copy
 import os
 import sys
 from builtins import str
-from builtins import range
 #--------------------
 # External Imports
 #--------------------
@@ -314,7 +313,7 @@ def plotspec(miri_spectrum, output_type, output_file, flux_scale_factor,
             if full_ylabels:
                 this_plotarea.yaxis.set_major_formatter(FormatStrFormatter(
                     '%3.2E'))
-                
+
             textsize = "x-large"
             plottext = "Fluxes are all 0."
 

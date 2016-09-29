@@ -19,11 +19,11 @@ from __future__ import unicode_literals
 from __future__ import print_function
 import argparse
 from os import path
+from builtins import str
 #--------------------
 # External Imports
 #--------------------
 from astropy.io import fits
-import numpy
 #--------------------
 # Package Imports
 #--------------------
@@ -35,7 +35,7 @@ FLUX_SCALE_FACTOR_DEFAULT = 10.
 FLUXERR_SCALE_FACTOR_DEFAULT = 5.
 N_CONSECUTIVE_DEFAULT = 20
 OUTPUT_PATH_DEFAULT = ""
-OUTPUT_TYPE_DEFAULT = "png"
+OUTPUT_TYPE_DEFAULT = str("png")
 DPI_VAL_DEFAULT = 96.
 DEBUG_DEFAULT = False
 FULL_YLABELS_DEFAULT = False

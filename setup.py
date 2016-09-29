@@ -26,6 +26,6 @@ setup(name="spec_plots",
       install_requires=["astropy>=0.4.1", "matplotlib>=1.4.1", "numpy>=1.9.1"],
       entry_points={"console_scripts" :
                     ["make_hst_spec_previews = spec_plots.__main__:main",
-                     "make_jwst_spec_previews = spec_plots.__main-jwst__:main"
+                     "make_jwst_spec_previews = spec_plots.__main_jwst__:main"
                     ]},
       zip_safe=False)
