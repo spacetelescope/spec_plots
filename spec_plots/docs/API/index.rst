@@ -12,7 +12,7 @@ Contents:
    :numbered:
    :maxdepth: 4
 
-   make_hst_spec_previews
+   main_programs
    modules
    diagnostics
 
