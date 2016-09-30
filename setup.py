@@ -22,7 +22,8 @@ setup(name="spec_plots",
       packages=["spec_plots", "spec_plots.utils", "spec_plots.utils.specutils",
                 "spec_plots.utils.specutils_cos",
                 "spec_plots.utils.specutils_stis"],
-      install_requires=["astropy>=0.4.1", "matplotlib>=1.4.1", "numpy>=1.9.1"],
+      install_requires=["astropy>=0.4.1", "matplotlib>=1.4.1", "numpy>=1.9.1",
+                        "future>=0.15"],
       entry_points={"console_scripts" :
                     ["make_hst_spec_previews = spec_plots.__main__:main",
                      "make_jwst_spec_previews = spec_plots.__main_jwst__:main"
