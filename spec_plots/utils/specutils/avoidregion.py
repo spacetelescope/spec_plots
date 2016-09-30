@@ -6,9 +6,19 @@
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
 """
 
-__version__ = '1.33.2'
+#--------------------
+# Built-In Imports
+#--------------------
+from __future__ import absolute_import
+from builtins import object
+from builtins import str
+#--------------------
+# Package Imports
+#--------------------
+from spec_plots import __version__
 
 #--------------------
+
 class AvoidRegion(object):
     """
     Defines an avoid region, which is a section of wavelength space that should

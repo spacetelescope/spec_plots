@@ -1,8 +1,10 @@
 setup.py
 spec_plots/__init__.py
 spec_plots/__main__.py
+spec_plots/__main_jwst__.py
 spec_plots/make_hst_spec_previews.py
 spec_plots/make_html.py
+spec_plots/make_jwst_spec_previews.py
 spec_plots.egg-info/PKG-INFO
 spec_plots.egg-info/SOURCES.txt
 spec_plots.egg-info/dependency_links.txt
@@ -32,6 +34,10 @@ spec_plots/utils/specutils_cos/extract_subspec.py
 spec_plots/utils/specutils_cos/get_segment_names.py
 spec_plots/utils/specutils_cos/plotspec.py
 spec_plots/utils/specutils_cos/readspec.py
+spec_plots/utils/specutils_miri/__init__.py
+spec_plots/utils/specutils_miri/mirispectrum.py
+spec_plots/utils/specutils_miri/plotspec.py
+spec_plots/utils/specutils_miri/readspec.py
 spec_plots/utils/specutils_stis/__init__.py
 spec_plots/utils/specutils_stis/get_association_indices.py
 spec_plots/utils/specutils_stis/plotspec.py

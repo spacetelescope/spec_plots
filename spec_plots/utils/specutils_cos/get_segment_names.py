@@ -6,9 +6,17 @@
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
 """
 
-__version__ = '1.33.2'
+#--------------------
+# Built-In Imports
+#--------------------
+from __future__ import absolute_import
+#--------------------
+# Package Imports
+#--------------------
+from spec_plots import __version__
 
 #--------------------
+
 def get_segment_names(cos_spectrum):
     """
     Returns a list of segment names sorted such that the bluest segment come
@@ -22,7 +30,7 @@ def get_segment_names(cos_spectrum):
     """
 
     # Get an initial list of segment names.
-    segment_names = cos_spectrum.segments.keys()
+    segment_names = list(cos_spectrum.segments.keys())
 
     # Reverse the list of segment names *FOR FUV DATA*, becaue the bluest
     # segment is the latter in the alphabet, but only for the FUV spectra.  If

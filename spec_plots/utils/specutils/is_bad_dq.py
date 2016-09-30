@@ -8,11 +8,20 @@
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
 """
 
-import numpy
-
-__version__ = '1.33.2'
-
 #--------------------
+# Built-In Imports
+#--------------------
+from __future__ import absolute_import
+#--------------------
+# External Imports
+#--------------------
+import numpy
+#--------------------
+# Package Imports
+#--------------------
+from spec_plots import __version__
+#--------------------
+
 def is_bad_dq(instrument, dqs):
     """
     Returns True/False whether the DQ values are from a good part of the
@@ -42,6 +51,12 @@ def is_bad_dq(instrument, dqs):
             return numpy.asarray([x != 0 and x != 16 for x in dqs])
         else:
             return dqs != 0 and dqs != 16
+
+    elif instrument == "miri":
+        if isinstance(dqs, numpy.ndarray):
+            return numpy.asarray([x < 1 for x in dqs])
+        else:
+            return dqs < 1
 
     else:
         return numpy.asarray([])

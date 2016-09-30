@@ -5,19 +5,32 @@
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
 """
 
+#--------------------
+# Built-In Imports
+#--------------------
+from __future__ import absolute_import
+from __future__ import division
 import copy
 import os
 import sys
+from builtins import str
+from builtins import range
+#--------------------
+# External Imports
+#--------------------
 import matplotlib
 from matplotlib.ticker import FormatStrFormatter
 import matplotlib.pyplot as pyplot
 from matplotlib import rc
 import numpy
-from ..specutils.specutilserror import SpecUtilsError
-from ..specutils.debug_oplot import debug_oplot
-from ..specutils.calc_covering_fraction import calc_covering_fraction
-
-__version__ = '1.33.2'
+#--------------------
+# Package Imports
+#--------------------
+from spec_plots.utils.specutils.specutilserror import SpecUtilsError
+from spec_plots.utils.specutils.debug_oplot import debug_oplot
+from spec_plots.utils.specutils.calc_covering_fraction import (
+    calc_covering_fraction)
+from spec_plots import __version__
 
 if matplotlib.get_backend().lower() != 'agg':
     pyplot.switch_backend('Agg')
@@ -28,11 +41,11 @@ if matplotlib.get_backend().lower() != 'agg':
 # efforts to work around it.  I don't think it will be a major issue, but
 #  worth thinking about in the future. </DEVEL>
 if __package__ is None:
-    SPECUTILS_COS_DIR = os.path.dirname(os.path.abspath(__file__))
-    UTILS_DIR = os.path.dirname(SPECUTILS_COS_DIR)
+    SPECUTILS_STIS_DIR = os.path.dirname(os.path.abspath(__file__))
+    UTILS_DIR = os.path.dirname(SPECUTILS_STIS_DIR)
     PARENT_DIR = os.path.dirname(UTILS_DIR)
     sys.path.insert(1, PARENT_DIR)
-    __package__ = str("utils.specutils")
+    __package__ = str("utils.specutils_stis")
     __name__ = str(__package__+"."+__name__)
 #--------------------
 
@@ -167,7 +180,7 @@ def plotspec(stis_spectrum, association_indices, stitched_spectra, output_type,
 
     # Loop over each association.
     covering_fractions = [0.] * len(stitched_spectra)
-    for i in xrange(len(stitched_spectra)):
+    for i in range(len(stitched_spectra)):
         this_plotarea = these_plotareas[i]
 
         # Get the wavelengths, fluxes, flux uncertainties, and data quality

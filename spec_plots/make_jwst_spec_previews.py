@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
 """
-.. module:: make_hst_spec_previews
-   :synopsis: Given an HST spectrum file name, this script will read in the
+.. module:: make_jwst_spec_previews
+   :synopsis: Given a JWST spectrum file name, this script will read in the
        data and generate preview plots of the spectra.  The plots are generated
        in different dimensions (large, thumbnail) and, depending on the
        instrument / configuration, are plotted in different formats to maximize
@@ -23,11 +23,11 @@ from builtins import str
 # External Imports
 #--------------------
 from astropy.io import fits
-import numpy
 #--------------------
 # Package Imports
 #--------------------
-from spec_plots.utils import specutils, specutils_cos, specutils_stis
+from spec_plots.utils.specutils_miri import readspec, plotspec
+from spec_plots.utils.specutils.calc_plot_metrics import calc_plot_metrics
 from spec_plots import __version__
 
 FLUX_SCALE_FACTOR_DEFAULT = 10.
@@ -43,16 +43,16 @@ VERBOSE_DEFAULT = False
 
 #--------------------
 
-class HSTSpecPrevError(Exception, object):
+class JWSTSpecPrevError(Exception, object):
     """
     This class defines a generic Exception to use for errors raised in
-    MAKE_HST_SPEC_PREVIEWS.  It simply prints the given string when raising the
+    MAKE_JWST_SPEC_PREVIEWS.  It simply prints the given string when raising the
     exception. e.g.,
 
     .. code-block:: python
 
-         raise HSTSpecPrevError("Print this string")
-         HSTSpecPrevError: *** MAKE_HST_SPEC_PREVIEWS ERROR: 'Print this string'
+         raise JWSTSpecPrevError("Print a string")
+         JWSTSpecPrevError: *** MAKE_JWST_SPEC_PREVIEWS ERROR: 'Print a string'
     """
 
     def __init__(self, value):
@@ -63,14 +63,14 @@ class HSTSpecPrevError(Exception, object):
 
         :type value: str
         """
-        super(HSTSpecPrevError, self).__init__(value)
+        super(JWSTSpecPrevError, self).__init__(value)
         self.value = value
 
     def __str__(self):
         """
         Overrides the str function for this class.
         """
-        return "*** MAKE_HST_SPEC_PREVIEWS ERROR: "+repr(self.value)
+        return "*** MAKE_JWST_SPEC_PREVIEWS ERROR: "+repr(self.value)
 
 #--------------------
 
@@ -82,7 +82,7 @@ def check_input_options(args):
 
     :type args: argparse.Namespace object.
 
-    :raises: HSTSpecPrevError, ValueError
+    :raises: JWSTSpecPrevError, ValueError
     """
 
     # Make sure the input file is specified on input (non-empty string), and
@@ -90,7 +90,7 @@ def check_input_options(args):
     # in this case.  If it does exist, check that the input file exists at the
     # time of the command-line parameter checking.
     if not args.input_file:
-        raise HSTSpecPrevError("File name must be specified.")
+        raise JWSTSpecPrevError("File name must be specified.")
     else:
         args.input_file = args.input_file.strip()
 
@@ -114,13 +114,13 @@ def get_instrument_name(input_file):
     :returns: str -- The name of the instrument based on the FITS header
         keyword, in uppercase with leading/trailing whitespace removed.
 
-    :raises: KeyError, HSTSpecPrevError
+    :raises: KeyError, JWSTSpecPrevError
     """
 
     # Make sure file exists.
     if not path.isfile(input_file):
-        raise HSTSpecPrevError("Input file not found, looking for file: " +
-                               input_file)
+        raise JWSTSpecPrevError("Input file not found, looking for file: " +
+                                input_file)
 
     with fits.open(input_file) as hdulist:
         # Make sure the INSTRUME keyword exists in the primary header,
@@ -128,21 +128,22 @@ def get_instrument_name(input_file):
         try:
             this_instrument = hdulist[0].header["INSTRUME"]
         except KeyError:
-            print("*** MAKE_HST_SPEC_PREVIEWS ERROR: INSTRUME keyword not"
+            print("*** MAKE_JWST_SPEC_PREVIEWS ERROR: INSTRUME keyword not"
                   " found in this file's primary header: " + input_file)
             exit(1)
     return this_instrument.strip().upper()
 
 #--------------------
 
-def make_hst_spec_previews(input_file, flux_scale_factor=
-                           FLUX_SCALE_FACTOR_DEFAULT, fluxerr_scale_factor=
-                           FLUXERR_SCALE_FACTOR_DEFAULT, n_consecutive=
-                           N_CONSECUTIVE_DEFAULT, output_path=
-                           OUTPUT_PATH_DEFAULT, output_type=OUTPUT_TYPE_DEFAULT,
-                           dpi_val=DPI_VAL_DEFAULT, debug=DEBUG_DEFAULT,
-                           full_ylabels=FULL_YLABELS_DEFAULT, optimize=
-                           not NOOPTIMIZE_DEFAULT, verbose=VERBOSE_DEFAULT):
+def make_jwst_spec_previews(input_file, flux_scale_factor=
+                            FLUX_SCALE_FACTOR_DEFAULT, fluxerr_scale_factor=
+                            FLUXERR_SCALE_FACTOR_DEFAULT, n_consecutive=
+                            N_CONSECUTIVE_DEFAULT,
+                            output_path=OUTPUT_PATH_DEFAULT,
+                            output_type=OUTPUT_TYPE_DEFAULT,
+                            dpi_val=DPI_VAL_DEFAULT, debug=DEBUG_DEFAULT,
+                            full_ylabels=FULL_YLABELS_DEFAULT, optimize=
+                            not NOOPTIMIZE_DEFAULT, verbose=VERBOSE_DEFAULT):
     """
     Main function in the module.
 
@@ -202,7 +203,7 @@ def make_hst_spec_previews(input_file, flux_scale_factor=
 
     :type verbose: bool
 
-    :raises: HSTSpecPrevError
+    :raises: JWSTSpecPrevError
     """
 
     # Print file name, if verbose is turned on.
@@ -233,117 +234,37 @@ def make_hst_spec_previews(input_file, flux_scale_factor=
 
     # Read in the FITS files and create plots using the local package
     # appropriate for the instrument used in the input file.
-    if this_instrument == "COS":
+    if this_instrument == "MIRI":
         # Get wavelengths, fluxes, flux uncertainties.
-        cos_spectrum = specutils_cos.readspec(input_file)
+        miri_spectrum = readspec(input_file)
 
-        # Get a list of segment names sorted such that the bluest segment is
-        # first.
-        cos_segment_names = specutils_cos.get_segment_names(cos_spectrum)
-
-        # Trim the wavelengths < 900 Angstroms for FUVB segment if optical
-        # element used is G140L.
-        if ("FUVB" in cos_spectrum.segments and cos_spectrum.optical_element ==
-                "G140L"):
-            specutils_cos.extract_subspec(cos_spectrum, "FUVB", min_wl=900.)
-
-        # Create a stitched spectrum for use when making thumb-size plots.
-        stitched_spectrum = specutils.stitch_components(cos_spectrum,
-                                                        n_consecutive,
-                                                        flux_scale_factor,
-                                                        fluxerr_scale_factor,
-                                                        segment_names=
-                                                        cos_segment_names)
-
-        # Calculate plot metrics for the each segment.
-        segment_plot_metrics = [
-            specutils.calc_plot_metrics("cos",
-                                        cos_spectrum.segments[x].wavelengths,
-                                        cos_spectrum.segments[x].fluxes,
-                                        cos_spectrum.segments[x].fluxerrs,
-                                        cos_spectrum.segments[x].dqs,
-                                        n_consecutive, flux_scale_factor,
-                                        fluxerr_scale_factor)
-            for x in cos_segment_names]
+        # Calculate plot metrics.
+        spec_plot_metrics = calc_plot_metrics("miri",
+                                              miri_spectrum.wavelengths,
+                                              miri_spectrum.fluxes,
+                                              miri_spectrum.fluxerrs,
+                                              miri_spectrum.dqs,
+                                              n_consecutive, flux_scale_factor,
+                                              fluxerr_scale_factor)
 
         # Make "large-size" plot.
-        specutils_cos.plotspec(cos_spectrum, output_type, output_file,
-                               flux_scale_factor,
-                               fluxerr_scale_factor, segment_plot_metrics,
-                               dpi_val=dpi_val, output_size=1024, debug=debug,
-                               full_ylabels=full_ylabels,
-                               title_addendum=stitched_spectrum["title"],
-                               optimize=optimize)
+        plotspec(miri_spectrum, output_type, output_file,
+                 flux_scale_factor,
+                 fluxerr_scale_factor, spec_plot_metrics,
+                 dpi_val=dpi_val, output_size=1024, debug=debug,
+                 full_ylabels=full_ylabels,
+                 optimize=optimize)
 
         if not debug:
-            # Calculate plot metrics for the stitched spectrum.
-            stitched_plot_metrics = [
-                specutils.calc_plot_metrics("cos", stitched_spectrum["wls"],
-                                            stitched_spectrum["fls"],
-                                            stitched_spectrum["flerrs"],
-                                            stitched_spectrum["dqs"],
-                                            n_consecutive, flux_scale_factor,
-                                            fluxerr_scale_factor)]
-
             # Make "thumbnail-size" plot, if requested.
-            specutils_cos.plotspec(cos_spectrum, output_type, output_file,
-                                   flux_scale_factor,
-                                   fluxerr_scale_factor, stitched_plot_metrics,
-                                   dpi_val=dpi_val, output_size=128,
-                                   stitched_spectrum=stitched_spectrum,
-                                   optimize=optimize)
-
-    elif this_instrument == "STIS":
-        # Get wavelengths, fluxes, flux uncertainties.
-        stis_spectrum = specutils_stis.readspec(input_file)
-
-        # Get the indices to plot.  If the number of associations is <=3 then
-        # we will plot all of them, but if >3 then only the first, middle, and
-        # last association will be plotted, so it's not necessary to stitch or
-        # calculate plot metrics for any of the others.
-        indices_to_plot = specutils_stis.get_association_indices(
-            stis_spectrum.associations)
-
-        # Create a stitched spectrum for each association, used when making
-        # thumb-size plots.  The stitched spectrum joins the orders together (if
-        # there is more than one).  The length of the returned list is equal to
-        # the number of associations that will be plotted.
-        stitched_spectra = [
-            specutils.stitch_components(x, n_consecutive, flux_scale_factor,
-                                        fluxerr_scale_factor)
-            for x in numpy.asarray(stis_spectrum.associations)[indices_to_plot]]
-
-        # Calculate plot metrics for the each association that will be
-        # plotted.  The length of the returned list is equal to the number of
-        # associations that will be plotted.
-        association_plot_metrics = [
-            specutils.calc_plot_metrics("stis", x["wls"], x["fls"], x["flerrs"],
-                                        x["dqs"], n_consecutive,
-                                        flux_scale_factor, fluxerr_scale_factor)
-            for x in stitched_spectra]
-
-        # Make "large-size" plot.
-        specutils_stis.plotspec(stis_spectrum, indices_to_plot,
-                                stitched_spectra, output_type, output_file,
-                                flux_scale_factor,
-                                fluxerr_scale_factor, association_plot_metrics,
-                                dpi_val=dpi_val, output_size=1024, debug=debug,
-                                full_ylabels=full_ylabels, optimize=optimize)
-
-        # Make "thumbnail-size" plot, if requested.  Notice that in this case
-        # we always plot just the first association, by passing only
-        # `stitched_spectra[0]`.
-        if not debug:
-            specutils_stis.plotspec(stis_spectrum, indices_to_plot,
-                                    [stitched_spectra[0]], output_type,
-                                    output_file, flux_scale_factor,
-                                    fluxerr_scale_factor,
-                                    association_plot_metrics, dpi_val=dpi_val,
-                                    output_size=128, optimize=optimize)
-
+            plotspec(miri_spectrum, output_type, output_file,
+                     flux_scale_factor,
+                     fluxerr_scale_factor, spec_plot_metrics,
+                     dpi_val=dpi_val, output_size=128,
+                     optimize=optimize)
     else:
-        raise HSTSpecPrevError("'INSTRUME' keyword not understood: " +
-                               this_instrument)
+        raise JWSTSpecPrevError("'INSTRUME' keyword not understood: " +
+                                this_instrument)
 
 #--------------------
 
@@ -354,11 +275,11 @@ def setup_args():
     :returns: ArgumentParser -- Stores arguments and options.
     """
     parser = argparse.ArgumentParser(
-        description="Create spectroscopic preview plots given an HST spectrum"
+        description="Create spectroscopic preview plots given an JWST spectrum"
         " FITS file.")
 
     parser.add_argument("input_file", action="store", type=str, help=
-                        "[Required] Full path to input file (HST spectrum) for"
+                        "[Required] Full path to input file (JWST spectrum) for"
                         " which to generate preview plots.  Include the file"
                         " name in the path.")
 
@@ -435,15 +356,16 @@ if __name__ == "__main__":
     check_input_options(INPUT_ARGS)
 
     # Call main function.
-    make_hst_spec_previews(INPUT_ARGS.input_file,
-                           flux_scale_factor=INPUT_ARGS.flux_scale_factor,
-                           fluxerr_scale_factor=INPUT_ARGS.fluxerr_scale_factor,
-                           n_consecutive=INPUT_ARGS.n_consecutive,
-                           output_path=INPUT_ARGS.output_path,
-                           output_type=INPUT_ARGS.output_type,
-                           dpi_val=INPUT_ARGS.dpi_val,
-                           debug=INPUT_ARGS.debug,
-                           full_ylabels=INPUT_ARGS.full_ylabels,
-                           optimize=not INPUT_ARGS.nooptimize,
-                           verbose=INPUT_ARGS.verbose)
+    make_jwst_spec_previews(INPUT_ARGS.input_file,
+                            flux_scale_factor=INPUT_ARGS.flux_scale_factor,
+                            fluxerr_scale_factor=(
+                                INPUT_ARGS.fluxerr_scale_factor),
+                            n_consecutive=INPUT_ARGS.n_consecutive,
+                            output_path=INPUT_ARGS.output_path,
+                            output_type=INPUT_ARGS.output_type,
+                            dpi_val=INPUT_ARGS.dpi_val,
+                            debug=INPUT_ARGS.debug,
+                            full_ylabels=INPUT_ARGS.full_ylabels,
+                            optimize=not INPUT_ARGS.nooptimize,
+                            verbose=INPUT_ARGS.verbose)
 #--------------------

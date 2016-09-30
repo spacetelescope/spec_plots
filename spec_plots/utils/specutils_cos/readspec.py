@@ -5,11 +5,22 @@
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
 """
 
-import numpy
+#--------------------
+# Built-In Imports
+#--------------------
+from __future__ import absolute_import
+from __future__ import print_function
+#--------------------
+# External Imports
+#--------------------
 from astropy.io import fits
+import numpy
+#--------------------
+# Package Imports
+#--------------------
+from spec_plots import __version__
 from spec_plots.utils.specutils_cos.check_segments import check_segments
 from spec_plots.utils.specutils_cos.cosspectrum import COSSpectrum, COSSegment
-__version__ = '1.33.2'
 
 #--------------------
 
@@ -42,8 +53,8 @@ def readspec(input_file):
         try:
             segment_arr = cos_tabledata.field("SEGMENT")
         except KeyError:
-            print ("*** MAKE_HST_SPEC_PREVIEWS ERROR: SEGMENT column not found"
-                   " in first extension's binary table.")
+            print("*** MAKE_HST_SPEC_PREVIEWS ERROR: SEGMENT column not found"
+                  " in first extension's binary table.")
             exit(1)
 
         # Determine which band this is (NUV, FUV).
@@ -53,8 +64,8 @@ def readspec(input_file):
         try:
             optical_element = hdulist[0].header["OPT_ELEM"]
         except KeyError:
-            print ("*** MAKE_HST_SPEC_PREVIEWS ERROR: OPT_ELEM keyword not"
-                   " found in the primary header.")
+            print("*** MAKE_HST_SPEC_PREVIEWS ERROR: OPT_ELEM keyword not"
+                  " found in the primary header.")
             exit(1)
 
         # Extract the number of elements (n_wavelengths, n_fluxes, etc.) for
@@ -62,8 +73,8 @@ def readspec(input_file):
         try:
             nelems_arr = cos_tabledata.field("NELEM")
         except KeyError:
-            print ("*** MAKE_HST_SPEC_PREVIEWS ERROR: NELEM column not found"
-                   " in first extension's binary table.")
+            print("*** MAKE_HST_SPEC_PREVIEWS ERROR: NELEM column not found"
+                  " in first extension's binary table.")
             exit(1)
 
         # Extract wavelength, fluxes, flux uncertainties, and DQ flags for
@@ -72,29 +83,29 @@ def readspec(input_file):
         try:
             wavelength_table = cos_tabledata.field("WAVELENGTH")
         except KeyError:
-            print ("*** MAKE_HST_SPEC_PREVIEWS ERROR: WAVELENGTH column not"
-                   " found in first extension's binary table.")
+            print("*** MAKE_HST_SPEC_PREVIEWS ERROR: WAVELENGTH column not"
+                  " found in first extension's binary table.")
             exit(1)
 
         try:
             flux_table = cos_tabledata.field("FLUX")
         except KeyError:
-            print ("*** MAKE_HST_SPEC_PREVIEWS ERROR: FLUX column not found in"
-                   " first extension's binary table.")
+            print("*** MAKE_HST_SPEC_PREVIEWS ERROR: FLUX column not found in"
+                  " first extension's binary table.")
             exit(1)
 
         try:
             fluxerr_table = cos_tabledata.field("ERROR")
         except KeyError:
-            print ("*** MAKE_HST_SPEC_PREVIEWS ERROR: ERROR column not found"
-                   " in first extension's binary table.")
+            print("*** MAKE_HST_SPEC_PREVIEWS ERROR: ERROR column not found"
+                  " in first extension's binary table.")
             exit(1)
 
         try:
             dq_table = cos_tabledata.field("DQ_WGT")
         except KeyError:
-            print ("*** MAKE_HST_SPEC_PREVIEWS ERROR: DQ_WGT column not found"
-                   " in first extension's binary table.")
+            print("*** MAKE_HST_SPEC_PREVIEWS ERROR: DQ_WGT column not found"
+                  " in first extension's binary table.")
             exit(1)
 
         # Create COSSegment objects to populate the COSSpectrum object with.

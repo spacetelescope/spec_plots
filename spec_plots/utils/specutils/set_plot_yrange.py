@@ -5,11 +5,22 @@
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
 """
 
+#--------------------
+# Built-In Imports
+#--------------------
+from __future__ import absolute_import
+from builtins import range
+#--------------------
+# External Imports
+#--------------------
 import numpy
-
-__version__ = '1.33.2'
+#--------------------
+# Package Imports
+#--------------------
+from spec_plots import __version__
 
 #--------------------
+
 def set_plot_yrange(wavelengths, fluxes, avoid_regions=None, wl_range=None):
     """
     Given an array of wavelengths, fluxes, and avoid regions, returns a list of

@@ -5,12 +5,23 @@
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
 """
 
+#--------------------
+# Built-In Imports
+#--------------------
+from __future__ import absolute_import
+from __future__ import print_function
+#--------------------
+# External Imports
+#--------------------
 import numpy
+#--------------------
+# Package Imports
+#--------------------
 from spec_plots.utils.specutils.edge_trim import edge_trim
-
-__version__ = '1.33.2'
+from spec_plots import __version__
 
 #--------------------
+
 def set_plot_xrange(instrument, wavelengths, fluxes, fluxerrs, dqs,
                     n_consecutive, flux_scale_factor, fluxerr_scale_factor,
                     median_flux, median_fluxerr, fluxerr_95th):

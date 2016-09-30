@@ -6,12 +6,22 @@
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
 """
 
+#--------------------
+# Built-In Imports
+#--------------------
+from __future__ import absolute_import
 import os
 import sys
+from builtins import str
+#--------------------
+# External Imports
+#--------------------
 import numpy
-from ..specutils import SpecUtilsError
-
-__version__ = '1.33.2'
+#--------------------
+# Package Imports
+#--------------------
+from spec_plots.utils.specutils.specutilserror import SpecUtilsError
+from spec_plots import __version__
 
 # <DEVEL> Note that this hack to make it so that the user can import
 # `check_segments` directly as a module or run it from the command line as
@@ -23,7 +33,7 @@ if __package__ is None:
     UTILS_DIR = os.path.dirname(SPECUTILS_COS_DIR)
     PARENT_DIR = os.path.dirname(UTILS_DIR)
     sys.path.insert(1, PARENT_DIR)
-    __package__ = str("utils.specutils")
+    __package__ = str("utils.specutils_cos")
     __name__ = str(__package__+"."+__name__)
     del sys, os
 #--------------------

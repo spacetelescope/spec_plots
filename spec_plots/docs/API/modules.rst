@@ -6,4 +6,5 @@ Utility Modules, Including Instrument-Specific READ and PLOT Modules
 
    utils.specutils
    utils.specutils_cos
+   utils.specutils_miri
    utils.specutils_stis

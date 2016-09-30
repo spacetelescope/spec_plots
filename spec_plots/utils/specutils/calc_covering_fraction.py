@@ -6,11 +6,23 @@
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
 """
 
+#--------------------
+# Built-In Imports
+#--------------------
+from __future__ import absolute_import
+from __future__ import division
+from builtins import range
+#--------------------
+# External Imports
+#--------------------
 import numpy
-
-__version__ = '1.33.2'
+#--------------------
+# Package Imports
+#--------------------
+from spec_plots import __version__
 
 #--------------------
+
 def count_blue_red(buf):
     """
     Counts the number of "blue" vs. "red" pixels in the plot area.
@@ -27,7 +39,7 @@ def count_blue_red(buf):
 
     blue_count = 0
     red_count = 0
-    for i in xrange(0, len(buf), 3):
+    for i in range(0, len(buf), 3):
         # First make sure this isn't a grey pixel, where R=G=B.
         if not (buf[i] == buf[i+1] and buf[i] == buf[i+2]):
             if buf[i] > 0 and buf[i+2] == 0:
@@ -94,7 +106,7 @@ def calc_covering_fraction(fig, subplots, subplot_num, optimize=True):
     # red and blue pixels can be done quicker.  Early tests have shown this
     # usually produces the same results.
     if optimize:
-        n_per_subplot = numpy.ceil(len(buf) / len(subplots))
+        n_per_subplot = int(numpy.ceil(len(buf) / len(subplots)))
         while n_per_subplot % 3 != 0:
             n_per_subplot += 1
         startindex = subplot_num * n_per_subplot

@@ -6,9 +6,18 @@
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
 """
 
-__version__ = '1.33.2'
+#--------------------
+# Built-In Imports
+#--------------------
+from __future__ import absolute_import
+from builtins import str
+#--------------------
+# Package Imports
+#--------------------
+from spec_plots import __version__
 
 #--------------------
+
 def dq_has_flag(dqf, flag_to_check):
     """
     Returns true/false if the given DQ value has a specific flag value set after

@@ -5,11 +5,23 @@
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
 """
 
+#--------------------
+# Built-In Imports
+#--------------------
+from __future__ import absolute_import
+from builtins import object
+from builtins import str
+#--------------------
+# External Imports
+#--------------------
 import numpy
-
-__version__ = '1.33.2'
+#--------------------
+# Package Imports
+#--------------------
+from spec_plots import __version__
 
 #--------------------
+
 class COSSpectrum(object):
     """
     Defines a COS spectrum, including wavelegnth, flux, flux errors, and DQ_WGT

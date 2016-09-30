@@ -5,11 +5,21 @@
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
 """
 
+#--------------------
+# Built-In Imports
+#--------------------
+from __future__ import absolute_import
+from builtins import range
+#--------------------
+# External Imports
+#--------------------
 from astropy.io import fits
+#--------------------
+# Package Imports
+#--------------------
 from spec_plots.utils.specutils_stis.stis1dspectrum import (
     STIS1DSpectrum, STISExposureSpectrum, STISOrderSpectrum)
-
-__version__ = '1.33.2'
+from spec_plots import __version__
 
 #--------------------
 
@@ -46,8 +56,7 @@ def readspec(input_file):
                 wavelengths=exten_data_table["WAVELENGTH"][order],
                 fluxes=exten_data_table["FLUX"][order],
                 fluxerrs=exten_data_table["ERROR"][order],
-                dqs=exten_data_table["DQ"][order]) for order in xrange(
-                    n_orders)]
+                dqs=exten_data_table["DQ"][order]) for order in range(n_orders)]
 
             # Create a STISExposureSpectrum from the STISOrderSpectrum
             # objects.  Append to the running list of them.
