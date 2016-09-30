@@ -4,4 +4,4 @@
 python setup.py sdist
 
 ## Build the wheel.
-python setup.py bdist_wheel --python-tag py27
+python setup.py bdist_wheel
