@@ -26,6 +26,7 @@ sys.path.insert(0, os.path.abspath('../../'))
 sys.path.insert(0, os.path.abspath('../../utils/'))
 sys.path.insert(0, os.path.abspath('../../utils/specutils/'))
 sys.path.insert(0, os.path.abspath('../../utils/specutils_cos/'))
+sys.path.insert(0, os.path.abspath('../../utils/specutils_miri/'))
 sys.path.insert(0, os.path.abspath('../../utils/specutils_stis/'))
 
 # -- General configuration ------------------------------------------------
