@@ -34,10 +34,10 @@ spec_plots/utils/specutils_cos/extract_subspec.py
 spec_plots/utils/specutils_cos/get_segment_names.py
 spec_plots/utils/specutils_cos/plotspec.py
 spec_plots/utils/specutils_cos/readspec.py
-spec_plots/utils/specutils_miri/__init__.py
-spec_plots/utils/specutils_miri/mirispectrum.py
-spec_plots/utils/specutils_miri/plotspec.py
-spec_plots/utils/specutils_miri/readspec.py
+spec_plots/utils/specutils_jwst/__init__.py
+spec_plots/utils/specutils_jwst/jwstspectrum.py
+spec_plots/utils/specutils_jwst/plotspec.py
+spec_plots/utils/specutils_jwst/readspec.py
 spec_plots/utils/specutils_stis/__init__.py
 spec_plots/utils/specutils_stis/get_association_indices.py
 spec_plots/utils/specutils_stis/plotspec.py
