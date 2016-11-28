@@ -29,20 +29,6 @@ from spec_plots.utils.specutils.edge_trim import edge_trim
 from spec_plots.utils.specutils_cos.cosspectrum import COSSpectrum
 from spec_plots.utils.specutils_stis.stis1dspectrum import STISExposureSpectrum
 from spec_plots import __version__
-
-# <DEVEL> Note that this hack to make it so that the user can import
-# `stitch_components` directly as a module or run it from the command line as
-# __main__ has the side effect of importing this module twice, despite my best
-# efforts to work around it.  I don't think it will be a major issue, but worth
-# thinking about in the future. </DEVEL>
-if __package__ is None:
-    SPECUTILS_DIR = os.path.dirname(os.path.abspath(__file__))
-    UTILS_DIR = os.path.dirname(SPECUTILS_DIR)
-    PARENT_DIR = os.path.dirname(UTILS_DIR)
-    sys.path.insert(1, PARENT_DIR)
-    __package__ = str("utils.specutils")
-    __name__ = str(__package__+"."+__name__)
-    del sys, os
 #--------------------
 
 #--------------------

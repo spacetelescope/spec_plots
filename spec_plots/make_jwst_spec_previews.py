@@ -26,7 +26,7 @@ from astropy.io import fits
 #--------------------
 # Package Imports
 #--------------------
-from spec_plots.utils.specutils_miri import readspec, plotspec
+from spec_plots.utils.specutils_jwst import readspec, plotspec
 from spec_plots.utils.specutils.calc_plot_metrics import calc_plot_metrics
 from spec_plots import __version__
 
@@ -234,21 +234,21 @@ def make_jwst_spec_previews(input_file, flux_scale_factor=
 
     # Read in the FITS files and create plots using the local package
     # appropriate for the instrument used in the input file.
-    if this_instrument == "MIRI":
+    if this_instrument in ["MIRI", "NIRSPEC", "NIRISS"]:
         # Get wavelengths, fluxes, flux uncertainties.
-        miri_spectrum = readspec(input_file)
+        jwst_spectrum = readspec(input_file)
 
         # Calculate plot metrics.
-        spec_plot_metrics = calc_plot_metrics("miri",
-                                              miri_spectrum.wavelengths,
-                                              miri_spectrum.fluxes,
-                                              miri_spectrum.fluxerrs,
-                                              miri_spectrum.dqs,
+        spec_plot_metrics = calc_plot_metrics(this_instrument.lower(),
+                                              jwst_spectrum.wavelengths,
+                                              jwst_spectrum.fluxes,
+                                              jwst_spectrum.fluxerrs,
+                                              jwst_spectrum.dqs,
                                               n_consecutive, flux_scale_factor,
                                               fluxerr_scale_factor)
 
         # Make "large-size" plot.
-        plotspec(miri_spectrum, output_type, output_file,
+        plotspec(jwst_spectrum, output_type, output_file,
                  flux_scale_factor,
                  fluxerr_scale_factor, spec_plot_metrics,
                  dpi_val=dpi_val, output_size=1024, debug=debug,
@@ -257,7 +257,7 @@ def make_jwst_spec_previews(input_file, flux_scale_factor=
 
         if not debug:
             # Make "thumbnail-size" plot, if requested.
-            plotspec(miri_spectrum, output_type, output_file,
+            plotspec(jwst_spectrum, output_type, output_file,
                      flux_scale_factor,
                      fluxerr_scale_factor, spec_plot_metrics,
                      dpi_val=dpi_val, output_size=128,

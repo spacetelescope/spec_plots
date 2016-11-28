@@ -1,10 +1,10 @@
-utils.specutils_miri package
+utils.specutils_jwst package
 ============================
 
-mirispectrum
+jwstspectrum
 --------------------------------------
 
-.. automodule:: utils.specutils_miri.mirispectrum
+.. automodule:: utils.specutils_jwst.jwstspectrum
     :members:
     :undoc-members:
     :show-inheritance:
@@ -12,7 +12,7 @@ mirispectrum
 plotspec
 -----------------------------------
 
-.. automodule:: utils.specutils_miri.plotspec
+.. automodule:: utils.specutils_jwst.plotspec
     :members:
     :undoc-members:
     :show-inheritance:
@@ -20,7 +20,7 @@ plotspec
 readspec
 -----------------------------------
 
-.. automodule:: utils.specutils_miri.readspec
+.. automodule:: utils.specutils_jwst.readspec
     :members:
     :undoc-members:
     :show-inheritance:

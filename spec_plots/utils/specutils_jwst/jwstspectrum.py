@@ -1,6 +1,6 @@
 """
-.. module:: mirispectrum
-   :synopsis: Class definitions for a MIRI Spectrum object.
+.. module:: jwstspectrum
+   :synopsis: Class definitions for a JWST Spectrum object.
 
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
 """
@@ -17,16 +17,16 @@ from spec_plots import __version__
 
 #--------------------
 
-class MIRISpectrum(object):
+class JWSTSpectrum(object):
     """
-    Defines a MIRI spectrum, including wavelegnth, flux, flux errors, and DQ
+    Defines a JWST spectrum, including wavelegnth, flux, flux errors, and DQ
     values.
 
     :raises: ValueError
     """
     def __init__(self, wl_arr, fl_arr, fle_arr, dq_arr, orig_file=None):
         """
-        Create a MIRISpectrum object.
+        Create a JWSTSpectrum object.
 
         :param wl_arr: The array of wavelength values.
 

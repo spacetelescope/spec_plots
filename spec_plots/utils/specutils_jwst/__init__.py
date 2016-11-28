@@ -1,7 +1,7 @@
 """
 .. module:: __init__
 
-   :synopsis: Used to treat "specutils_miri" as a directory and package.
+   :synopsis: Used to treat "specutils_jwst" as a directory and package.
 
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
 """
@@ -14,5 +14,5 @@ from __future__ import absolute_import
 # Package Imports
 #--------------------
 from spec_plots import __version__
-from spec_plots.utils.specutils_miri.plotspec import plotspec
-from spec_plots.utils.specutils_miri.readspec import readspec
+from spec_plots.utils.specutils_jwst.plotspec import plotspec
+from spec_plots.utils.specutils_jwst.readspec import readspec
