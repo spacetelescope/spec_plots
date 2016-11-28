@@ -55,7 +55,7 @@ def plotspec(cos_spectrum, output_type, output_file,
              stitched_spectrum=None, title_addendum="", optimize=True):
     """
     Accepts a COSSpectrum object from the READSPEC function and produces preview
-    plots.
+        plots.
 
     :param cos_spectrum: COS spectrum as returned by READSPEC.
 
