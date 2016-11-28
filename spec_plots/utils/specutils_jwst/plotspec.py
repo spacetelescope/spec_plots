@@ -1,6 +1,6 @@
 """
 .. module:: plotspec
-   :synopsis: Creates preview plots for the provided MIRI spectrum.
+   :synopsis: Creates preview plots for the provided JWST spectrum.
 
 .. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
 """
@@ -40,25 +40,25 @@ if matplotlib.get_backend().lower() != 'agg':
 # efforts to work around it.  I don't think it will be a major issue, but
 #  worth thinking about in the future. </DEVEL>
 if __package__ is None:
-    SPECUTILS_MIRI_DIR = os.path.dirname(os.path.abspath(__file__))
-    UTILS_DIR = os.path.dirname(SPECUTILS_MIRI_DIR)
+    SPECUTILS_JWST_DIR = os.path.dirname(os.path.abspath(__file__))
+    UTILS_DIR = os.path.dirname(SPECUTILS_JWST_DIR)
     PARENT_DIR = os.path.dirname(UTILS_DIR)
     sys.path.insert(1, PARENT_DIR)
-    __package__ = str("utils.specutils_miri")
+    __package__ = str("utils.specutils_jwst")
     __name__ = str(__package__+"."+__name__)
 #--------------------
 
 #--------------------
-def plotspec(miri_spectrum, output_type, output_file, flux_scale_factor,
+def plotspec(jwst_spectrum, output_type, output_file, flux_scale_factor,
              fluxerr_scale_factor, plot_metrics, dpi_val=96., output_size=1024,
              debug=False, full_ylabels=False, optimize=True):
     """
-    Accepts a MIRISpectrum object from the READSPEC function and produces
+    Accepts a JWSTSpectrum object from the READSPEC function and produces
     preview plots.
 
-    :param miri_spectrum: MIRI spectrum as returned by READSPEC.
+    :param jwst_spectrum: JWST spectrum as returned by READSPEC.
 
-    :type miri_spectrum: MIRISpectrum
+    :type jwst_spectrum: JWSTSpectrum
 
     :param output_type: What kind of output to make?
 
@@ -158,10 +158,10 @@ def plotspec(miri_spectrum, output_type, output_file, flux_scale_factor,
     # Get the wavelengths, fluxes, flux uncertainties, and data quality
     # flags out of the spectrum.
     try:
-        all_wls = miri_spectrum.wavelengths
-        all_fls = miri_spectrum.fluxes
-        all_flerrs = miri_spectrum.fluxerrs
-        all_dqs = miri_spectrum.dqs
+        all_wls = jwst_spectrum.wavelengths
+        all_fls = jwst_spectrum.fluxes
+        all_flerrs = jwst_spectrum.fluxerrs
+        all_dqs = jwst_spectrum.dqs
     except KeyError as the_error:
         raise SpecUtilsError("The provided stitched spectrum does not have"
                              " the expected format, missing key " +
@@ -213,11 +213,11 @@ def plotspec(miri_spectrum, output_type, output_file, flux_scale_factor,
 
         if is_bigplot:
             this_figure.suptitle(os.path.basename(
-                miri_spectrum.orig_file), fontsize=18, color='r')
+                jwst_spectrum.orig_file), fontsize=18, color='r')
 
         if debug:
             # Overplot points color-coded based on rejection criteria.
-            debug_oplot(this_plotarea, "miri", all_wls, all_fls,
+            debug_oplot(this_plotarea, "jwst", all_wls, all_fls,
                         all_flerrs, all_dqs,
                         plot_metrics["median_flux"],
                         plot_metrics["median_fluxerr"],
