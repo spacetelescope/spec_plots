@@ -397,8 +397,8 @@ def setup_args():
     parser.add_argument("-o", action="store", type=str, dest="output_path",
                         default=OUTPUT_PATH_DEFAULT, help="[Optional] Full path"
                         " to output plot files.  Do not include file name in"
-                        " path.    Default is to output to the same directory
-                        as the input file.")
+                        " path.    Default is to output to the same directory"
+                        " as the input file.")
 
     parser.add_argument("-s", action="store", type=float, dest=
                         "flux_scale_factor", default=FLUX_SCALE_FACTOR_DEFAULT,
