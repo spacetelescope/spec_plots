@@ -1,6 +1,11 @@
 Change Log for SPEC_PLOTS
 =========================
 
+v1.34.2 - 2017 Mar. 15
+-----------------
+* Removed useless argument checks in main function.
+* First build that includes a conda package.
+
 v1.34.1 - 2016 Nov. 28
 -----------------
 * Added basic support for NIRSPEC and NIRISS.

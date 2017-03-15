@@ -85,14 +85,8 @@ def check_input_options(args):
     :raises: HSTSpecPrevError, ValueError
     """
 
-    # Make sure the input file is specified on input (non-empty string), and
-    # remove any leading/trailing whitespace.  Catch as an ArgumentsParser error
-    # in this case.  If it does exist, check that the input file exists at the
-    # time of the command-line parameter checking.
-    if not args.input_file:
-        raise HSTSpecPrevError("File name must be specified.")
-    else:
-        args.input_file = args.input_file.strip()
+    # Make sure the input file is trimmed for use later on in the program.
+    args.input_file = args.input_file.strip()
 
     # Make sure the output_type string is trimmed and lowercase.
     args.output_type = args.output_type.strip().lower()

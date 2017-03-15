@@ -85,14 +85,8 @@ def check_input_options(args):
     :raises: JWSTSpecPrevError, ValueError
     """
 
-    # Make sure the input file is specified on input (non-empty string), and
-    # remove any leading/trailing whitespace.  Catch as an ArgumentsParser error
-    # in this case.  If it does exist, check that the input file exists at the
-    # time of the command-line parameter checking.
-    if not args.input_file:
-        raise JWSTSpecPrevError("File name must be specified.")
-    else:
-        args.input_file = args.input_file.strip()
+    # Make sure the input file is trimmed for use later on in the program.
+    args.input_file = args.input_file.strip()
 
     # Make sure the output_type string is trimmed and lowercase.
     args.output_type = args.output_type.strip().lower()
@@ -318,8 +312,8 @@ def setup_args():
     parser.add_argument("-o", action="store", type=str, dest="output_path",
                         default=OUTPUT_PATH_DEFAULT, help="[Optional] Full path"
                         " to output plot files.  Do not include file name in"
-                        " path.    Default = %(default)s, the same directory as"
-                        " the input file.")
+                        " path.    Default is to output to the same directory"
+                        " as the input file.")
 
     parser.add_argument("-s", action="store", type=float, dest=
                         "flux_scale_factor", default=FLUX_SCALE_FACTOR_DEFAULT,
