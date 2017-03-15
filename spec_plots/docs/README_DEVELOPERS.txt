@@ -19,3 +19,7 @@ Best Practices for Development Of A New Branch
 9.)  After regression testing is finished and all Issues assigned to this branch are closed or moved to a future build, initiate a pull request and merge into master.
 
 10.)  To upload to PyPI with twine: twine upload dist/*, with the -u and -p options.
+
+11.)  After uploading to PyPI, you can build the conda package.  Inside the "conda" folder in the top-level directory, run "conda skeleton pypi spec-plots", then "conda build spec-plots".  You can also make a Python 3.6 version by doing "conda build --python 3.6 spec-plots".  NOTE: On SWF's environment, it's necessary to keep anaconda Python at "2" but the overall Python environment at 3.6 when building that version.
+
+12.)  Test the build using "conda install --user-local spec-plots".  If everything looks good, upload it to anaconda.org using "anaconda upload /Users/fleming/anaconda2/conda-bld/osx-64/spec-plots-1.34.2-py27_0.tar.bz2", where the last part is the name of the built .tar.bz2 file.
