@@ -404,8 +404,8 @@ def setup_args():
                         "output_type", default=OUTPUT_TYPE_DEFAULT, help=
                         "[Optional] Specify the file type of the plots to make."
                         "  Default = %(default)s.", choices=['png', 'eps',
-                                                             'screen'],
-                        metavar="{png,ps,screen}")
+                                                             'screen', 'fits'],
+                        metavar="{png,ps,screen,fits}")
 
     parser.add_argument("-v", action="store_true", dest="verbose",
                         default=VERBOSE_DEFAULT, help="[Optional] Turn on"
