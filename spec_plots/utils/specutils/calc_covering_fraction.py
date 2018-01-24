@@ -95,7 +95,7 @@ def calc_covering_fraction(fig, subplots, subplot_num, optimize=True):
 
     # Temporarily make the background color red so that it's easy to identify
     # empty pixels.
-    subplots[subplot_num].set_axis_bgcolor('red')
+    subplots[subplot_num].set_facecolor('red')
 
     # Draw the plot, convert into numpy array of RGB values.
     fig.canvas.draw()
@@ -125,7 +125,7 @@ def calc_covering_fraction(fig, subplots, subplot_num, optimize=True):
             subplot.set_visible(True)
 
     # Make the background color white again for this subplot.
-    subplots[subplot_num].set_axis_bgcolor('white')
+    subplots[subplot_num].set_facecolor('white')
 
     return float(blue_count) / float(red_count+blue_count) * 100.
 #--------------------

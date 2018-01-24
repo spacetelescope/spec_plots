@@ -269,7 +269,7 @@ def plotspec(jwst_spectrum, output_type, output_file, flux_scale_factor,
 
         # Make the plot background grey to distinguish that this is a
         # `special` plot.  Turn off y-tick labels.
-        this_plotarea.set_axis_bgcolor("lightgrey")
+        this_plotarea.set_facecolor("lightgrey")
         this_plotarea.set_yticklabels([])
 
         # Configure the plot units, text size, and other markings based

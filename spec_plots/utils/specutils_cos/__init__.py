@@ -20,3 +20,4 @@ from spec_plots.utils.specutils_cos.extract_subspec import extract_subspec
 from spec_plots.utils.specutils_cos.plotspec import plotspec
 from spec_plots.utils.specutils_cos.readspec import readspec
 from spec_plots.utils.specutils_cos.get_segment_names import get_segment_names
+from spec_plots.utils.specutils_cos.make_fits import make_fits

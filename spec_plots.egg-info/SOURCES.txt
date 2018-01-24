@@ -1,3 +1,4 @@
+README.md
 setup.py
 spec_plots/__init__.py
 spec_plots/__main__.py
@@ -32,6 +33,7 @@ spec_plots/utils/specutils_cos/check_segments.py
 spec_plots/utils/specutils_cos/cosspectrum.py
 spec_plots/utils/specutils_cos/extract_subspec.py
 spec_plots/utils/specutils_cos/get_segment_names.py
+spec_plots/utils/specutils_cos/make_fits.py
 spec_plots/utils/specutils_cos/plotspec.py
 spec_plots/utils/specutils_cos/readspec.py
 spec_plots/utils/specutils_jwst/__init__.py

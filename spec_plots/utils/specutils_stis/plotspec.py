@@ -334,7 +334,7 @@ def plotspec(stis_spectrum, association_indices, stitched_spectra, output_type,
 
             # Make the plot background grey to distinguish that this is a
             # `special` plot.  Turn off y-tick labels.
-            this_plotarea.set_axis_bgcolor("lightgrey")
+            this_plotarea.set_facecolor("lightgrey")
             this_plotarea.set_yticklabels([])
 
             # Configure the plot units, text size, and other markings based

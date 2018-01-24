@@ -205,9 +205,14 @@ def make_hst_spec_previews(input_file, flux_scale_factor=
 
     # Derive output file name from input file name.
     if output_type != "screen":
-        output_file = (path.join(output_path, "") +
-                       path.basename(input_file).split(".fits")[0] + "." +
-                       output_type)
+        if output_type != "fits":
+            output_file = (path.join(output_path, "") +
+                           path.basename(input_file).split(".fits")[0] + "." +
+                           output_type)
+        else:
+            output_file = (path.join(output_path, "") +
+                           path.basename(input_file).split(".fits")[0] +
+                           "_prev." + output_type)
     else:
         output_file = None
 
@@ -260,16 +265,21 @@ def make_hst_spec_previews(input_file, flux_scale_factor=
                                         fluxerr_scale_factor)
             for x in cos_segment_names]
 
-        # Make "large-size" plot.
-        specutils_cos.plotspec(cos_spectrum, output_type, output_file,
-                               flux_scale_factor,
-                               fluxerr_scale_factor, segment_plot_metrics,
-                               dpi_val=dpi_val, output_size=1024, debug=debug,
-                               full_ylabels=full_ylabels,
-                               title_addendum=stitched_spectrum["title"],
-                               optimize=optimize)
+        if output_type != "fits":
+            # Make "large-size" plot.
+            specutils_cos.plotspec(cos_spectrum, output_type, output_file,
+                                   flux_scale_factor,
+                                   fluxerr_scale_factor, segment_plot_metrics,
+                                   dpi_val=dpi_val, output_size=1024,
+                                   debug=debug, full_ylabels=full_ylabels,
+                                   title_addendum=stitched_spectrum["title"],
+                                   optimize=optimize)
+        else:
+            # Write the spectrum that would be plotted to a binary FITS table.
+            specutils_cos.make_fits(cos_spectrum, output_file,
+                                    segment_plot_metrics, input_file)
 
-        if not debug:
+        if not debug and output_type != "fits":
             # Calculate plot metrics for the stitched spectrum.
             stitched_plot_metrics = [
                 specutils.calc_plot_metrics("cos", stitched_spectrum["wls"],
@@ -404,8 +414,8 @@ def setup_args():
                         "output_type", default=OUTPUT_TYPE_DEFAULT, help=
                         "[Optional] Specify the file type of the plots to make."
                         "  Default = %(default)s.", choices=['png', 'eps',
-                                                             'screen'],
-                        metavar="{png,ps,screen}")
+                                                             'screen', 'fits'],
+                        metavar="{png,ps,screen,fits}")
 
     parser.add_argument("-v", action="store_true", dest="verbose",
                         default=VERBOSE_DEFAULT, help="[Optional] Turn on"

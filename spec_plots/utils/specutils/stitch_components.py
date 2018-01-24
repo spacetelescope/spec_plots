@@ -77,7 +77,7 @@ def stitch_components(input_exposure, n_consecutive, flux_scale_factor,
     all_dqs = []
 
     # Determine how many pieces there are to stitch, and how to loop through
-    # them (different depending on instrument type.
+    # them (different depending on instrument type).
     if isinstance(input_exposure, COSSpectrum):
         if segment_names is not None:
             n_components = len(segment_names)
