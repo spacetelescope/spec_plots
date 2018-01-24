@@ -20,9 +20,9 @@ Best Practices for Development Of A New Branch
 
 10.)  To upload to PyPI with twine: twine upload dist/*, with the -u and -p options.
 
-11.)  After uploading to PyPI, you can build the conda package.  Inside the "conda" folder in the top-level directory, run "conda skeleton pypi spec-plots", then "conda build spec-plots".  You can also make a Python 3.6 version by doing "conda build --python 3.6 spec-plots".  NOTE: On SWF's environment, it's necessary to keep anaconda Python at "2" but the overall Python environment at 3.6 when building that version.
+11.)  After uploading to PyPI, you can build the conda package.  Inside the "conda" folder in the top-level directory, run "conda skeleton pypi spec-plots" (if you want to remake the "meta.yaml" file from scratch, but first make sure you save a copy of the "conda_build_config.yaml"), then "conda build spec-plots".  NOTE for SWF: if building for multiple Python versions, you have to change PY_SHORTVER to match the version in "conda_build_config.yaml" before running conda build command.
 
 12.)  Now you can convert the build file to other platforms.  E.g., "conda convert -f --platform linux-64 <name of .tar.bz2>".  Note that you'll need to locate where the conda build package was output and run it there.  The output of the original build is reported when run when you first create it.
 
-13.)  Test the build using "conda install --user-local spec-plots".  If everything looks good, upload it to anaconda.org using "anaconda upload /Users/fleming/anaconda2/conda-bld/osx-64/spec-plots-1.34.2-py27_0.tar.bz2", where the last part is the name of the built .tar.bz2 file.
+13.)  Test the build using "conda install --use-local spec-plots".  If everything looks good, upload it to anaconda.org using "anaconda upload /Users/fleming/anaconda2/conda-bld/osx-64/spec-plots-1.34.2-py27_0.tar.bz2", where the last part is the name of the built .tar.bz2 file.
 
