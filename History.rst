@@ -3,7 +3,7 @@ Change Log for SPEC_PLOTS
 
 v1.34.3 - 2017 Dec. 08
 -----------------
-* Added binary FITS table as an output option.
+* Added binary FITS table as an output option for COS spectra.
 
 v1.34.2 - 2017 Mar. 15
 -----------------
