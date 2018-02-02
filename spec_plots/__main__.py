@@ -42,6 +42,7 @@ def main():
                                 dpi_val=args.dpi_val,
                                 debug=args.debug,
                                 full_ylabels=args.full_ylabels,
+                                optimize=not args.nooptimize,
                                 verbose=args.verbose)
 
 if __name__ == "__main__":
