@@ -168,7 +168,7 @@ def make_hst_spec_previews(input_file, flux_scale_factor=
 
     :type output_path: str
 
-    :param output_type: The file type of the plots to make.
+    :param output_type: The file type(s) of the plots to make.
 
     :type output_type: list
 
@@ -217,7 +217,9 @@ def make_hst_spec_previews(input_file, flux_scale_factor=
                                "_prev." + out_type)
         else:
             output_file = None
+
         output_files.append(output_file)
+
         # Print name of output file, if verbose is turned on and not plotting to
         # screen.
         if verbose and out_type != "screen":
@@ -267,9 +269,9 @@ def make_hst_spec_previews(input_file, flux_scale_factor=
                                         fluxerr_scale_factor)
             for x in cos_segment_names]
 
+        # Make "large-size" plot.
         for out_type, out_file in zip(output_type, output_files):
             if out_type != "fits":
-                # Make "large-size" plot.
                 specutils_cos.plotspec(cos_spectrum, out_type, out_file,
                                        flux_scale_factor,
                                        fluxerr_scale_factor,
