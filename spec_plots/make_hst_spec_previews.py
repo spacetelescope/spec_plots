@@ -34,7 +34,7 @@ FLUX_SCALE_FACTOR_DEFAULT = 10.
 FLUXERR_SCALE_FACTOR_DEFAULT = 5.
 N_CONSECUTIVE_DEFAULT = 20
 OUTPUT_PATH_DEFAULT = ""
-OUTPUT_TYPE_DEFAULT = str("png")
+OUTPUT_TYPE_DEFAULT = [str("png")]
 DPI_VAL_DEFAULT = 96.
 DEBUG_DEFAULT = False
 FULL_YLABELS_DEFAULT = False
@@ -88,8 +88,8 @@ def check_input_options(args):
     # Make sure the input file is trimmed for use later on in the program.
     args.input_file = args.input_file.strip()
 
-    # Make sure the output_type string is trimmed and lowercase.
-    args.output_type = args.output_type.strip().lower()
+    # Make sure the output_type string(s) is(are) trimmed and lowercase.
+    args.output_type = [x.strip().lower() for x in args.output_type]
 
     # The DPI value must be greater than zero...
     if args.dpi_val <= 0.:
@@ -168,9 +168,9 @@ def make_hst_spec_previews(input_file, flux_scale_factor=
 
     :type output_path: str
 
-    :param output_type: The file type of the plots to make.
+    :param output_type: The file type(s) of the plots to make.
 
-    :type output_type: str
+    :type output_type: list
 
     :param dpi_val: The DPI value of your device's monitor, which will affect
         the size of the output plots.
@@ -203,25 +203,29 @@ def make_hst_spec_previews(input_file, flux_scale_factor=
     if verbose:
         print("Input file: " + input_file)
 
-    # Derive output file name from input file name.
-    if output_type != "screen":
-        if output_type != "fits":
-            output_file = (path.join(output_path, "") +
-                           path.basename(input_file).split(".fits")[0] + "." +
-                           output_type)
+    # Derive output file names from input file name.
+    output_files = []
+    for out_type in output_type:
+        if out_type != "screen":
+            if out_type != "fits":
+                output_file = (path.join(output_path, "") +
+                               path.basename(input_file).split(".fits")[0] +
+                               "." + out_type)
+            else:
+                output_file = (path.join(output_path, "") +
+                               path.basename(input_file).split(".fits")[0] +
+                               "_prev." + out_type)
         else:
-            output_file = (path.join(output_path, "") +
-                           path.basename(input_file).split(".fits")[0] +
-                           "_prev." + output_type)
-    else:
-        output_file = None
+            output_file = None
 
-    # Print name of output file, if verbose is turned on and not plotting to
-    # screen.
-    if verbose and output_type != "screen":
-        print("Output file: " + output_file)
-    elif verbose:
-        print("Output file: Plotting to screen.")
+        output_files.append(output_file)
+
+        # Print name of output file, if verbose is turned on and not plotting to
+        # screen.
+        if verbose and out_type != "screen":
+            print("Output file: " + output_file)
+        elif verbose:
+            print("Output file: Plotting to screen.")
 
     # Read in the FITS file to determine which instrument it comes from.
     # Print the name of the instrument found in the header if verbose is turned
@@ -265,21 +269,24 @@ def make_hst_spec_previews(input_file, flux_scale_factor=
                                         fluxerr_scale_factor)
             for x in cos_segment_names]
 
-        if output_type != "fits":
-            # Make "large-size" plot.
-            specutils_cos.plotspec(cos_spectrum, output_type, output_file,
-                                   flux_scale_factor,
-                                   fluxerr_scale_factor, segment_plot_metrics,
-                                   dpi_val=dpi_val, output_size=1024,
-                                   debug=debug, full_ylabels=full_ylabels,
-                                   title_addendum=stitched_spectrum["title"],
-                                   optimize=optimize)
-        else:
-            # Write the spectrum that would be plotted to a binary FITS table.
-            specutils_cos.make_fits(cos_spectrum, output_file,
-                                    segment_plot_metrics, input_file)
+        # Make "large-size" plot.
+        for out_type, out_file in zip(output_type, output_files):
+            if out_type != "fits":
+                specutils_cos.plotspec(cos_spectrum, out_type, out_file,
+                                       flux_scale_factor,
+                                       fluxerr_scale_factor,
+                                       segment_plot_metrics,
+                                       dpi_val=dpi_val, output_size=1024,
+                                       debug=debug, full_ylabels=full_ylabels,
+                                       title_addendum=stitched_spectrum["title"],
+                                       optimize=optimize)
+            else:
+                # Write the spectrum that would be plotted to a binary FITS
+                # table.
+                specutils_cos.make_fits(cos_spectrum, out_file,
+                                        segment_plot_metrics, input_file)
 
-        if not debug and output_type != "fits":
+        if not debug and output_type != ["fits"]:
             # Calculate plot metrics for the stitched spectrum.
             stitched_plot_metrics = [
                 specutils.calc_plot_metrics("cos", stitched_spectrum["wls"],
@@ -290,12 +297,15 @@ def make_hst_spec_previews(input_file, flux_scale_factor=
                                             fluxerr_scale_factor)]
 
             # Make "thumbnail-size" plot, if requested.
-            specutils_cos.plotspec(cos_spectrum, output_type, output_file,
-                                   flux_scale_factor,
-                                   fluxerr_scale_factor, stitched_plot_metrics,
-                                   dpi_val=dpi_val, output_size=128,
-                                   stitched_spectrum=stitched_spectrum,
-                                   optimize=optimize)
+            for out_type, out_file in zip(output_type, output_files):
+                if out_type != 'fits':
+                    specutils_cos.plotspec(cos_spectrum, out_type,
+                                           out_file, flux_scale_factor,
+                                           fluxerr_scale_factor,
+                                           stitched_plot_metrics,
+                                           dpi_val=dpi_val, output_size=128,
+                                           stitched_spectrum=stitched_spectrum,
+                                           optimize=optimize)
 
     elif this_instrument == "STIS":
         # Get wavelengths, fluxes, flux uncertainties.
@@ -327,23 +337,27 @@ def make_hst_spec_previews(input_file, flux_scale_factor=
             for x in stitched_spectra]
 
         # Make "large-size" plot.
-        specutils_stis.plotspec(stis_spectrum, indices_to_plot,
-                                stitched_spectra, output_type, output_file,
-                                flux_scale_factor,
-                                fluxerr_scale_factor, association_plot_metrics,
-                                dpi_val=dpi_val, output_size=1024, debug=debug,
-                                full_ylabels=full_ylabels, optimize=optimize)
+        for out_type, out_file in zip(output_type, output_files):
+            if out_type != 'fits':
+                specutils_stis.plotspec(stis_spectrum, indices_to_plot,
+                                        stitched_spectra, out_type, out_file,
+                                        flux_scale_factor, fluxerr_scale_factor,
+                                        association_plot_metrics,
+                                        dpi_val=dpi_val, output_size=1024,
+                                        debug=debug, full_ylabels=full_ylabels,
+                                        optimize=optimize)
 
-        # Make "thumbnail-size" plot, if requested.  Notice that in this case
-        # we always plot just the first association, by passing only
-        # `stitched_spectra[0]`.
-        if not debug:
-            specutils_stis.plotspec(stis_spectrum, indices_to_plot,
-                                    [stitched_spectra[0]], output_type,
-                                    output_file, flux_scale_factor,
-                                    fluxerr_scale_factor,
-                                    association_plot_metrics, dpi_val=dpi_val,
-                                    output_size=128, optimize=optimize)
+                # Make "thumbnail-size" plot, if requested.  Notice that in this
+                # case we always plot just the first association, by passing only
+                # `stitched_spectra[0]`.
+                if not debug:
+                    specutils_stis.plotspec(stis_spectrum, indices_to_plot,
+                                            [stitched_spectra[0]], out_type,
+                                            out_file, flux_scale_factor,
+                                            fluxerr_scale_factor,
+                                            association_plot_metrics,
+                                            dpi_val=dpi_val,
+                                            output_size=128, optimize=optimize)
 
     else:
         raise HSTSpecPrevError("'INSTRUME' keyword not understood: " +
@@ -410,7 +424,7 @@ def setup_args():
                         " the median flux that defines the pass/fail criterion"
                         " within the edge trim test.  Default = %(default)s.")
 
-    parser.add_argument("-t", action="store", type=str.lower, dest=
+    parser.add_argument("-t", nargs='+', action="store", type=str, dest=
                         "output_type", default=OUTPUT_TYPE_DEFAULT, help=
                         "[Optional] Specify the file type of the plots to make."
                         "  Default = %(default)s.", choices=['png', 'eps',
