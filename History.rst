@@ -1,6 +1,13 @@
 Change Log for SPEC_PLOTS
 =========================
 
+v1.34.5 - 2018 Mar. 15
+-----------------
+* Output file names when verbose turned on now accurate.
+* Changed output file names, size no longer in the file name.
+* Fixed multi-panel large spectra so labels weren't overlapping with other text.
+* Changed matplotlib backend to be TkAGG instead of Agg.
+
 v1.34.4 - 2018 Feb. 02
 -----------------
 * Fixed Python 2.x issue with output_type argparse option.

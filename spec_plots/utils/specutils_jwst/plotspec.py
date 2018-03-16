@@ -31,8 +31,8 @@ from spec_plots.utils.specutils.calc_covering_fraction import (
     calc_covering_fraction)
 from spec_plots import __version__
 
-if matplotlib.get_backend().lower() != 'agg':
-    pyplot.switch_backend('Agg')
+if matplotlib.get_backend().lower() != 'tkagg':
+    pyplot.switch_backend('TkAgg')
 #--------------------
 
 #--------------------
@@ -311,17 +311,10 @@ def plotspec(jwst_spectrum, output_type, output_file, flux_scale_factor,
 
     # Display or plot to the desired format.
     if output_type != "screen":
-        # Deconstruct output file to include plot size information.
-        output_splits = os.path.split(output_file)
-        file_splits = os.path.splitext(output_splits[1])
-        if output_splits[0] != "":
-            revised_output_file = (output_splits[0]+os.path.sep+file_splits[0] +
-                                   '_{0:04d}'.format(output_size) +
-                                   file_splits[1])
+        if output_size == 128:
+            revised_output_file = output_file.strip('\.png') + '_thumb.png'
         else:
-            revised_output_file = (file_splits[0] +
-                                   '_{0:04d}'.format(output_size) +
-                                   file_splits[1])
+            revised_output_file = output_file
 
         # Save figure.
         this_figure.savefig(revised_output_file, format=output_type,

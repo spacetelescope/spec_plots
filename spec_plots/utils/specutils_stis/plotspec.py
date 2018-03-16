@@ -14,7 +14,6 @@ import copy
 import os
 import sys
 from builtins import str
-from builtins import range
 #--------------------
 # External Imports
 #--------------------
@@ -32,8 +31,8 @@ from spec_plots.utils.specutils.calc_covering_fraction import (
     calc_covering_fraction)
 from spec_plots import __version__
 
-if matplotlib.get_backend().lower() != 'agg':
-    pyplot.switch_backend('Agg')
+if matplotlib.get_backend().lower() != 'tkagg':
+    pyplot.switch_backend('TkAgg')
 #--------------------
 
 #--------------------
@@ -161,23 +160,23 @@ def plotspec(stis_spectrum, association_indices, stitched_spectra, output_type,
 
     # Adjust the plot geometry (margins, etc.) based on plot size.
     if is_bigplot:
-        this_figure.subplots_adjust(hspace=0.3, top=0.915)
+        this_figure.subplots_adjust(hspace=0.35, top=0.915)
     else:
         this_figure.subplots_adjust(top=0.85, bottom=0.3, left=0.25, right=0.8)
 
     # Loop over each association.
     covering_fractions = [0.] * len(stitched_spectra)
-    for i in range(len(stitched_spectra)):
+    for i, stitched_spectrum in enumerate(stitched_spectra):
         this_plotarea = these_plotareas[i]
 
         # Get the wavelengths, fluxes, flux uncertainties, and data quality
         # flags out of the stitched spectrum for this association.
         try:
-            all_wls = stitched_spectra[i]["wls"]
-            all_fls = stitched_spectra[i]["fls"]
-            all_flerrs = stitched_spectra[i]["flerrs"]
-            all_dqs = stitched_spectra[i]["dqs"]
-            title_addendum = stitched_spectra[i]["title"]
+            all_wls = stitched_spectrum["wls"]
+            all_fls = stitched_spectrum["fls"]
+            all_flerrs = stitched_spectrum["flerrs"]
+            all_dqs = stitched_spectrum["dqs"]
+            title_addendum = stitched_spectrum["title"]
         except KeyError as the_error:
             raise SpecUtilsError("The provided stitched spectrum does not have"
                                  " the expected format, missing key " +
@@ -376,17 +375,10 @@ def plotspec(stis_spectrum, association_indices, stitched_spectra, output_type,
 
     # Display or plot to the desired format.
     if output_type != "screen":
-        # Deconstruct output file to include plot size information.
-        output_splits = os.path.split(output_file)
-        file_splits = os.path.splitext(output_splits[1])
-        if output_splits[0] != "":
-            revised_output_file = (output_splits[0]+os.path.sep+file_splits[0] +
-                                   '_{0:04d}'.format(output_size) +
-                                   file_splits[1])
+        if output_size == 128:
+            revised_output_file = output_file.strip('\.png') + '_thumb.png'
         else:
-            revised_output_file = (file_splits[0] +
-                                   '_{0:04d}'.format(output_size) +
-                                   file_splits[1])
+            revised_output_file = output_file
 
         # Save figure.
         this_figure.savefig(revised_output_file, format=output_type,

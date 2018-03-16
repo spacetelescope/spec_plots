@@ -220,12 +220,19 @@ def make_hst_spec_previews(input_file, flux_scale_factor=
 
         output_files.append(output_file)
 
-        # Print name of output file, if verbose is turned on and not plotting to
-        # screen.
-        if verbose and out_type != "screen":
-            print("Output file: " + output_file)
-        elif verbose:
-            print("Output file: Plotting to screen.")
+    # Print name of output file.
+    if verbose:
+        print("Output file names are:")
+        for ofile in output_files:
+            if ofile is not None:
+                if ofile[-4:] == '.png':
+                    print("  Output file: " + ofile)
+                    print("  Output file: " + ofile.strip('\.png') +
+                          '_thumb.png')
+                else:
+                    print("  Output file: " + ofile)
+            else:
+                print("  Plotting to screen.")
 
     # Read in the FITS file to determine which instrument it comes from.
     # Print the name of the instrument found in the header if verbose is turned
