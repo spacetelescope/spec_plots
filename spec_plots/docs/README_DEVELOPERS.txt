@@ -20,7 +20,7 @@ Best Practices for Development Of A New Branch
 
 10.)  To upload to PyPI with twine: twine upload dist/*, with the -u and -p options.
 
-11.)  After uploading to PyPI, you can build the conda package.  Inside the "conda" folder in the top-level directory, run "conda skeleton pypi spec-plots" (if you want to remake the "meta.yaml" file from scratch, but first make sure you save a copy of the "conda_build_config.yaml"), then "conda build spec-plots".  NOTE for SWF: if building for multiple Python versions, you have to change PY_SHORTVER to match the version in "conda_build_config.yaml" before running conda build command.
+11.)  After uploading to PyPI, you can build the conda package.  Inside the "conda" folder in the top-level directory, run "conda skeleton pypi spec-plots" (if you want to remake the "meta.yaml" file from scratch, but first make sure you save a copy of the "conda_build_config.yaml"), then "conda build spec-plots".  NOTE for SWF: if building for multiple Python versions, you have to change PY_SHORTVER and CONDAPY_FULLVER to match the version in "conda_build_config.yaml" before running conda build command.
 
 12.)  Now you can convert the build file to other platforms.  E.g., "conda convert -f --platform linux-64 <name of .tar.bz2>".  Note that you'll need to locate where the conda build package was output and run it there.  The output of the original build is reported when run when you first create it.
 
