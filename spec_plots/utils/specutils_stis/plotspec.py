@@ -31,8 +31,8 @@ from spec_plots.utils.specutils.calc_covering_fraction import (
     calc_covering_fraction)
 from spec_plots import __version__
 
-if matplotlib.get_backend().lower() != 'tkagg':
-    pyplot.switch_backend('TkAgg')
+if matplotlib.get_backend().lower() != 'agg':
+    pyplot.switch_backend('Agg')
 #--------------------
 
 #--------------------
