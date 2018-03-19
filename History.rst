@@ -1,6 +1,10 @@
 Change Log for SPEC_PLOTS
 =========================
 
+v1.34.6 - 2018 Mar. 15
+-----------------
+* Changed default backend back to Agg.
+
 v1.34.5 - 2018 Mar. 15
 -----------------
 * Output file names when verbose turned on now accurate.
