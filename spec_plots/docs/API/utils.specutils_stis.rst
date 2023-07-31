@@ -12,18 +12,12 @@ get_association_indices
 plotspec
 ------------------------------------
 
-.. automodule:: utils.specutils_stis.plotspec
-    :members:
-    :undoc-members:
-    :show-inheritance:
+.. autofunction:: utils.specutils_stis.plotspec
 
 readspec
 ------------------------------------
 
-.. automodule:: utils.specutils_stis.readspec
-    :members:
-    :undoc-members:
-    :show-inheritance:
+.. autofunction:: utils.specutils_stis.readspec
 
 stis1dspectrum
 ------------------------------------------

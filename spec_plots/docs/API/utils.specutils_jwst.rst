@@ -12,15 +12,9 @@ jwstspectrum
 plotspec
 -----------------------------------
 
-.. automodule:: utils.specutils_jwst.plotspec
-    :members:
-    :undoc-members:
-    :show-inheritance:
+.. autofunction:: utils.specutils_jwst.plotspec
 
 readspec
 -----------------------------------
 
-.. automodule:: utils.specutils_jwst.readspec
-    :members:
-    :undoc-members:
-    :show-inheritance:
+.. autofunction:: utils.specutils_jwst.readspec

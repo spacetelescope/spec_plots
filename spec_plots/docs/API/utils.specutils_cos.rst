@@ -36,15 +36,9 @@ get_segment_names
 plotspec
 -----------------------------------
 
-.. automodule:: utils.specutils_cos.plotspec
-    :members:
-    :undoc-members:
-    :show-inheritance:
+.. autofunction:: utils.specutils_cos.plotspec
 
 readspec
 -----------------------------------
 
-.. automodule:: utils.specutils_cos.readspec
-    :members:
-    :undoc-members:
-    :show-inheritance:
+.. autofunction:: utils.specutils_cos.readspec
