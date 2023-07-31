@@ -13,7 +13,7 @@ from spec_plots import __version__
 setup(name="spec_plots",
       version=__version__,
       description="Create preview plots of HST or JWST spectra.",
-      classifiers=["Programming Language :: Python :: 3.8"],
+      classifiers=["Programming Language :: Python :: 3.9"],
       url="https://github.com/spacetelescope/spec_plots",
       author="Scott W. Fleming",
       author_email="fleming@stsci.edu",

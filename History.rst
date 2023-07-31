@@ -1,6 +1,11 @@
 Change Log for SPEC_PLOTS
 =========================
 
+v1.35.0 - 2023 Jul. 31
+-----------------
+* Added required config file for ReadTheDocs.
+* Updated package dependencies to newer versions.
+
 v1.34.6 - 2018 Mar. 15
 -----------------
 * Changed default backend back to Agg.

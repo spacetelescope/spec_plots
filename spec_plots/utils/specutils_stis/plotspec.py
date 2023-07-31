@@ -217,7 +217,7 @@ def plotspec(stis_spectrum, association_indices, stitched_spectra, output_type,
             # so that calc_covering_fraction would have someting to draw on the
             # canvas and thereby determine which pixels were "blue" (i.e., part
             # of the plotted spectrum vs. background).
-            this_plotarea.lines.remove(this_line[0])
+            this_line.pop(0).remove()
             # Now we plot the spectrum as a LineCollection so that the
             # transparency will have the desired effect, but, this is not
             # rendered on the canvas inside calc_covering_fraction, hence why we
@@ -240,7 +240,7 @@ def plotspec(stis_spectrum, association_indices, stitched_spectra, output_type,
                 this_collection.set_alpha(0.1)
 
             # Turn on plot grid lines.
-            this_plotarea.grid(True)
+            this_plotarea.grid(True, linestyle='dashed')
 
             if is_bigplot:
                 if i == len(stitched_spectra)-1:
