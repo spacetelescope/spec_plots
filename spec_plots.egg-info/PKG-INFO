@@ -1,9 +1,9 @@
 Metadata-Version: 2.1
 Name: spec-plots
-Version: 1.35.0
+Version: 1.35.1
 Summary: Create preview plots of HST or JWST spectra.
 Home-page: https://github.com/spacetelescope/spec_plots
 Author: Scott W. Fleming
 Author-email: fleming@stsci.edu
 License: MIT
-Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3
