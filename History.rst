@@ -1,7 +1,14 @@
 Change Log for SPEC_PLOTS
 =========================
 
-v1.35.0 - 2023 Jul. 31
+v1.35.1 - 2023 Aug. 4  
+-----------------
+* Added support for flux uncertainties being in FLUX_ERROR column
+  instead of ERROR column for JWST x1d FITS files.
+* Fixed readability of y-axis tick labels by adjusting font size,
+  angle, and padding.
+
+v1.35.0 - 2023 Jul. 31 
 -----------------
 * Added required config file for ReadTheDocs.
 * Updated package dependencies to newer versions.
