@@ -63,9 +63,13 @@ def readspec(input_file):
         try:
             fluxerr_table = jwst_tabledata.field("ERROR")
         except KeyError:
-            print("*** MAKE_JWST_SPEC_PREVIEWS ERROR: ERROR column not found"
-                  " in first extension's binary table.")
-            exit(1)
+            try:
+                fluxerr_table = jwst_tabledata.field("FLUX_ERROR")
+            except KeyError:
+                print("*** MAKE_JWST_SPEC_PREVIEWS ERROR: neither ERROR "
+                          "nor FLUX_ERROR column found in first "
+                          "extension's binary table.")
+                exit(1)
 
         try:
             dq_table = jwst_tabledata.field("DQ")

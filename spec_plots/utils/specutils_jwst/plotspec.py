@@ -237,7 +237,8 @@ def plotspec(jwst_spectrum, output_type, output_file, flux_scale_factor,
         # Only use two tick labels (min and max wavelengths) for
         # thumbnails, because there isn't enough space otherwise.
         if not is_bigplot:
-            rc('font', size=10)
+            this_plotarea.tick_params(labelsize=6., labelrotation=45.,
+                                          axis='y', pad=0.)
             minwl = numpy.nanmin(all_wls)
             maxwl = numpy.nanmax(all_wls)
             this_plotarea.set_xticks([minwl, maxwl])
@@ -275,7 +276,8 @@ def plotspec(jwst_spectrum, output_type, output_file, flux_scale_factor,
         # Configure the plot units, text size, and other markings based
         # on whether this is a large or thumbnail-sized plot.
         if not is_bigplot:
-            rc('font', size=10)
+            this_plotarea.tick_params(labelsize=6., labelrotation=45.,
+                                          axis='y', pad=0.)
             minwl = numpy.nanmin(all_wls)
             maxwl = numpy.nanmax(all_wls)
             this_plotarea.set_xticks([minwl, maxwl])
