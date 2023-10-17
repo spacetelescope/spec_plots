@@ -36,6 +36,10 @@ spec_plots/utils/specutils_cos/get_segment_names.py
 spec_plots/utils/specutils_cos/make_fits.py
 spec_plots/utils/specutils_cos/plotspec.py
 spec_plots/utils/specutils_cos/readspec.py
+spec_plots/utils/specutils_hasp/__init__.py
+spec_plots/utils/specutils_hasp/haspspectrum.py
+spec_plots/utils/specutils_hasp/plotspec.py
+spec_plots/utils/specutils_hasp/readspec.py
 spec_plots/utils/specutils_jwst/__init__.py
 spec_plots/utils/specutils_jwst/jwstspectrum.py
 spec_plots/utils/specutils_jwst/plotspec.py

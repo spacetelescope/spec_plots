@@ -118,6 +118,7 @@ def _set_plot_xrange_test(instrument, flux_values, flux_err_values, median_flux,
     # Return array of boolean values for the edge_trim test.
     if numpy.isfinite(median_flux):
         bool_results = [((instrument == "cos" and x != 0. and check_fluxes) or
+                         (instrument == "hasp" and x != 0. and check_fluxes) or
                          (instrument == "stis" and x != 0. and check_fluxes) or
                          (instrument == "miri" and x != 0. and check_fluxes) or
                          (not check_fluxes))
@@ -131,6 +132,8 @@ def _set_plot_xrange_test(instrument, flux_values, flux_err_values, median_flux,
                         and ((instrument == "stis" and not
                               is_bad_dq(instrument, z) and check_dqs) or
                              (instrument == "cos" and not
+                              is_bad_dq(instrument, z) and check_dqs) or
+                             (instrument == "hasp" and not
                               is_bad_dq(instrument, z) and check_dqs) or
                              (instrument == "miri" and not
                               is_bad_dq(instrument, z) and check_dqs) or
@@ -217,7 +220,7 @@ def edge_trim(instrument, fluxes, fluxerrs, dqs, n_consecutive, median_flux,
 
     # First run the xrange test on the first and last 100 elements (for
     # speed).  If no good indices are found within those ranges, then and only
-    # then will we run it on the entire array. """
+    # then will we run it on the entire array.
     where_good_fluxes_nodq = numpy.where(numpy.asarray(_set_plot_xrange_test(
         instrument, numpy.concatenate((fluxes[0:edge_size],
                                        fluxes[-1*edge_size:])),
