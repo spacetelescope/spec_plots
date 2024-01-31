@@ -2,7 +2,7 @@
 .. module:: plotspec
    :synopsis: Creates preview plots for the provided HASP spectrum.
 
-.. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
+.. moduleauthor:: Rob Swaters <rswaters@stsci.edu>
 """
 
 #--------------------
@@ -226,7 +226,7 @@ def plotspec(hasp_spectrum, output_type,
 
         if debug:
             # Overplot points color-coded based on rejection criteria.
-            debug_oplot(this_plotarea, "stis", all_wls, all_fls,
+            debug_oplot(this_plotarea, "hasp", all_wls, all_fls,
                         all_flerrs, all_dqs,
                         plot_metrics["median_flux"],
                         plot_metrics["median_fluxerr"],
