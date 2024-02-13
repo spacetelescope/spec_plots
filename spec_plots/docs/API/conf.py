@@ -12,7 +12,7 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
-import mock,os,sys
+import unittest.mock,os,sys
 
 MOCK_MODULES = ['astropy', 'astropy.io', 'matplotlib', 'matplotlib.pyplot', 'matplotlib.ticker', 'matplotlib.collections', 'numpy', 'future', 'future.builtins']
 for mod_name in MOCK_MODULES:
