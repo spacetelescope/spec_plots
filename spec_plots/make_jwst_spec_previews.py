@@ -17,8 +17,9 @@
 from __future__ import absolute_import
 from __future__ import print_function
 import argparse
-from os import path
 from builtins import str
+from os import path
+import sys
 #--------------------
 # External Imports
 #--------------------
@@ -43,7 +44,7 @@ VERBOSE_DEFAULT = False
 
 #--------------------
 
-class JWSTSpecPrevError(Exception, object):
+class JWSTSpecPrevError(Exception):
     """
     This class defines a generic Exception to use for errors raised in
     MAKE_JWST_SPEC_PREVIEWS.  It simply prints the given string when raising the
@@ -124,7 +125,7 @@ def get_instrument_name(input_file):
         except KeyError:
             print("*** MAKE_JWST_SPEC_PREVIEWS ERROR: INSTRUME keyword not"
                   " found in this file's primary header: " + input_file)
-            exit(1)
+            sys.exit()
     return this_instrument.strip().upper()
 
 #--------------------
@@ -228,7 +229,7 @@ def make_jwst_spec_previews(input_file, flux_scale_factor=
             if ofile is not None:
                 if ofile[-4:] == '.png':
                     print("  Output file: " + ofile)
-                    print("  Output file: " + ofile.strip('\.png') +
+                    print("  Output file: " + ofile.split('.png')[0] +
                           '_thumb.png')
                 else:
                     print("  Output file: " + ofile)

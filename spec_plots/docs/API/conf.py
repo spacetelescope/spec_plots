@@ -12,7 +12,9 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
-import mock,os,sys
+import unittest.mock as mock
+import os
+import sys
 
 MOCK_MODULES = ['astropy', 'astropy.io', 'matplotlib', 'matplotlib.pyplot', 'matplotlib.ticker', 'matplotlib.collections', 'numpy', 'future', 'future.builtins']
 for mod_name in MOCK_MODULES:
@@ -26,6 +28,7 @@ sys.path.insert(0, os.path.abspath('../../'))
 sys.path.insert(0, os.path.abspath('../../utils/'))
 sys.path.insert(0, os.path.abspath('../../utils/specutils/'))
 sys.path.insert(0, os.path.abspath('../../utils/specutils_cos/'))
+sys.path.insert(0, os.path.abspath('../../utils/specutils_hasp/'))
 sys.path.insert(0, os.path.abspath('../../utils/specutils_jwst/'))
 sys.path.insert(0, os.path.abspath('../../utils/specutils_stis/'))
 
@@ -55,7 +58,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'spec_plots'
-copyright = u'2014,2015,2016 Scott W. Fleming'
+copyright = u'2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024 Scott W. Fleming'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the

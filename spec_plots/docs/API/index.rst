@@ -3,7 +3,7 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Documentation for MAST's openSAIL project: spec_plots
+Documentation for MAST's spectral preview generator: spec_plots
 =====================================================
 
 Contents:

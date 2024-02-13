@@ -1,8 +1,8 @@
 """
 .. module:: plotspec
-   :synopsis: Creates preview plots for the provided JWST spectrum.
+   :synopsis: Creates preview plots for the provided HASP spectrum.
 
-.. moduleauthor:: Scott W. Fleming <fleming@stsci.edu>
+.. moduleauthor:: Rob Swaters <rswaters@stsci.edu>
 """
 
 #--------------------
@@ -20,6 +20,7 @@ from builtins import str
 import matplotlib
 from matplotlib.ticker import FormatStrFormatter
 from matplotlib import pyplot
+from matplotlib import rc
 import numpy
 #--------------------
 # Package Imports
@@ -35,16 +36,17 @@ if matplotlib.get_backend().lower() != 'agg':
 #--------------------
 
 #--------------------
-def plotspec(jwst_spectrum, output_type, output_file, flux_scale_factor,
+def plotspec(hasp_spectrum, output_type,
+             output_file, flux_scale_factor,
              fluxerr_scale_factor, plot_metrics, dpi_val=96., output_size=1024,
              debug=False, full_ylabels=False, optimize=True):
     """
-    Accepts a JWSTSpectrum object from the READSPEC function and produces
+    Accepts a HASPSpectrum object from the READSPEC function and produces
     preview plots.
 
-    :param jwst_spectrum: JWST spectrum as returned by READSPEC.
+    :param hasp_spectrum: HASP spectrum as returned by READSPEC.
 
-    :type jwst_spectrum: JWSTSpectrum
+    :type hasp_spectrum: HASPSpectrum
 
     :param output_type: What kind of output to make?
 
@@ -69,7 +71,7 @@ def plotspec(jwst_spectrum, output_type, output_file, flux_scale_factor,
         ranges, etc.) to use when making the plots.  These are computed using
         `utils.specutils.calc_plot_metrics()`.
 
-    :type plot_metrics: dict
+    :type plot_metrics: list
 
     :param dpi_val: The DPI value of your device's monitor.  Affects the size of
         the output plots.  Default = 96. (applicable to most modern monitors).
@@ -119,39 +121,57 @@ def plotspec(jwst_spectrum, output_type, output_file, flux_scale_factor,
                 os.mkdir(os.path.dirname(output_file))
             except OSError as this_error:
                 if this_error.errno == 13:
-                    sys.stderr.write("*** MAKE_JWST_SPEC_PREVIEWS ERROR:"
+                    sys.stderr.write("*** MAKE_HST_SPEC_PREVIEWS ERROR:"
                                      " Output directory could not be created,"
                                      " "+repr(this_error.strerror)+"\n")
-                    sys.exit()
+                    sys.exit
                 else:
                     raise
 
+    # If the figure size is large, then plot up to three associations,
+    # otherwise force only one association on the plot.
     is_bigplot = output_size > 128
 
     # Start plot figure.
-    this_figure, this_plotarea = pyplot.subplots(nrows=1, ncols=1,
-                                                 figsize=(
-                                                     output_size/dpi_val,
-                                                     output_size/dpi_val),
-                                                 dpi=dpi_val)
+    this_figure, these_plotareas = pyplot.subplots(nrows=1, ncols=1,
+                                                   figsize=(
+                                                       output_size/dpi_val,
+                                                       output_size/dpi_val),
+                                                   dpi=dpi_val)
+
+    # Make sure the subplots are in a numpy array (I think by default it is
+    # not if there is only one).
+    if not isinstance(these_plotareas, numpy.ndarray):
+        these_plotareas = numpy.asarray([these_plotareas])
 
     # Adjust the plot geometry (margins, etc.) based on plot size.
     if is_bigplot:
-        this_figure.subplots_adjust(hspace=0.3, top=0.915)
+        this_figure.subplots_adjust(hspace=0.35, top=0.915)
     else:
         this_figure.subplots_adjust(top=0.85, bottom=0.3, left=0.25, right=0.8)
 
+    # Unlike COS and STIS, there is only one plotarea
+    covering_fraction = 0.
+    this_plotarea = these_plotareas[0]
+
     # Get the wavelengths, fluxes, flux uncertainties, and data quality
-    # flags out of the spectrum.
+    # flags out of the stitched spectrum for this association.
     try:
-        all_wls = jwst_spectrum.wavelengths
-        all_fls = jwst_spectrum.fluxes
-        all_flerrs = jwst_spectrum.fluxerrs
-        all_dqs = jwst_spectrum.dqs
+        all_wls = hasp_spectrum.wavelengths
+        all_fls = hasp_spectrum.fluxes
+        all_flerrs = hasp_spectrum.fluxerrs
+        all_dqs = hasp_spectrum.dqs
+        title_addendum = hasp_spectrum.plot_info["title"]
     except KeyError as the_error:
         raise SpecUtilsError("The provided stitched spectrum does not have"
                              " the expected format, missing key " +
                              str(the_error)+".")
+
+    # Only plot information in the plot title if the plot is large (and
+    # therefore sufficient space exists on the plot).
+    if is_bigplot:
+        this_plotarea.set_title(title_addendum, loc="right", size="small",
+                                color="red")
 
     # Extract the optimal x-axis plot range from the plot_metrics dict,
     # since we use it a lot.
@@ -170,8 +190,9 @@ def plotspec(jwst_spectrum, output_type, output_file, flux_scale_factor,
         if not debug:
             this_plotarea.set_ylim(plot_metrics["y_axis_range"])
 
-        covering_fractions = calc_covering_fraction(
-            this_figure, numpy.asarray([this_plotarea]), 0, optimize=optimize)
+        covering_fraction = calc_covering_fraction(this_figure,
+                                                   these_plotareas, 0,
+                                                   optimize=optimize)
         # Note: here we remove the line we plotted before, it was only
         # so that calc_covering_fraction would have someting to draw on the
         # canvas and thereby determine which pixels were "blue" (i.e., part
@@ -191,19 +212,21 @@ def plotspec(jwst_spectrum, output_type, output_file, flux_scale_factor,
         this_collection = this_plotarea.add_collection(copy.copy(
             plot_metrics["line_collection"]))
 
-        if covering_fractions > 30.:
+        if covering_fraction > 30.:
             this_collection.set_alpha(0.1)
 
         # Turn on plot grid lines.
-        this_plotarea.grid(True, linestyle="dashed")
+        this_plotarea.grid(True, linestyle='dashed')
 
         if is_bigplot:
             this_figure.suptitle(os.path.basename(
-                jwst_spectrum.orig_file), fontsize=18, color='r')
+                hasp_spectrum.plot_info['orig_file']), fontsize=18, color='r')
+            # Uncomment the lines below to include the covering fraction
+            # as part of the suptitle.
 
         if debug:
             # Overplot points color-coded based on rejection criteria.
-            debug_oplot(this_plotarea, "jwst", all_wls, all_fls,
+            debug_oplot(this_plotarea, "hasp", all_wls, all_fls,
                         all_flerrs, all_dqs,
                         plot_metrics["median_flux"],
                         plot_metrics["median_fluxerr"],
@@ -236,8 +259,7 @@ def plotspec(jwst_spectrum, output_type, output_file, flux_scale_factor,
         # Only use two tick labels (min and max wavelengths) for
         # thumbnails, because there isn't enough space otherwise.
         if not is_bigplot:
-            this_plotarea.tick_params(labelsize=6., labelrotation=45.,
-                                          axis='y', pad=0.)
+            rc('font', size=10)
             minwl = numpy.nanmin(all_wls)
             maxwl = numpy.nanmax(all_wls)
             this_plotarea.set_xticks([minwl, maxwl])
@@ -275,8 +297,7 @@ def plotspec(jwst_spectrum, output_type, output_file, flux_scale_factor,
         # Configure the plot units, text size, and other markings based
         # on whether this is a large or thumbnail-sized plot.
         if not is_bigplot:
-            this_plotarea.tick_params(labelsize=6., labelrotation=45.,
-                                          axis='y', pad=0.)
+            rc('font', size=10)
             minwl = numpy.nanmin(all_wls)
             maxwl = numpy.nanmax(all_wls)
             this_plotarea.set_xticks([minwl, maxwl])

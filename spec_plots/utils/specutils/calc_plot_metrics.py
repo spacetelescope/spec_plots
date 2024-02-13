@@ -103,4 +103,3 @@ def calc_plot_metrics(instrument, wls, fls, flerrs, dqs, n_consecutive,
                 optimal_xaxis_range, "avoid_regions":avoid_regions,
             "y_axis_range":y_axis_range, "line_collection":linecoll}
 #--------------------
-
