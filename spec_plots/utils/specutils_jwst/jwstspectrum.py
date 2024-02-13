@@ -9,7 +9,6 @@
 # Built-In Imports
 #--------------------
 from __future__ import absolute_import
-from builtins import object
 #--------------------
 # Package Imports
 #--------------------
@@ -17,7 +16,7 @@ from spec_plots import __version__
 
 #--------------------
 
-class JWSTSpectrum(object):
+class JWSTSpectrum():
     """
     Defines a JWST spectrum, including wavelegnth, flux, flux errors, and DQ
     values.

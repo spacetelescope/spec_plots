@@ -9,7 +9,6 @@
 # Built-In Imports
 #--------------------
 from __future__ import absolute_import
-from builtins import object
 #--------------------
 # External Imports
 #--------------------
@@ -21,7 +20,7 @@ from spec_plots import __version__
 
 #--------------------
 
-class HASPSpectrum(object):
+class HASPSpectrum():
     """
     Defines a HASP 1D spectrum, including wavelegnth, flux, and flux errors.
 

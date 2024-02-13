@@ -10,6 +10,7 @@
 #--------------------
 from __future__ import absolute_import
 from __future__ import print_function
+import sys
 #--------------------
 # External Imports
 #--------------------
@@ -51,14 +52,14 @@ def readspec(input_file):
         except KeyError:
             print("*** MAKE_JWST_SPEC_PREVIEWS ERROR: WAVELENGTH column not"
                   " found in first extension's binary table.")
-            exit(1)
+            sys.exit()
 
         try:
             flux_table = jwst_tabledata.field("FLUX")
         except KeyError:
             print("*** MAKE_JWST_SPEC_PREVIEWS ERROR: FLUX column not found in"
                   " first extension's binary table.")
-            exit(1)
+            sys.exit()
 
         try:
             fluxerr_table = jwst_tabledata.field("ERROR")
@@ -69,14 +70,14 @@ def readspec(input_file):
                 print("*** MAKE_JWST_SPEC_PREVIEWS ERROR: neither ERROR "
                           "nor FLUX_ERROR column found in first "
                           "extension's binary table.")
-                exit(1)
+                sys.exit()
 
         try:
             dq_table = jwst_tabledata.field("DQ")
         except KeyError:
             print("*** MAKE_JWST_SPEC_PREVIEWS ERROR: DQ column not found"
                   " in first extension's binary table.")
-            exit(1)
+            sys.exit()
 
         # Create JWSTSpectrum object.
         return_spec = JWSTSpectrum(wavelength_table, flux_table, fluxerr_table,

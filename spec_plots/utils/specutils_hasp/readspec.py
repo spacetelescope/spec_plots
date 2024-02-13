@@ -9,7 +9,6 @@
 # Built-In Imports
 #--------------------
 from __future__ import absolute_import
-from builtins import range
 #--------------------
 # External Imports
 #--------------------

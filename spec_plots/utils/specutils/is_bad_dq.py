@@ -43,27 +43,22 @@ def is_bad_dq(instrument, dqs):
     if instrument == "cos":
         if isinstance(dqs, numpy.ndarray):
             return numpy.asarray([x < 1 for x in dqs])
-        else:
-            return dqs < 1
+        return dqs < 1
 
     if instrument == "hasp":
         if isinstance(dqs, numpy.ndarray):
             return numpy.asarray([x < 1 for x in dqs])
-        else:
-            return dqs < 1
+        return dqs < 1
 
-    elif instrument == "stis":
+    if instrument == "stis":
         if isinstance(dqs, numpy.ndarray):
-            return numpy.asarray([x != 0 and x != 16 for x in dqs])
-        else:
-            return dqs != 0 and dqs != 16
+            return numpy.asarray([x not in (0, 16) for x in dqs])
+        return dqs not in (0, 16)
 
-    elif instrument in ["miri", "nirspec", "niriss"]:
+    if instrument in ["miri", "nirspec", "niriss"]:
         if isinstance(dqs, numpy.ndarray):
             return numpy.asarray([x < 1 for x in dqs])
-        else:
-            return dqs < 1
+        return dqs < 1
 
-    else:
-        return numpy.asarray([])
+    return numpy.asarray([])
 #--------------------

@@ -9,7 +9,6 @@
 # Built-In Imports
 #--------------------
 from __future__ import absolute_import
-from builtins import object
 from builtins import str
 #--------------------
 # External Imports
@@ -22,7 +21,7 @@ from spec_plots import __version__
 
 #--------------------
 
-class COSSpectrum(object):
+class COSSpectrum():
     """
     Defines a COS spectrum, including wavelegnth, flux, flux errors, and DQ_WGT
     values.  A COS spectrum consists of N segments (N = {2,3}) stored as a dict
@@ -131,7 +130,7 @@ class COSSpectrum(object):
 #--------------------
 
 #--------------------
-class COSSegment(object):
+class COSSegment():
     """
     Defines a spectrum from a COS segment.  The data (wavelength, flux, flux
     errors) are stored as numpy ndarrays.  A scalar int property provides the

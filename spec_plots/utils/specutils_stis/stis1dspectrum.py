@@ -9,7 +9,6 @@
 # Built-In Imports
 #--------------------
 from __future__ import absolute_import
-from builtins import object
 #--------------------
 # External Imports
 #--------------------
@@ -21,7 +20,7 @@ from spec_plots import __version__
 
 #--------------------
 
-class STIS1DSpectrum(object):
+class STIS1DSpectrum():
     """
     Defines a STIS 1D spectrum (either "x1d" extracted or "sx1" summed
     extracted), including wavelegnth, flux, and flux errors.  A STIS 1D
@@ -61,7 +60,7 @@ class STIS1DSpectrum(object):
 #--------------------
 
 #--------------------
-class STISExposureSpectrum(object):
+class STISExposureSpectrum():
     """
     Defines a STIS exposure spectrum, which consists of "M" STISOrderSpectrum
     objects.
@@ -87,7 +86,7 @@ class STISExposureSpectrum(object):
 #--------------------
 
 #--------------------
-class STISOrderSpectrum(object):
+class STISOrderSpectrum():
     """
     Defines a STIS order spectrum, including wavelength, flux, flux errors,
     and data quality flags, which are stored as numpy arrays.  A scalar int

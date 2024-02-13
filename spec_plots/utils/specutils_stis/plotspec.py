@@ -19,7 +19,7 @@ from builtins import str
 #--------------------
 import matplotlib
 from matplotlib.ticker import FormatStrFormatter
-import matplotlib.pyplot as pyplot
+from matplotlib import pyplot
 from matplotlib import rc
 import numpy
 #--------------------
@@ -136,7 +136,7 @@ def plotspec(stis_spectrum, association_indices, stitched_spectra, output_type,
                     sys.stderr.write("*** MAKE_HST_SPEC_PREVIEWS ERROR:"
                                      " Output directory could not be created,"
                                      " "+repr(this_error.strerror)+"\n")
-                    exit(1)
+                    sys.exit()
                 else:
                     raise
 
@@ -376,7 +376,7 @@ def plotspec(stis_spectrum, association_indices, stitched_spectra, output_type,
     # Display or plot to the desired format.
     if output_type != "screen":
         if output_size == 128:
-            revised_output_file = output_file.strip('\.png') + '_thumb.png'
+            revised_output_file = output_file.split('.png')[0] + '_thumb.png'
         else:
             revised_output_file = output_file
 
