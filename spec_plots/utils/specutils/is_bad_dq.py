@@ -46,6 +46,12 @@ def is_bad_dq(instrument, dqs):
         else:
             return dqs < 1
 
+    if instrument == "hasp":
+        if isinstance(dqs, numpy.ndarray):
+            return numpy.asarray([x < 1 for x in dqs])
+        else:
+            return dqs < 1
+
     elif instrument == "stis":
         if isinstance(dqs, numpy.ndarray):
             return numpy.asarray([x != 0 and x != 16 for x in dqs])

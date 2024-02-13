@@ -27,7 +27,7 @@ import numpy
 #--------------------
 # Package Imports
 #--------------------
-from spec_plots.utils import specutils, specutils_cos, specutils_stis
+from spec_plots.utils import specutils, specutils_cos, specutils_stis, specutils_hasp
 from spec_plots import __version__
 
 FLUX_SCALE_FACTOR_DEFAULT = 10.
@@ -99,7 +99,8 @@ def check_input_options(args):
 
 def get_instrument_name(input_file):
     """
-    Retrieves the instrument name from a FITS file primary header.
+    Determines whether the input file is for HASP (Hubbble Advanced
+    Spectral Product).
 
     :param input_file: Name of input FITS file.
 
@@ -126,6 +127,23 @@ def get_instrument_name(input_file):
                   " found in this file's primary header: " + input_file)
             exit(1)
     return this_instrument.strip().upper()
+
+#--------------------
+
+def is_hasp_product(input_file):
+    """
+    Retrieves the instrument name from a FITS file primary header.
+
+    :param input_file: Name of input FITS file.
+
+    :type input_file: str
+
+    :returns: bool -- Returns True if the filename ends in _cspec.fits.
+    """
+
+    if input_file.endswith("_cspec.fits"):
+        return True
+    return False
 
 #--------------------
 
@@ -233,6 +251,43 @@ def make_hst_spec_previews(input_file, flux_scale_factor=
                     print("  Output file: " + ofile)
             else:
                 print("  Plotting to screen.")
+
+    # Handle previews for HASP products.
+    if is_hasp_product(input_file):
+        if verbose:
+            print("HASP product")
+        # Get wavelengths, fluxes, flux uncertainties.
+        hasp_spectrum = specutils_hasp.readspec(input_file)
+
+        # Make "large-size" plot.
+        for out_type, out_file in zip(output_type, output_files):
+            if out_type != 'fits':
+                # Make "large-size" plot
+                hasp_plot_metrics = specutils.calc_plot_metrics("hasp",
+                    hasp_spectrum.wavelengths,
+                    hasp_spectrum.fluxes,
+                    hasp_spectrum.fluxerrs,
+                    hasp_spectrum.dqs,
+                    1, flux_scale_factor, fluxerr_scale_factor)
+                specutils_hasp.plotspec(hasp_spectrum,
+                                        out_type, out_file,
+                                        flux_scale_factor, fluxerr_scale_factor,
+                                        hasp_plot_metrics,
+                                        dpi_val=dpi_val, output_size=1024,
+                                        debug=debug, full_ylabels=full_ylabels,
+                                        optimize=optimize)
+
+                # Make "thumbnail-size" plot, if requested.  Notice that in this
+                # case we always plot just the first association, by passing only
+                # `stitched_spectra[0]`.
+                if not debug:
+                    specutils_hasp.plotspec(hasp_spectrum,
+                                            out_type, out_file,
+                                            flux_scale_factor, fluxerr_scale_factor,
+                                            hasp_plot_metrics,
+                                            dpi_val=dpi_val,
+                                            output_size=128, optimize=optimize)
+        return
 
     # Read in the FITS file to determine which instrument it comes from.
     # Print the name of the instrument found in the header if verbose is turned
