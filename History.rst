@@ -1,10 +1,15 @@
 Change Log for SPEC_PLOTS
 =========================
 
-v1.36.0 - 2024 Feb. 9
+v1.36.1 - 2025 Feb. 14
+----------------------
+* Fixed incorrect units being shown for JWST NIRSPEC 1D files
+* NIRCam x1d files now supported
+ 
+v1.36.0 - 2024 Feb. 9  
 -----------------
-* Added basic support HST Hubble Advanced Spectral Products (HASP)
-
+* Added basic support HST Hubble Advanced Spectral Products (HASP)  
+ 
 v1.35.1 - 2023 Aug. 4
 -----------------
 * Added support for flux uncertainties being in FLUX_ERROR column

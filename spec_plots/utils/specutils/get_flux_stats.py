@@ -47,12 +47,12 @@ def get_flux_stats(fluxes, fluxerrs):
     if len(where_finite_and_notzero[0]) > 0:
         median_flux = numpy.median(fluxes[where_finite_and_notzero])
         median_fluxerr = numpy.median(fluxerrs[where_finite_and_notzero])
+        # Get the 95th percentile flux uncertainty value.
+        fluxerr_95th = numpy.percentile(fluxerrs, 95.)
     else:
         median_flux = numpy.nan
         median_fluxerr = numpy.nan
-
-    # Get the 95th percentile flux uncertainty value.
-    fluxerr_95th = numpy.percentile(fluxerrs, 95.)
+        fluxerr_95th = numpy.nan
 
     return median_flux, median_fluxerr, fluxerr_95th
 #--------------------

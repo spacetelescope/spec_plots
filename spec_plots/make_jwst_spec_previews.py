@@ -245,7 +245,7 @@ def make_jwst_spec_previews(input_file, flux_scale_factor=
 
     # Read in the FITS files and create plots using the local package
     # appropriate for the instrument used in the input file.
-    if this_instrument in ["MIRI", "NIRSPEC", "NIRISS"]:
+    if this_instrument in ["MIRI", "NIRSPEC", "NIRISS", "NIRCAM"]:
         # Get wavelengths, fluxes, flux uncertainties.
         jwst_spectrum = readspec(input_file)
 

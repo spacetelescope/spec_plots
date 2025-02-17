@@ -15,6 +15,7 @@ import sys
 # External Imports
 #--------------------
 from astropy.io import fits
+from astropy.table import Table
 #--------------------
 # Package Imports
 #--------------------
@@ -43,29 +44,37 @@ def readspec(input_file):
 
         # Read the data from the first extension.  For JWST, the spectra are
         # always stored as tables in the first FITS extension.
-        jwst_tabledata = hdulist[1].data
+        try:
+            jwst_table = Table.read(hdulist["EXTRACT1D"],
+                                        unit_parse_strict='silent')
+        except KeyError:
+            print("*** MAKE_JWST_SPEC_PREVIEWS ERROR: EXTRACT1D extension not"
+                  " found in FITS file.")
+            sys.exit()
 
         # Extract wavelength, fluxes, flux uncertainties, and DQ flags for
         # each segment.
         try:
-            wavelength_table = jwst_tabledata.field("WAVELENGTH")
+            wavelength_col = jwst_table["WAVELENGTH"]
         except KeyError:
             print("*** MAKE_JWST_SPEC_PREVIEWS ERROR: WAVELENGTH column not"
                   " found in first extension's binary table.")
             sys.exit()
+        wavelength_unit = wavelength_col.unit
 
         try:
-            flux_table = jwst_tabledata.field("FLUX")
+            flux_col = jwst_table["FLUX"]
         except KeyError:
             print("*** MAKE_JWST_SPEC_PREVIEWS ERROR: FLUX column not found in"
                   " first extension's binary table.")
             sys.exit()
+        flux_unit = flux_col.unit
 
         try:
-            fluxerr_table = jwst_tabledata.field("ERROR")
+            fluxerr_col = jwst_table["ERROR"]
         except KeyError:
             try:
-                fluxerr_table = jwst_tabledata.field("FLUX_ERROR")
+                fluxerr_col = jwst_table["FLUX_ERROR"]
             except KeyError:
                 print("*** MAKE_JWST_SPEC_PREVIEWS ERROR: neither ERROR "
                           "nor FLUX_ERROR column found in first "
@@ -73,15 +82,17 @@ def readspec(input_file):
                 sys.exit()
 
         try:
-            dq_table = jwst_tabledata.field("DQ")
+            dq_col = jwst_table["DQ"]
         except KeyError:
             print("*** MAKE_JWST_SPEC_PREVIEWS ERROR: DQ column not found"
                   " in first extension's binary table.")
             sys.exit()
 
         # Create JWSTSpectrum object.
-        return_spec = JWSTSpectrum(wavelength_table, flux_table, fluxerr_table,
-                                   dq_table, orig_file=input_file)
+        return_spec = JWSTSpectrum(wavelength_col.data, flux_col.data,
+                                       fluxerr_col.data, dq_col.data,
+                                       wavelength_unit, flux_unit,
+                                       orig_file=input_file)
 
         return return_spec
 #--------------------

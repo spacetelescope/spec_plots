@@ -70,7 +70,6 @@ def calc_plot_metrics(instrument, wls, fls, flerrs, dqs, n_consecutive,
 
     :returns: dict -- A container for the plot metrics.
     """
-
     # Calculate statistics on the fluxes.
     median_flux, median_fluxerr, fluxerr_95th = get_flux_stats(fls, flerrs)
 
@@ -85,7 +84,7 @@ def calc_plot_metrics(instrument, wls, fls, flerrs, dqs, n_consecutive,
     avoid_regions = generate_avoid_regions(instrument)
 
     # Determine the optimal y-axis.
-    if all(numpy.isfinite(optimal_xaxis_range)):
+    if all(numpy.isfinite(optimal_xaxis_range)) and not all(numpy.isnan(fls.data)):
         y_axis_range = set_plot_yrange(wls, fls, avoid_regions=avoid_regions,
                                        wl_range=optimal_xaxis_range)
     else:
