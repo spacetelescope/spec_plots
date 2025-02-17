@@ -170,7 +170,7 @@ def plotspec(jwst_spectrum, output_type, output_file, flux_scale_factor,
         # Update y-axis range, but only adjust the ranges if this isn't
         # an all-zero flux case (and not in debug mode, in which case I want
         # to see the entire y-axis range).
-        if not debug :
+        if not debug:
             this_plotarea.set_ylim(plot_metrics["y_axis_range"])
 
         covering_fractions = calc_covering_fraction(
