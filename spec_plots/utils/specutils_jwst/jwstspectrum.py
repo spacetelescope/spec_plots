@@ -23,7 +23,8 @@ class JWSTSpectrum():
 
     :raises: ValueError
     """
-    def __init__(self, wl_arr, fl_arr, fle_arr, dq_arr, orig_file=None):
+    def __init__(self, wl_arr, fl_arr, fle_arr, dq_arr, wl_unit, fl_unit,
+                     orig_file=None):
         """
         Create a JWSTSpectrum object.
 
@@ -43,6 +44,14 @@ class JWSTSpectrum():
 
         :type dq_arr: numpy.ndarray
 
+        :param wl_unit: The unit of the wavelength values.
+
+        :type wl_unit: astropy.units.core.Unit
+
+        :param fl_unit: The unit of the flux values.
+
+        :type fl_unit: astropy.units.core.Unit
+
         :param orig_file: Original FITS file read to create the spectrum
             (includes full path).
 
@@ -54,7 +63,9 @@ class JWSTSpectrum():
 
         # Record the wavelength, flux, flux uncertainty, and DQ values.
         self.wavelengths = wl_arr
+        self.wavelengths_unit = wl_unit
         self.fluxes = fl_arr
+        self.fluxes_unit = fl_unit
         self.fluxerrs = fle_arr
         self.dqs = dq_arr
 #--------------------

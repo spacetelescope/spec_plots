@@ -158,8 +158,11 @@ def plotspec(jwst_spectrum, output_type, output_file, flux_scale_factor,
     optimal_xaxis_range = plot_metrics["optimal_xaxis_range"]
 
     # Plot the spectrum, but only if valid wavelength ranges for x-axis
-    # are returned, otherwise plot a special "Fluxes Are All Zero" plot.
-    if all(numpy.isfinite(optimal_xaxis_range)):
+    # are returned, otherwise plot a special "Fluxes Are All Zero or NaN" plot.
+    if (
+            all(numpy.isfinite(optimal_xaxis_range)) and
+            not all(numpy.isnan(plot_metrics["y_axis_range"]))
+        ):
         # We plot the spectrum as a regular line for use
         # in calc_covering_fraction, it will be removed later.
         this_line = this_plotarea.plot(all_wls, all_fls, 'b')
@@ -249,10 +252,20 @@ def plotspec(jwst_spectrum, output_type, output_file, flux_scale_factor,
             # Make sure the font properties go back to normal.
             pyplot.rcdefaults()
             this_plotarea.tick_params(axis='x', labelsize=14)
-            this_plotarea.set_xlabel(r"Wavelength $(\AA)$", fontsize=16,
-                                     color='k')
-            this_plotarea.set_ylabel(r"Flux $\mathrm{(erg/s/cm^2\!/\AA)}$",
-                                     fontsize=16, color='k')
+            if jwst_spectrum.wavelengths_unit:
+                this_plotarea.set_xlabel(
+                    f"Wavelength ({jwst_spectrum.wavelengths_unit:latex})",
+                    fontsize=16, color='k')
+            else:
+                this_plotarea.set_xlabel(
+                    f"Wavelength (unknown unit)", fontsize=16, color='k')
+            if jwst_spectrum.fluxes_unit:
+                this_plotarea.set_ylabel(
+                    f"Flux ({jwst_spectrum.fluxes_unit:latex})",
+                    fontsize=16, color='k')
+            else:
+                this_plotarea.set_xlabel(
+                    f"Wavelength (unknown unit)", fontsize=16, color='k')
 
             # If requested, include the powers of 10 part of the y-axis
             # tickmarks.
@@ -261,8 +274,8 @@ def plotspec(jwst_spectrum, output_type, output_file, flux_scale_factor,
                     '%3.2E'))
 
     else:
-        # Otherwise this is a spectrum that has all zero fluxes, or some
-        # other problem, and we make a default plot.  Define the optimal
+        # Otherwise this is a spectrum that has all zero fluxes, all NaN fluxes
+        # or some other problem, and we make a default plot. Define the optimal
         # x-axis range to span the original spectrum.
         optimal_xaxis_range = [numpy.nanmin(all_wls), numpy.nanmax(all_wls)]
         this_plotarea.set_xlim(optimal_xaxis_range)
@@ -285,15 +298,25 @@ def plotspec(jwst_spectrum, output_type, output_file, flux_scale_factor,
             this_plotarea.xaxis.set_major_formatter(FormatStrFormatter(
                 "%6.1f"))
             textsize = "small"
-            plottext = "Fluxes are \n all 0."
+            plottext = "Fluxes are \n all 0 or NaN."
         else:
             # Make sure the font properties go back to normal.
             pyplot.rcdefaults()
             this_plotarea.tick_params(axis='x', labelsize=14)
-            this_plotarea.set_xlabel(r"Wavelength $(\AA)$", fontsize=16,
-                                     color='k')
-            this_plotarea.set_ylabel(r"Flux $\mathrm{(erg/s/cm^2\!/\AA)}$",
-                                     fontsize=16, color='k')
+            if jwst_spectrum.wavelengths_unit:
+                this_plotarea.set_xlabel(
+                    f"Wavelength ({jwst_spectrum.wavelengths_unit:latex})",
+                    fontsize=16, color='k')
+            else:
+                this_plotarea.set_xlabel(
+                    f"Wavelength (unknown unit)", fontsize=16, color='k')
+            if jwst_spectrum.fluxes_unit:
+                this_plotarea.set_ylabel(
+                    f"Flux ({jwst_spectrum.fluxes_unit:latex})",
+                    fontsize=16, color='k')
+            else:
+                this_plotarea.set_xlabel(
+                    f"Wavelength (unknown unit)", fontsize=16, color='k')
 
             # If requested, include the powers of 10 part of the y-axis
             # tickmarks.
@@ -302,7 +325,7 @@ def plotspec(jwst_spectrum, output_type, output_file, flux_scale_factor,
                     '%3.2E'))
 
             textsize = "x-large"
-            plottext = "Fluxes are all 0."
+            plottext = "Fluxes are all 0 or NaN."
 
         # Place the text with the informational message in the center of
         # the plot.
