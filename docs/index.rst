@@ -4,7 +4,7 @@
    contain the root `toctree` directive.
 
 Documentation for MAST's spectral preview generator: spec_plots
-=====================================================
+===============================================================
 
 Contents:
 

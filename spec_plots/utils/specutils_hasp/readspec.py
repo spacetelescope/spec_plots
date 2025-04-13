@@ -24,7 +24,7 @@ from spec_plots import __version__
 #--------------------
 def readspec(input_file):
     """
-    Reads in a HASP spectrum FITS file (*_cspec.fits) and returns the
+    Reads in a HASP spectrum FITS file (_cspec.fits) and returns the
     wavelengths, fluxes, and flux uncertainties.
 
     :param input_file: Name of input FITS file.

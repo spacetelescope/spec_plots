@@ -136,7 +136,6 @@ class COSSegment():
     errors) are stored as numpy ndarrays.  A scalar int property provides the
     number of elements in this segment.
     """
-
     def __init__(self, nelem=None, wavelengths=None, fluxes=None, fluxerrs=None,
                  dqs=None):
         """
@@ -149,7 +148,7 @@ class COSSegment():
         :type nelem: int
 
         :param wavelengths: [Optional] List of wavelengths in this segment's
-        spectrum.
+            spectrum.
 
         :type wavelengths: list
 
@@ -158,12 +157,12 @@ class COSSegment():
         :type fluxes: list
 
         :param fluxerrs: [Optional] List of flux uncertainties in this segment's
-        spectrum.
+            spectrum.
 
         :type fluxerrs: list
 
         :param dqs: [Optional] List of Data Quality (DQ) flags in this segment's
-        spectrum.
+            spectrum.
 
         :type dqs: list
         """
