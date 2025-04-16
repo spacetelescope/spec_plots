@@ -41,9 +41,7 @@ def readspec(input_file):
     """
 
     with fits.open(input_file) as hdulist:
-
-        # Read the data from the first extension.  For JWST, the spectra are
-        # always stored as tables in the first FITS extension.
+        # Read the data from the "EXTRACT1D" FITS extension.
         try:
             jwst_table = Table.read(hdulist["EXTRACT1D"],
                                         unit_parse_strict='silent')
