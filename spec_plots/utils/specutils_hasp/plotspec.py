@@ -124,7 +124,7 @@ def plotspec(hasp_spectrum, output_type,
                     sys.stderr.write("*** MAKE_HST_SPEC_PREVIEWS ERROR:"
                                      " Output directory could not be created,"
                                      " "+repr(this_error.strerror)+"\n")
-                    sys.exit
+                    sys.exit(1)
                 else:
                     raise
 
