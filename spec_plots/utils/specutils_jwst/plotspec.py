@@ -122,7 +122,7 @@ def plotspec(jwst_spectrum, output_type, output_file, flux_scale_factor,
                     sys.stderr.write("*** MAKE_JWST_SPEC_PREVIEWS ERROR:"
                                      " Output directory could not be created,"
                                      " "+repr(this_error.strerror)+"\n")
-                    sys.exit()
+                    sys.exit(1)
                 else:
                     raise
 

@@ -50,7 +50,7 @@ def readspec(input_file):
         except KeyError:
             print("*** MAKE_JWST_SPEC_PREVIEWS ERROR: EXTRACT1D extension not"
                   " found in FITS file.")
-            sys.exit()
+            sys.exit(1)
 
         # Extract wavelength, fluxes, flux uncertainties, and DQ flags for
         # each segment.
@@ -59,7 +59,7 @@ def readspec(input_file):
         except KeyError:
             print("*** MAKE_JWST_SPEC_PREVIEWS ERROR: WAVELENGTH column not"
                   " found in first extension's binary table.")
-            sys.exit()
+            sys.exit(1)
         wavelength_unit = wavelength_col.unit
 
         try:
@@ -67,7 +67,7 @@ def readspec(input_file):
         except KeyError:
             print("*** MAKE_JWST_SPEC_PREVIEWS ERROR: FLUX column not found in"
                   " first extension's binary table.")
-            sys.exit()
+            sys.exit(1)
         flux_unit = flux_col.unit
 
         try:
@@ -79,14 +79,14 @@ def readspec(input_file):
                 print("*** MAKE_JWST_SPEC_PREVIEWS ERROR: neither ERROR "
                           "nor FLUX_ERROR column found in first "
                           "extension's binary table.")
-                sys.exit()
+                sys.exit(1)
 
         try:
             dq_col = jwst_table["DQ"]
         except KeyError:
             print("*** MAKE_JWST_SPEC_PREVIEWS ERROR: DQ column not found"
                   " in first extension's binary table.")
-            sys.exit()
+            sys.exit(1)
 
         # Create JWSTSpectrum object.
         return_spec = JWSTSpectrum(wavelength_col.data, flux_col.data,

@@ -125,7 +125,7 @@ def get_instrument_name(input_file):
         except KeyError:
             print("*** MAKE_JWST_SPEC_PREVIEWS ERROR: INSTRUME keyword not"
                   " found in this file's primary header: " + input_file)
-            sys.exit()
+            sys.exit(1)
     return this_instrument.strip().upper()
 
 #--------------------
