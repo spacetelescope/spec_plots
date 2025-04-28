@@ -99,7 +99,10 @@ def calc_covering_fraction(fig, subplots, subplot_num, optimize=True):
 
     # Draw the plot, convert into numpy array of RGB values.
     fig.canvas.draw()
-    buf = numpy.fromstring(fig.canvas.tostring_rgb(), dtype=numpy.uint8)
+    buf = numpy.fromstring(fig.canvas.tostring_argb(), dtype=numpy.uint8)
+    # tostring_argb gives {alpha, r, g, b}, so reform with a mask skipping over
+    # alpha values.
+    buf = buf[numpy.arange(buf.shape[0]) % 4 != 0]
 
     # Count the number of "blue" and "red" pixels.  The optimized version
     # attempts to split the RGB array into equal slices so that the counting of
