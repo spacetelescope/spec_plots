@@ -120,12 +120,13 @@ def get_instrument_name(input_file):
     with fits.open(input_file) as hdulist:
         # Make sure the INSTRUME keyword exists in the primary header,
         # otherwise, catch as a KeyError in this case.
+        instrume_kw = "INSTRUME"
         try:
-            this_instrument = hdulist[0].header["INSTRUME"]
+            this_instrument = hdulist[0].header[instrume_kw]
         except KeyError:
-            print("*** MAKE_JWST_SPEC_PREVIEWS ERROR: INSTRUME keyword not"
-                  " found in this file's primary header: " + input_file)
-            sys.exit(1)
+            sys.exit("*** MAKE_JWST_SPEC_PREVIEWS ERROR: " + instrume_kw +
+                         " keyword not found in this file's primary header: " +
+                         input_file)
     return this_instrument.strip().upper()
 
 #--------------------

@@ -124,9 +124,8 @@ def get_instrument_name(input_file):
         try:
             this_instrument = hdulist[0].header["INSTRUME"]
         except KeyError:
-            print("*** MAKE_HST_SPEC_PREVIEWS ERROR: INSTRUME keyword not"
-                  " found in this file's primary header: " + input_file)
-            sys.exit(1)
+            sys.exit("*** MAKE_HST_SPEC_PREVIEWS ERROR: INSTRUME keyword not"
+                    " found in this file's primary header: " + input_file)
     return this_instrument.strip().upper()
 
 #--------------------

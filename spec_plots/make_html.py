@@ -109,10 +109,9 @@ def make_html(idir, odir="html/plot_previews/", ofile="plot_previews",
             os.mkdir(odir)
         except OSError as this_error:
             if this_error.errno == 13:
-                sys.stderr.write("*** MAKE_HTML ERROR: Output directory could"
-                                 " not be created, "+repr(this_error.strerror)+
-                                 "\n")
-                exit(1)
+                exit("*** MAKE_HTML ERROR: Output directory could"
+                         " not be created, " + repr(this_error.strerror) +
+                         "\n")
             else:
                 raise
 

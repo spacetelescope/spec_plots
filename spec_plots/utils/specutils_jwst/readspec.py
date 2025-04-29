@@ -48,26 +48,23 @@ def readspec(input_file):
             jwst_table = Table.read(hdulist["EXTRACT1D"],
                                         unit_parse_strict='silent')
         except KeyError:
-            print("*** MAKE_JWST_SPEC_PREVIEWS ERROR: EXTRACT1D extension not"
-                  " found in FITS file.")
-            sys.exit(1)
+            sys.exit("*** MAKE_JWST_SPEC_PREVIEWS ERROR: EXTRACT1D extension"
+                         " not found in FITS file.")
 
         # Extract wavelength, fluxes, flux uncertainties, and DQ flags for
         # each segment.
         try:
             wavelength_col = jwst_table["WAVELENGTH"]
         except KeyError:
-            print("*** MAKE_JWST_SPEC_PREVIEWS ERROR: WAVELENGTH column not"
+            sys.exit("*** MAKE_JWST_SPEC_PREVIEWS ERROR: WAVELENGTH column not"
                   " found in first extension's binary table.")
-            sys.exit(1)
         wavelength_unit = wavelength_col.unit
 
         try:
             flux_col = jwst_table["FLUX"]
         except KeyError:
-            print("*** MAKE_JWST_SPEC_PREVIEWS ERROR: FLUX column not found in"
-                  " first extension's binary table.")
-            sys.exit(1)
+            sys.exit("*** MAKE_JWST_SPEC_PREVIEWS ERROR: FLUX column not"
+                         " found in first extension's binary table.")
         flux_unit = flux_col.unit
 
         try:
@@ -76,17 +73,15 @@ def readspec(input_file):
             try:
                 fluxerr_col = jwst_table["FLUX_ERROR"]
             except KeyError:
-                print("*** MAKE_JWST_SPEC_PREVIEWS ERROR: neither ERROR "
+                sys.exit("*** MAKE_JWST_SPEC_PREVIEWS ERROR: neither ERROR "
                           "nor FLUX_ERROR column found in first "
                           "extension's binary table.")
-                sys.exit(1)
 
         try:
             dq_col = jwst_table["DQ"]
         except KeyError:
-            print("*** MAKE_JWST_SPEC_PREVIEWS ERROR: DQ column not found"
+            sys.exit("*** MAKE_JWST_SPEC_PREVIEWS ERROR: DQ column not found"
                   " in first extension's binary table.")
-            sys.exit(1)
 
         # Create JWSTSpectrum object.
         return_spec = JWSTSpectrum(wavelength_col.data, flux_col.data,

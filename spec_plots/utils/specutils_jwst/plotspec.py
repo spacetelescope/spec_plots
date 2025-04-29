@@ -119,10 +119,9 @@ def plotspec(jwst_spectrum, output_type, output_file, flux_scale_factor,
                 os.mkdir(os.path.dirname(output_file))
             except OSError as this_error:
                 if this_error.errno == 13:
-                    sys.stderr.write("*** MAKE_JWST_SPEC_PREVIEWS ERROR:"
-                                     " Output directory could not be created,"
-                                     " "+repr(this_error.strerror)+"\n")
-                    sys.exit(1)
+                    sys.exit("*** MAKE_JWST_SPEC_PREVIEWS ERROR:"
+                                 " Output directory could not be created,"
+                                 " " + repr(this_error.strerror) + "\n")
                 else:
                     raise
 
