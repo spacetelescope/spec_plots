@@ -131,10 +131,9 @@ def plotspec(cos_spectrum, output_type, output_file,
                 os.mkdir(os.path.dirname(output_file))
             except OSError as this_error:
                 if this_error.errno == 13:
-                    sys.stderr.write("*** MAKE_HST_SPEC_PREVIEWS ERROR: Output"
+                    sys.exit("*** MAKE_HST_SPEC_PREVIEWS ERROR: Output"
                                      " directory could not be created, " +
-                                     repr(this_error.strerror)+"\n")
-                    sys.exit()
+                                     repr(this_error.strerror) + "\n")
                 else:
                     raise
 

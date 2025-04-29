@@ -54,9 +54,8 @@ def readspec(input_file):
         try:
             segment_arr = cos_tabledata.field("SEGMENT")
         except KeyError:
-            print("*** MAKE_HST_SPEC_PREVIEWS ERROR: SEGMENT column not found"
-                  " in first extension's binary table.")
-            sys.exit()
+            sys.exit("*** MAKE_HST_SPEC_PREVIEWS ERROR: SEGMENT column not"
+                         " found in first extension's binary table.")
 
         # Determine which band this is (NUV, FUV).
         band = check_segments(segment_arr, input_file)
@@ -65,18 +64,16 @@ def readspec(input_file):
         try:
             optical_element = hdulist[0].header["OPT_ELEM"]
         except KeyError:
-            print("*** MAKE_HST_SPEC_PREVIEWS ERROR: OPT_ELEM keyword not"
-                  " found in the primary header.")
-            sys.exit()
+            sys.exit("*** MAKE_HST_SPEC_PREVIEWS ERROR: OPT_ELEM keyword not"
+                    " found in the primary header.")
 
         # Extract the number of elements (n_wavelengths, n_fluxes, etc.) for
         # each segment.  The dimension will match the array of segment names.
         try:
             nelems_arr = cos_tabledata.field("NELEM")
         except KeyError:
-            print("*** MAKE_HST_SPEC_PREVIEWS ERROR: NELEM column not found"
+            sys.exit("*** MAKE_HST_SPEC_PREVIEWS ERROR: NELEM column not found"
                   " in first extension's binary table.")
-            sys.exit()
 
         # Extract wavelength, fluxes, flux uncertainties, and DQ flags for
         # each segment.  These will be mxn tables, where m is the number of
@@ -84,30 +81,26 @@ def readspec(input_file):
         try:
             wavelength_table = cos_tabledata.field("WAVELENGTH")
         except KeyError:
-            print("*** MAKE_HST_SPEC_PREVIEWS ERROR: WAVELENGTH column not"
+            sys.exit("*** MAKE_HST_SPEC_PREVIEWS ERROR: WAVELENGTH column not"
                   " found in first extension's binary table.")
-            sys.exit()
 
         try:
             flux_table = cos_tabledata.field("FLUX")
         except KeyError:
-            print("*** MAKE_HST_SPEC_PREVIEWS ERROR: FLUX column not found in"
-                  " first extension's binary table.")
-            sys.exit()
+            sys.exit("*** MAKE_HST_SPEC_PREVIEWS ERROR: FLUX column not"
+                         " found in first extension's binary table.")
 
         try:
             fluxerr_table = cos_tabledata.field("ERROR")
         except KeyError:
-            print("*** MAKE_HST_SPEC_PREVIEWS ERROR: ERROR column not found"
+            sys.exit("*** MAKE_HST_SPEC_PREVIEWS ERROR: ERROR column not found"
                   " in first extension's binary table.")
-            sys.exit()
 
         try:
             dq_table = cos_tabledata.field("DQ_WGT")
         except KeyError:
-            print("*** MAKE_HST_SPEC_PREVIEWS ERROR: DQ_WGT column not found"
+            sys.exit("*** MAKE_HST_SPEC_PREVIEWS ERROR: DQ_WGT column not found"
                   " in first extension's binary table.")
-            sys.exit()
 
         # Create COSSegment objects to populate the COSSpectrum object with.
         if band == 'FUV':
