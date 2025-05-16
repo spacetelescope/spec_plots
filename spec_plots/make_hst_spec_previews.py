@@ -138,10 +138,10 @@ def is_hasp_product(input_file):
 
     :type input_file: str
 
-    :returns: bool -- Returns True if the filename ends in _cspec.fits.
+    :returns: bool -- Returns True if the filename ends in _aspec.fits or _cspec.fits.
     """
 
-    if input_file.endswith("_cspec.fits"):
+    if input_file.endswith("_cspec.fits") or input_file.endswith("_aspec.fits"):
         return True
     return False
 
