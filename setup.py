@@ -25,6 +25,8 @@ setup(name="spec_plots",
                 "spec_plots.utils.specutils_stis"],
       install_requires=["astropy>=5.2.2", "matplotlib>=3.7.1", "numpy>=1.24.3",
                         "future>=0.18.3"],
+      extras_require={
+          "DOCS": ["sphinx_astropy"],},
       entry_points={"console_scripts" :
                     ["make_hst_spec_previews = spec_plots.__main__:main",
                      "make_jwst_spec_previews = spec_plots.__main_jwst__:main"
