@@ -24,7 +24,7 @@ setup(name="spec_plots",
                 "spec_plots.utils.specutils_jwst",
                 "spec_plots.utils.specutils_stis"],
       install_requires=["astropy>=5.2.2", "matplotlib>=3.7.1", "numpy>=1.24.3",
-                        "future>=0.18.3"],
+                        "future>=0.18.3", "pytest>=8.3.4"],
       extras_require={
           "DOCS": ["sphinx_astropy"],},
       entry_points={"console_scripts" :
