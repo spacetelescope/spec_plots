@@ -4,8 +4,6 @@ on:
   push:
     branches:
     - main
-    - switch_to_tostring_agrb
-    - add_ghactions
     tags:
   pull_request:
     branches:
