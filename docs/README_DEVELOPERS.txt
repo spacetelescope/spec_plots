@@ -14,9 +14,9 @@ Best Practices for Development Of A New Branch
 
 7.)  Keep the various documentation files (mostly located inside the "docs" folder) as up-to-date as possible before final commit to the branch.
 
-8.)  To upload to PyPI with twine: twine upload dist/*, with the -u and -p options.
+8.)  To upload to PyPI with twine: twine upload dist/spec_plots-<version>* -u __token__
 
-9.)  After uploading to PyPI, you can build the conda package.  Inside the "conda" folder in the top-level directory, run "conda skeleton pypi spec-plots" (if you want to remake the "meta.yaml" file from scratch, but first make sure you save a copy of the "conda_build_config.yaml"), then "conda build spec-plots".  NOTE: lately the "conda skeleton" command hasn't run successfully, so lately the process has been to edit the "meta.yaml" file directly, including the URL and checksum hash for the PyPI version you are building.
+9.)  After uploading to PyPI, you can build the conda package.  Inside the "conda" folder in the top-level directory, run "conda skeleton pypi spec-plots" (if you want to remake the "meta.yaml" file from scratch, but first make sure you save a copy of the "conda_build_config.yaml"), then "conda build spec-plots" (one level above the meta.yaml file's location).  NOTE: lately the "conda skeleton" command hasn't run successfully, so lately the process has been to edit the "meta.yaml" file directly, including the URL and checksum hash for the PyPI version you are building.
 
 12.)  Now you can convert the build file to other platforms.  E.g., "conda convert -f --platform linux-64 <name of .tar.bz2>".  Note that you'll need to locate where the conda build package was output and run it there.  The output of the original build is reported when run when you first create it. Lately, only the osx-arm64 platform is being built.
 
