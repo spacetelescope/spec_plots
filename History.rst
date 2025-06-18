@@ -1,20 +1,24 @@
 Change Log for SPEC_PLOTS
 =========================
 
-v1.37.0 - 2025 TBD  
+v1.37.0 - 2025 June 17 
 ----------------------
 * Switched to using `tostring_argb()` in `calc_covering_fraction`
   for compatibility with matplotlib > 3.10.0
 * Removed a misleading comment in readspec to reflect that JWST are
   not always stored in the first extension, nor do they need to be for
   `spec_plots` to work.
+* All error states end with a sys.error(1) error code now.
+* Updated numpy.fromstring() to use numpy.frombuffer() for
+  compatibility with numpy > v2.2.0
   
-v1.36.1 - 2025 Feb. 14  
+  
+v1.36.1 - 2025 Feb. 14 
 ----------------------
 * Fixed incorrect units being shown for JWST NIRSPEC 1D files  
 * NIRCam x1d files now supported  
   
-v1.36.0 - 2024 Feb. 9  
+v1.36.0 - 2024 Feb. 9 
 -----------------
 * Added basic support HST Hubble Advanced Spectral Products (HASP)  
  
