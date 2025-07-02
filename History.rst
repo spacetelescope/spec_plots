@@ -1,6 +1,13 @@
 Change Log for SPEC_PLOTS
 =========================
 
+v1.37.1 - 2025 July 2 
+----------------------
+* Updated readspec() for JWST to support new time series observations
+  (TSO) where all exposures are in a single FITS extension called
+  "EXTRACT1D". Previously each exposure was stored in its own
+  extension, all called "EXTRACT1D".
+
 v1.37.0 - 2025 June 17 
 ----------------------
 * Switched to using `tostring_argb()` in `calc_covering_fraction`
